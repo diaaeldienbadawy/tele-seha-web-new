@@ -1,0 +1,82 @@
+<div
+  class="bg-white rounded-xl shadow-lg p-[40px] text-center max-h-[90%] w-full  overflow-auto no-scrollbar relative">
+
+  <!-- Close Button -->
+  <div class="w-full h-fit text-left">
+    <i class="fa-solid fa-xmark text-[#899CC9] text-[25px] cursor-pointer" (click)="closePopup()"></i>
+  </div>
+
+  <!-- Title -->
+  <div class="w-fit mx-auto my-[20px]">
+    <h2 class="text-[#1F1F1F] text-[20px] font-bold leading-[100%]">
+      {{ title }}
+    </h2>
+  </div>
+
+  <!-- File Upload Input -->
+  <div class="w-[80%] mx-auto my-10">
+
+    <!-- Hidden file input -->
+    <input type="file" #fileInput class="hidden"  multiple (change)="onFileSelected($event)" />
+
+    <!-- Uploaded files list -->
+    @for (file of uploadedFiles; track file.name) {
+    <div class="flex items-center gap-3 border border-[#E5E7EB] rounded-xl px-4 py-3 mb-3 bg-white">
+      <!-- PDF Icon -->
+      <img src="assets/icons/pdf-icon.svg" alt="pdf" class="w-[32px] h-[32px]"
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'" />
+      <div class="hidden w-[32px] h-[32px] bg-red-100 rounded items-center justify-center">
+        <i class="fa-solid fa-file-pdf text-red-500 text-[16px]"></i>
+      </div>
+
+      <!-- File name -->
+      <span class="flex-1 text-left text-[#1F1F1F] text-[14px] font-medium truncate">
+        {{ file.name }}
+      </span>
+
+      <!-- View Button -->
+      <button
+        class="bg-[#2D7DD2] text-white text-[13px] font-medium px-[20px] py-[8px] rounded-full hover:bg-[#245fa8] transition-colors"
+        (click)="viewFile(file)">
+        View
+      </button>
+
+      <!-- Remove Button -->
+      <button
+        class="w-[32px] h-[32px] rounded-full border border-[#D1D5DB] flex items-center justify-center hover:bg-gray-100 transition-colors"
+        (click)="removeFile(file)">
+        <i class="fa-solid fa-xmark text-[#6B7280] text-[13px]"></i>
+      </button>
+    </div>
+    }
+
+    <!-- Drop zone (shown when no files or always) -->
+    @if (uploadedFiles.length === 0) {
+    <div
+      class="border-2 border-dashed border-[#CBD5E1] rounded-xl p-[32px] flex flex-col items-center gap-3 cursor-pointer hover:border-[#2D7DD2] hover:bg-blue-50/30 transition-all"
+      (click)="fileInput.click()" (dragover)="onDragOver($event)" (drop)="onDrop($event)">
+      <i class="fa-solid fa-cloud-arrow-up text-[#2D7DD2] text-[32px]"></i>
+      <p class="text-[#6B7280] text-[14px]">
+        Drag & drop your file here or
+        <span class="text-[#2D7DD2] font-semibold cursor-pointer">Browse</span>
+      </p>
+      <p class="text-[#9CA3AF] text-[12px]">Supports PDF, JPG, PNG</p>
+    </div>
+    } @else {
+    <!-- Add more files -->
+    <button class="flex items-center gap-2 text-[#2D7DD2] text-[14px] font-medium mt-2 hover:underline"
+      (click)="fileInput.click()">
+      <i class="fa-solid fa-plus"></i> Add another file
+    </button>
+    }
+  </div>
+
+  <!-- Send Button -->
+  <button
+    class="w-[400px] bg-[#2D7DD2] text-white text-[16px] font-semibold py-[16px] rounded-full mt-[16px] hover:bg-[#245fa8] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+    [disabled]="uploadedFiles.length === 0" (click)="onSend()"
+    >
+    Send
+  </button>
+
+</div>

@@ -1,0 +1,120 @@
+<div>
+
+  <div class="title w-full md:w-[90%] mx-auto  text-center">
+    <h2
+      class="text-[#1F1F1F] text-[22px] sm:text-[28px] md:text-[30px] lg:text-[40px] font-bold leading-[150%] tracking-[-0.02em] relative">
+      Payment Records 
+    </h2>
+  </div>
+
+  <div class=" mt-[50px] px-[20px]">
+    <div class="  flex flex-col md:flex-row  gap-4 lg:gap-8 ">
+
+      <!-- Tabs Header -->
+
+      <div class="">
+        <div class=" flex flex-col gap-3 text-left  ">
+          <button (click)="activeTab = 'tab1'" [ngClass]="activeTab === 'tab1'
+               ? 'text-[#007BBD]'
+              : 'text-[#555555]'"
+            class=" py-2 md:py-[10px] font-bold text-[14px] flex items-center  border-b w-fit border-[#55555557] transition whitespace-nowrap">
+            Paid <i class="fa-solid fa-chevron-right  text-[18px] font-medium mx-[10px] "
+              [ngClass]="{'text-[#007BBD]': activeTab === 'tab1' }"></i>
+          </button>
+          <button (click)="activeTab = 'tab2'" [ngClass]="activeTab === 'tab2'
+               ? 'text-[#007BBD]'
+              : 'text-[#555555]'"
+            class=" py-2 md:py-[10px] font-bold text-[14px]  flex items-center  border-b w-fit border-[#55555557] transition whitespace-nowrap">
+            Unpaid <i class="fa-solid fa-chevron-right  text-[18px] font-medium mx-[10px] "
+              [ngClass]="{'text-[#007BBD]': activeTab === 'tab2' }"></i>
+          </button>
+        </div>
+
+        <!-- Tab Content -->
+      </div>
+
+      <div class="mt-[30px] flex-1 ">
+        <!-- Tab Content -->
+        @if (activeTab === 'tab1') {
+        <div class="animate-fadeIn">
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3  gap-[40px]">
+            <div
+              class="bg-[#EEF6FB] rounded-[30px] p-[10px] md:p-[30px] shadow-[0px_2px_8px_0px_#007BBD26]  space-y-4 ">
+              <h3 class="text-[#1F1F1F] text-center text-[20px] font-semibold leading-[18px] ">
+                Invoice
+              </h3>
+              <div class="w-full mx-auto space-y-4 ">
+                <p class="text-[#555555] text-[18px] font-medium leading-[18px]  ">
+                  <span class="text-[#007BBD]">Doctor's Name</span>: Hossam Badr
+                </p>
+                <p class="text-[#555555] text-[18px] font-medium leading-[18px]  ">
+                  <span class="text-[#007BBD]"> Specialty </span>: Cardiology
+                </p>
+                <p class="text-[#555555] text-[18px] font-medium leading-[18px]  ">
+                  <span class="text-[#007BBD]"> Service Type </span>: Consultation
+                </p>
+                <p class="text-[#555555] text-[18px] font-medium leading-[18px]  ">
+                  <span class="text-[#007BBD]"> Date </span>: 12/3/2025
+                </p>
+                <p class="text-[#555555] text-[18px] font-medium leading-[18px]  ">
+                  <span class="text-[#007BBD]"> Amount Paid </span>: 300
+                </p>
+                <p class="text-[#555555] text-[18px] font-medium leading-[18px]  ">
+                  <span class="text-[#007BBD]"> Invoice Number </span>: 65454656
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        }
+        @if (activeTab === 'tab2') {
+        <div class="animate-fadeIn">
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3  gap-[40px]">
+            <div
+              class="bg-[#EEF6FB] rounded-[30px] p-[10px] md:p-[30px] shadow-[0px_2px_8px_0px_#007BBD26]  space-y-4 ">
+              <h3 class="text-[#1F1F1F] text-center text-[20px] font-semibold leading-[18px] ">
+                Invoice
+              </h3>
+              <div class="w-full mx-auto space-y-4 ">
+                <p class="text-[#555555] text-[18px] font-medium leading-[18px]  ">
+                  <span class="text-[#007BBD]">Doctor's Name</span>: Hossam Badr
+                </p>
+                <p class="text-[#555555] text-[18px] font-medium leading-[18px]  ">
+                  <span class="text-[#007BBD]"> Specialty </span>: Cardiology
+                </p>
+                <p class="text-[#555555] text-[18px] font-medium leading-[18px]  ">
+                  <span class="text-[#007BBD]"> Service Type </span>: Consultation
+                </p>
+                <p class="text-[#555555] text-[18px] font-medium leading-[18px]  ">
+                  <span class="text-[#007BBD]"> Date </span>: 12/3/2025
+                </p>
+                <p class="text-[#555555] text-[18px] font-medium leading-[18px]  ">
+                  <span class="text-[#007BBD]"> Amount Paid </span>: 300
+                </p>
+                <p class="text-[#555555] text-[18px] font-medium leading-[18px]  ">
+                  <span class="text-[#007BBD]"> Invoice Number </span>: 65454656
+                </p>
+              </div>
+              <div class="w-full md:w-[70%] mx-auto mt-[30px]">
+                <button type="button" class="w-full bg-[#007BBD] text-white py-[14px] rounded-full font-bold">
+                  Pay Now
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        }
+
+
+
+      </div>
+
+    </div>
+  </div>
+
+
+
+</div>

@@ -1,0 +1,52 @@
+@if (visible) {
+  <div class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+    <!-- Backdrop with blur -->
+    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300" (click)="cancel()"></div>
+
+    <!-- Dialog container -->
+    <div class="relative w-full max-w-md transform overflow-hidden rounded-3xl bg-white p-6 text-left align-middle shadow-2xl transition-all duration-300 scale-in border border-slate-100">
+      
+      <!-- Icon & Header -->
+      <div class="flex items-start gap-4">
+        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl transition-all duration-300"
+             [ngClass]="isDanger ? 'bg-rose-50 text-rose-500' : 'bg-sky-50 text-(--primary-color)'">
+          @if (isDanger) {
+            <i class="fa-solid fa-triangle-exclamation text-[22px]"></i>
+          } @else {
+            <i class="fa-solid fa-circle-question text-[22px]"></i>
+          }
+        </div>
+
+        <div class="flex-1">
+          <h3 class="text-lg font-bold text-slate-900 leading-6">
+            {{ title }}
+          </h3>
+          <p class="mt-2 text-sm text-slate-500 font-medium leading-relaxed">
+            {{ message }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="mt-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+        <!-- Cancel button -->
+        <button type="button"
+                (click)="cancel()"
+                class="inline-flex justify-center items-center rounded-full px-5 py-3 text-sm font-semibold border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 hover:text-slate-900 active:bg-slate-100 transition-all duration-200 cursor-pointer w-full sm:w-auto h-[48px]">
+          {{ cancelText }}
+        </button>
+
+        <!-- Confirm button -->
+        <button type="button"
+                (click)="confirm()"
+                class="inline-flex justify-center items-center rounded-full px-6 py-3 text-sm font-bold text-white transition-all duration-200 cursor-pointer w-full sm:w-auto h-[48px] shadow-md shadow-blue-500/10 hover:shadow-lg active:scale-[0.98]"
+                [ngClass]="isDanger 
+                  ? 'bg-rose-500 hover:bg-rose-600 active:bg-rose-700 hover:shadow-rose-500/20' 
+                  : 'bg-gradient-to-r from-(--primary-color) to-[#006ba5] hover:from-[#006ba5] hover:to-[#005a8c] hover:shadow-blue-500/20'">
+          {{ confirmText }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

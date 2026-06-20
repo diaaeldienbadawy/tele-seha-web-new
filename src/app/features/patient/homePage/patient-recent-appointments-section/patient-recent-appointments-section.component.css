@@ -1,0 +1,11 @@
+.card {
+
+  background: radial-gradient(114.87% 113.36% at 40.95% -10.45%, rgba(0, 123, 189, 0.17) 32.81%, rgba(0, 123, 189, 0.17) 100%) /* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */;
+
+  border-radius: 28px;
+  border: 2px solid;
+
+  border-image-source: linear-gradient(96.34deg, #C5ECFF 0.94%, #95DDFF 96.46%);
+  padding: 30px;
+
+}

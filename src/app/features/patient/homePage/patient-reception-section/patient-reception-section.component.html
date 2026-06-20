@@ -1,0 +1,50 @@
+<div class="py-4">
+  <div class="container mx-auto px-4">
+    <div class="ts-card border border-slate-100 hover:border-(--primary-color)/20 shadow-md">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div class="space-y-4">
+          <div class="flex items-center gap-3">
+            <img class="w-[28px] h-[28px] md:w-[36px] md:h-[36px] shrink-0" src="../../../../../assets/images/Group 76017.png" loading="lazy" alt="img">
+            <i class="fa-solid fa-arrow-right text-(--primary-color) text-sm shrink-0 rtl:rotate-180"></i>
+            <h3 class="text-(--primary-color) text-xl md:text-2xl font-bold">
+              {{ 'patientHome.receptionTitle' | translate }}
+            </h3>
+          </div>
+          
+          <div class="space-y-1">
+            <p class="text-slate-700 text-sm sm:text-base md:text-lg font-semibold">
+              {{ 'patientHome.receptionQuestion' | translate }}
+            </p>
+            <p class="text-slate-500 text-xs sm:text-sm md:text-base font-normal">
+              {{ 'patientHome.receptionSub' | translate }}
+            </p>
+          </div>
+        </div>
+
+        <div class="w-full md:w-auto">
+          <button (click)="openModel()"
+            class="ts-btn-primary w-full md:w-auto px-6 py-3.5 text-sm sm:text-base font-bold flex items-center justify-center gap-2 cursor-pointer">
+            <span>{{ 'patientHome.startBtn' | translate }}</span>
+            <i class="fa-solid fa-circle-check text-xs"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Show popup -->
+@if(showPopup){
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm px-4 py-6" (click)="closeModel()">
+  <!-- STOP CLICK INSIDE MODAL -->
+  <div (click)="$event.stopPropagation()" class="
+        bg-white rounded-[2rem] shadow-2xl border border-slate-100 relative
+        w-full max-w-[550px]
+        p-[24px] sm:p-[40px]
+        animate-fadeIn
+      ">
+    <app-patient-symptoms-section (close)="closeModel()"></app-patient-symptoms-section>
+  </div>
+</div>
+}
+

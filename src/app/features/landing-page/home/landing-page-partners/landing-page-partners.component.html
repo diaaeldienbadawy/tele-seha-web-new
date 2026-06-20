@@ -1,0 +1,25 @@
+<section>
+  <i class="fa-solid fa-e text-(--primary-color) text-[14px] sm:text-[16px] md:text-[20px]"></i>
+
+  <!-- Owl Carousel (Client-Side Browser only) -->
+  <div class="slider w-full" *ngIf="isBrowser">
+    <owl-carousel-o [options]="customOptions">
+      <ng-container *ngFor="let img of images">
+        <ng-template carouselSlide>
+          <div class="partner-item">
+            <img [src]="img" alt="partner logo" />
+          </div>
+        </ng-template>
+      </ng-container>
+    </owl-carousel-o>
+  </div>
+
+  <!-- Elegant Static Fallback (Server-Side Rendering / hydration fallback) -->
+  <div class="slider w-full" *ngIf="!isBrowser">
+    <div class="flex flex-wrap items-center justify-center gap-6 sm:gap-8 md:gap-12 py-4 px-6">
+      <div class="partner-item" *ngFor="let img of images">
+        <img [src]="img" alt="partner logo" />
+      </div>
+    </div>
+  </div>
+</section>

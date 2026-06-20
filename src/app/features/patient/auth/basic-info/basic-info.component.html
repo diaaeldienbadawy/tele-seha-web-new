@@ -1,0 +1,146 @@
+<div class="p-0 h-screen">
+
+  <div class="flex justify-between items-center h-full">
+
+    <!-- left Side -->
+    <div class="w-[50%] h-full hidden md:block">
+      <!-- <app-left-side></app-left-side> -->
+      <app-auth-left-side></app-auth-left-side>
+
+
+    </div>
+
+    <!-- Right Side -->
+    <div class="w-full md:w-[50%] p-[20px] sm:p-[30px] h-screen flex flex-col">
+
+      <!-- Header Logo  -->
+      <div class="w-full h-fit flex items-center justify-between">
+        <div class="w-[25px]"></div>
+        <app-auth-logo></app-auth-logo>
+        <i class="fa-solid fa-xmark text-[#899CC9] text-[25px] cursor-pointer" (click)="clearLocalStorage()">
+        </i>
+      </div>
+
+      <!-- Content Centered Vertically -->
+      <div class="flex-1 flex flex-col justify-center w-[95%] md:w-[70%] mx-auto">
+
+        <div
+          class="w-full border border-(--border-color) md:border-none rounded-[20px] p-[20px] sm:px-[30px] sm:py-[60px] md:p-0">
+
+          <h2 class="text-slate-800 text-[28px] sm:text-[32px] font-bold leading-tight tracking-tight">
+            {{ 'auth.getStartedNow' | translate }}
+          </h2>
+
+          <form class="mt-[30px]" [formGroup]="basicInfoForm">
+
+            <!-- About You -->
+            <div class="mb-[20px]">
+              <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+                {{ 'auth.fullName' | translate }}
+              </label>
+              <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out">
+                <i class="fa-solid fa-user-circle text-[#899CC9]/80 text-[18px] mr-2 shrink-0"></i>
+                <input type="text" [placeholder]="'auth.enterFullName' | translate" formControlName="Name"
+                  class="text-slate-800 text-[14px] font-normal bg-transparent w-full outline-none h-[48px]">
+              </div>
+
+              @if(basicInfoForm.get('Name')?.invalid && basicInfoForm.get('Name')?.touched){
+              <span class="text-red-500 text-[12px] block mt-1.5 ml-2 font-medium">
+                <i class="fa-solid fa-circle-exclamation text-red-500 mr-1"></i>
+                {{ 'auth.nameRequired' | translate }}
+              </span>
+              }
+
+            </div>
+
+            <!-- Row: DOB & Gender -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-[20px]">
+
+              <!-- Date of Birth -->
+              <div>
+                <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+                  {{ 'auth.dateOfBirth' | translate }}
+                </label>
+                <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out">
+                  <i class="fa-solid fa-calendar-days text-[#899CC9]/80 text-[18px] mr-2 shrink-0"></i>
+                  <p-datepicker class="w-full custom-datepicker" formControlName="BirthDate" [showButtonBar]="true"
+                    [placeholder]="'auth.selectBirthDate' | translate" dateFormat="dd/mm/yy" [maxDate]="maxBirthDate" [readonlyInput]="true" appendTo="body" />
+                </div>
+
+                @if(basicInfoForm.get('BirthDate')?.invalid && basicInfoForm.get('BirthDate')?.touched){
+                <span class="text-red-500 text-[12px] block mt-1.5 ml-2 font-medium">
+                  <i class="fa-solid fa-circle-exclamation text-red-500 mr-1"></i>
+                  @if(basicInfoForm.get('BirthDate')?.errors?.['required']){
+                    {{ 'auth.birthDateRequired' | translate }}
+                  } @else if(basicInfoForm.get('BirthDate')?.errors?.['underAge']){
+                    {{ 'auth.underAge' | translate }}
+                  }
+                </span>
+                }
+              </div>
+
+              <!-- Gender -->
+              <div>
+                <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+                  {{ 'auth.gender' | translate }}
+                </label>
+                <div class="flex gap-3 h-[58px] items-center">
+                  <!-- Male Button -->
+                  <button type="button" (click)="setGender(true)"
+                    [class]="basicInfoForm.get('IsMale')?.value === true
+                      ? 'border-[#007BBD] bg-[#007BBD]/5 text-[#007BBD] shadow-sm shadow-[#007BBD]/10'
+                      : 'border-slate-200 bg-slate-50/40 text-slate-600 hover:bg-slate-50/70'"
+                    class="w-full h-[58px] flex items-center justify-center gap-2 rounded-full border font-bold text-sm transition-all duration-200 cursor-pointer">
+                    <i class="fa-solid fa-mars text-lg"></i>
+                    <span>{{ 'auth.male' | translate }}</span>
+                  </button>
+                  <!-- Female Button -->
+                  <button type="button" (click)="setGender(false)"
+                    [class]="basicInfoForm.get('IsMale')?.value === false
+                      ? 'border-pink-500 bg-pink-500/5 text-pink-600 shadow-sm shadow-pink-500/10'
+                      : 'border-slate-200 bg-slate-50/40 text-slate-600 hover:bg-slate-50/70'"
+                    class="w-full h-[58px] flex items-center justify-center gap-2 rounded-full border font-bold text-sm transition-all duration-200 cursor-pointer">
+                    <i class="fa-solid fa-venus text-lg"></i>
+                    <span>{{ 'auth.female' | translate }}</span>
+                  </button>
+                </div>
+
+                @if(basicInfoForm.get('IsMale')?.invalid && basicInfoForm.get('IsMale')?.touched){
+                <span class="text-red-500 text-[12px] block mt-1.5 ml-2 font-medium">
+                  <i class="fa-solid fa-circle-exclamation text-red-500 mr-1"></i>
+                  {{ 'auth.genderRequired' | translate }}
+                </span>
+                }
+              </div>
+
+            </div>
+
+            <!-- Steps -->
+            <div class="w-full flex justify-center items-center gap-2">
+              <div class="w-[20px] h-[4px] bg-(--primary-color)  rounded-full "></div>
+              <div class="w-[20px] h-[4px] bg-[#007BBD33] rounded-full "></div>
+            </div>
+
+            <!-- Submit -->
+            <div class="w-full mt-[30px]">
+              <button (click)="save()" [disabled]="isLoading" class="w-full bg-gradient-to-r from-(--primary-color) to-[#006ba5] text-white hover:from-[#006ba5] hover:to-[#005a8c] px-[20px] h-[54px] rounded-full text-[16px] font-bold leading-none flex items-center justify-center gap-2 shadow-lg shadow-(--primary-color)/15 hover:shadow-xl hover:shadow-(--primary-color)/25 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 ease-in-out cursor-pointer cursor-pointer">
+                @if (isLoading) {
+                  <i class="fa-solid fa-spinner fa-spin mr-2"></i>
+                }
+                <span>{{ 'auth.signUp' | translate }}</span>
+              </button>
+            </div>
+
+            <p class="text-[#425583] text-[14px] mt-[20px]">
+              {{ 'auth.letsCreateAccount' | translate }}
+            </p>
+
+          </form>
+        </div>
+
+
+      </div>
+    </div>
+  </div>
+
+</div>

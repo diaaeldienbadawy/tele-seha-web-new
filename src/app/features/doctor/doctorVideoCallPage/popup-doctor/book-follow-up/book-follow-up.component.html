@@ -1,0 +1,77 @@
+<div>
+  @if(uniqueDays.length > 0){
+  <div class="flex justify-between my-[20px] ">
+    <h3 class="text-[#1E1E1E]  text-[20px] md:text-[24px] font-bold leading-[100%]">
+      Schedule
+    </h3>
+  </div>
+
+  <div class=" mb-[30px] flex gap-3 md:gap-[30px] flex-nowrap overflow-auto no-scrollbar py-[15px] ">
+
+    @for (day of uniqueDays; track $index) {
+
+    <div (click)="selectDay(day.date)" [ngClass]="selectedDate === day.date
+      ? 'bg-[#007BBD] text-white'
+      : 'bg-[#FFFFFF]'"
+      class="cursor-pointer translation duration-300 border border-[#D9D9D933] shadow-[0px_2px_8px_0px_#0000001A] rounded-[20px] p-[10px] ">
+
+      <h3 [ngClass]="selectedDate === day.date ? 'text-white' : 'text-[#007BBD]'"
+        class="text-[14px] md:text-[16px] font-bold leading-[100%] ">
+        {{ getDayName(day.date) }}
+      </h3>
+
+      <p [ngClass]="selectedDate === day.date ? 'text-white' : 'text-[#1F1F1F]'"
+        class="text-[20px] md:text-[28px] font-bold leading-[100%] mt-[30px] ">
+        {{ getDayWithMonth(day.date) }}
+      </p>
+
+    </div>
+    }
+
+  </div>
+
+
+  <div class="w-full sm:w-[80%] mx-auto text-left">
+    <h3 class="text-[#1E1E1E] text-[20px] md:text-[24px] font-bold leading-[100%] ">
+      Time
+    </h3>
+
+    <div class=" grid grid-cols-1 md:grid-cols-2 gap-[20px] items-center mt-[20px] ">
+
+      @for (session of getSessionsByDate(); track $index) {
+      <div (click)="selectSession(session.sessionId)" [ngClass]="selectedSessionId === session.sessionId
+      ? 'bg-[#007BBD]'
+      : 'bg-[#ABD3E980]'"
+        class="cursor-pointer translation duration-300 border border-[#D9D9D933] shadow-[0px_2px_8px_0px_#0000001A] rounded-[20px] py-[20px] px-[35px] ">
+
+        <h3 [ngClass]="selectedSessionId === session.sessionId
+        ? 'text-white'
+        : 'text-[#007BBD]'" class="text-[20px] md:text-[24px] font-extrabold leading-[100%] ">
+          {{ formatTime(session.start) }} - {{ formatTime(session.end) }}
+        </h3>
+
+      </div>
+      }
+
+    </div>
+
+
+
+  </div>
+
+  <button (click)="bookingSession()"
+    class="btn-header w-full sm:w-[50%] mt-[30px] bg-[#007BBD] text-[#F7F9FE] px-[25px] py-[15px] sm:py-[20px] rounded-full text-[24px] font-bold leading-[100%]">
+    Booking
+  </button>
+  }
+
+  @if( uniqueDays.length === 0){
+
+  <div class="w-full h-full flex items-center justify-center">
+    <h3 class="text-[#1E1E1E] text-[20px] md:text-[24px] font-bold leading-[100%]">
+      No Schedule
+    </h3>
+  </div>
+
+  }
+</div>

@@ -1,0 +1,17 @@
+.custom-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  counter-reset: item;
+}
+
+.custom-list li {
+  counter-increment: item;
+  display: flex;
+  gap: 8px;
+}
+
+.custom-list li::before {
+  content: counter(item) ".";
+  font-weight: 500;
+}

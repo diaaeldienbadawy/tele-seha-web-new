@@ -1,0 +1,43 @@
+:host {
+  display: block;
+}
+
+/* FAQ section styling */
+:host ::ng-deep .space-y-2 > div {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+:host ::ng-deep .space-y-2 > div:hover {
+  box-shadow: 0 4px 16px rgba(0, 123, 189, 0.1);
+  border-color: rgba(93, 90, 136, 0.4);
+}
+
+/* FAQ icon rotation animation */
+:host ::ng-deep .fa-chevron-down,
+:host ::ng-deep .fa-chevron-right {
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+/* Smooth open/close for FAQ content */
+:host ::ng-deep .overflow-hidden {
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.3s ease,
+              margin-top 0.3s ease;
+}
+
+/* Section divider before FAQ */
+:host ::ng-deep .container > div.mt-\\[100px\\] {
+  position: relative;
+}
+
+:host ::ng-deep .container > div.mt-\\[100px\\]::before {
+  content: '';
+  position: absolute;
+  top: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #007BBD, #5BADD6);
+  border-radius: 2px;
+}

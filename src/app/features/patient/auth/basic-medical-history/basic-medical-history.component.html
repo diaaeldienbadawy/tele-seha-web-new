@@ -1,0 +1,96 @@
+<section class="py-12 bg-slate-50/50">
+  <div class="container mx-auto px-4">
+    <div class="ts-card max-w-4xl mx-auto border border-slate-100/80 shadow-[0_10px_30px_rgba(0,0,0,0.02)] p-6 sm:p-10 bg-white">
+
+      @if (currentSection) {
+
+      <!-- TITLE -->
+      <div class="title flex justify-between items-center pb-4 border-b border-slate-100 mb-8">
+        <h2 class="text-slate-800 text-2xl sm:text-3xl font-bold tracking-tight">
+          {{ 'auth.medicalHistory' | translate }}
+        </h2>
+        <i class="fa-solid fa-xmark text-[#899CC9] hover:text-slate-600 transition-colors duration-200 text-[25px] cursor-pointer" (click)="clearLocalStorage()">
+        </i>
+      </div>
+
+      <!-- QUESTION -->
+      <div class="mt-6">
+        <h2 class="text-slate-700 text-lg sm:text-xl font-semibold mb-4">
+          {{ currentSection.question }}
+        </h2>
+
+        <!-- YES / NO -->
+        <form [formGroup]="form" class="flex gap-4 flex-wrap">
+
+          <!-- YES -->
+          <label class="flex items-center gap-3 border border-slate-200 bg-slate-50/30 py-3 px-6 rounded-full cursor-pointer hover:border-[#007BBD]/30 hover:bg-slate-50/60 transition-all duration-200 min-w-[140px] select-none">
+            <input type="radio" value="Yes" formControlName="answer" class="hidden peer">
+            <span class="w-[20px] h-[20px] rounded-full border border-slate-300 flex items-center justify-center peer-checked:bg-[#007BBD] peer-checked:border-[#007BBD] transition-all">
+              <i class="fa-solid fa-check text-white text-[10px] hidden peer-checked:block"></i>
+            </span>
+            <p class="text-sm font-semibold text-slate-700 peer-checked:text-[#007BBD]">{{ 'auth.yes' | translate }}</p>
+          </label>
+
+          <!-- NO -->
+          <label class="flex items-center gap-3 border border-slate-200 bg-slate-50/30 py-3 px-6 rounded-full cursor-pointer hover:border-[#007BBD]/30 hover:bg-slate-50/60 transition-all duration-200 min-w-[140px] select-none">
+            <input type="radio" value="No" formControlName="answer" class="hidden peer">
+            <span class="w-[20px] h-[20px] rounded-full border border-slate-300 flex items-center justify-center peer-checked:bg-[#007BBD] peer-checked:border-[#007BBD] transition-all">
+              <i class="fa-solid fa-check text-white text-[10px] hidden peer-checked:block"></i>
+            </span>
+            <p class="text-sm font-semibold text-slate-700 peer-checked:text-[#007BBD]">{{ 'auth.no' | translate }}</p>
+          </label>
+
+        </form>
+      </div>
+
+      <!-- SUB SECTIONS -->
+      @if (form.value.answer === 'Yes') {
+
+      @for (sub of currentSection.subSection; track sub.subSectionId) {
+
+      <div class="mt-8 pt-6 border-t border-slate-100">
+        <h3 class="text-slate-800 text-md sm:text-lg font-bold mb-4">{{ sub.subSectionName }}</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          @for (item of sub.items; track item.itemName) {
+
+          <label class="flex items-center gap-3 border border-slate-200 bg-slate-50/30 py-2.5 px-5 rounded-full cursor-pointer hover:border-[#007BBD]/30 hover:bg-slate-50/60 transition-all duration-200 w-full md:w-fit select-none">
+            <input type="checkbox" [(ngModel)]="item.checked" class="hidden peer">
+            <span class="w-[20px] h-[20px] rounded-full border border-slate-300 flex items-center justify-center peer-checked:bg-[#007BBD] peer-checked:border-[#007BBD] transition-all">
+              <i class="fa-solid fa-check text-white text-[10px] hidden peer-checked:block"></i>
+            </span>
+            <p class="text-sm font-medium text-slate-600 peer-checked:text-[#007BBD]">{{ item.itemName }}</p>
+          </label>
+
+          }
+        </div>
+      </div>
+
+      }
+
+      }
+
+      <!-- STEPS -->
+      <div class="flex justify-center gap-2 mt-8">
+        @for (s of sections; let i = $index; track i ) {
+        <div class="w-[20px] h-[4px] rounded-full transition-all duration-200" [class.bg-(--primary-color)]="i === currentIndex"
+          [class.bg-[#007BBD33]]="i !== currentIndex">
+        </div>
+        }
+      </div>
+
+      <!-- BUTTONS: BACK & NEXT -->
+      <div class="flex flex-col sm:flex-row gap-4 w-full md:w-[60%] lg:w-[50%] mx-auto mt-8 justify-center">
+        <button type="button" (click)="goBack()" class="ts-btn-secondary w-full py-4 text-base font-bold">
+          {{ 'auth.back' | translate }}
+        </button>
+        <button (click)="save()" class="ts-btn-primary w-full py-4 text-base font-bold shadow-lg shadow-(--primary-color)/15 hover:shadow-xl hover:shadow-(--primary-color)/25">
+          {{ 'auth.next' | translate }}
+        </button>
+      </div>
+
+      }
+
+    </div>
+  </div>
+</section>

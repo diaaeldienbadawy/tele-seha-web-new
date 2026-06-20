@@ -1,0 +1,476 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* Tailwind */
+@import "tailwindcss";
+/* Dark mode  */
+@custom-variant dark (&:where(.dark, .dark *));
+
+
+/* Google Fonts - Nunito Sans */
+@font-face {
+  font-family: 'Nunito Sans';
+  src: url('/assets/fonts/font-en/NunitoSans-VariableFont_YTLC,opsz,wdth,wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  unicode-range: U+0020-007F, U+00A0-00FF;
+}
+
+@font-face {
+  font-family: 'Nunito Sans';
+  src: url('/assets/fonts/font-en/NunitoSans-Italic-VariableFont_YTLC,opsz,wdth,wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: italic;
+  unicode-range: U+0020-007F, U+00A0-00FF;
+}
+
+/* // Google Fonts - Cairo Font */
+/* Arabic - Cairo */
+@font-face {
+  font-family: 'Cairo';
+  src: url('/assets/fonts/font-ar/Cairo-ExtraLight.ttf') format('truetype');
+  font-weight: 200;
+  unicode-range: U+0600-06FF;
+}
+
+@font-face {
+  font-family: 'Cairo';
+  src: url('/assets/fonts/font-ar/Cairo-Light.ttf') format('truetype');
+  font-weight: 300;
+  unicode-range: U+0600-06FF;
+}
+
+@font-face {
+  font-family: 'Cairo';
+  src: url('/assets/fonts/font-ar/Cairo-Regular.ttf') format('truetype');
+  font-weight: 400;
+  unicode-range: U+0600-06FF;
+}
+
+@font-face {
+  font-family: 'Cairo';
+  src: url('/assets/fonts/font-ar/Cairo-Medium.ttf') format('truetype');
+  font-weight: 500;
+  unicode-range: U+0600-06FF;
+}
+
+@font-face {
+  font-family: 'Cairo';
+  src: url('/assets/fonts/font-ar/Cairo-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  unicode-range: U+0600-06FF;
+}
+
+@font-face {
+  font-family: 'Cairo';
+  src: url('/assets/fonts/font-ar/Cairo-Bold.ttf') format('truetype');
+  font-weight: 700;
+  unicode-range: U+0600-06FF;
+}
+
+@font-face {
+  font-family: 'Cairo';
+  src: url('/assets/fonts/font-ar/Cairo-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  unicode-range: U+0600-06FF;
+}
+
+@font-face {
+  font-family: 'Cairo';
+  src: url('/assets/fonts/font-ar/Cairo-Black.ttf') format('truetype');
+  font-weight: 900;
+  unicode-range: U+0600-06FF;
+}
+
+/* // Theme */
+@theme {
+
+  /* Colors */
+  --background-color: #F7F9FE;
+  --primary-color: #007BBD;
+
+  --text-color: #1F1F1F;
+
+  --border-color: #D9D9D9;
+
+  /* Fonts */
+  --font-sans: 'Tajawal', 'Nunito Sans', sans-serif;
+}
+
+
+
+/* // Global Style */
+
+* {
+  box-sizing: border-box;
+}
+
+
+:root {
+  --p-font-family: 'Tajawal', 'Nunito Sans', sans-serif !important;
+  --font-sans: 'Tajawal', 'Nunito Sans', sans-serif !important;
+}
+
+html, body, div, span, app-root, app-header, app-desktop-nav, app-mobile-nav, h1, h2, h3, h4, h5, h6, p, a, button, input, select, textarea, ul, li {
+  font-family: 'Tajawal', 'Nunito Sans', sans-serif;
+}
+
+body {
+  background-color: #F7F9FE;
+  overflow-x: hidden;
+}
+
+html {
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+
+a {
+  text-decoration: none;
+}
+
+
+input {
+  outline: none;
+  border: none;
+}
+
+select,
+textarea {
+  outline: none;
+}
+
+ul {
+  list-style: none;
+}
+
+button,
+a {
+  cursor: pointer;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.container {
+  width: 90%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+
+/* // Section */
+section {
+  padding: 100px 0;
+
+  @media (max-width: 768px) {
+    padding: 60px 0;
+  }
+}
+
+/* // Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #007BBD;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #005F8A;
+}
+
+
+
+
+
+/*  */
+
+
+
+.p-carousel-container {
+  position: relative;
+}
+
+.p-carousel-prev {
+  left: -15px;
+}
+
+.p-carousel-next {
+  right: -15px;
+}
+
+.p-carousel-prev,
+.p-carousel-next {
+  background-color: #1e88e5;
+  color: #ffffff;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.p-carousel-prev:hover,
+.p-carousel-next:hover {
+  background-color: #1565c0;
+}
+
+/* .p-carousel-prev-button, .p-carousel-next-button {
+    align-self: center;
+    flex-shrink: 0;
+} */
+.p-carousel-prev,
+.p-carousel-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+
+  background: #1e88e5;
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.p-carousel-prev {
+  left: -18px;
+}
+
+.p-carousel-next {
+  right: -18px;
+}
+
+
+.btn-shadow {
+  box-shadow: 0px 4px 12px 0px rgba(0, 123, 189, 0.35);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-shadow:hover {
+  box-shadow: 0px 8px 24px 0px rgba(0, 123, 189, 0.45);
+  transform: translateY(-2px);
+}
+
+.btn-shadow:active {
+  transform: translateY(0);
+  box-shadow: 0px 2px 8px 0px rgba(0, 123, 189, 0.3);
+}
+
+
+/* Global Premium Design Utility Classes */
+
+.ts-card {
+  background-color: #ffffff;
+  border-radius: 1.5rem;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+  padding: 2rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ts-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.08), 0 1px 5px rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 123, 189, 0.25);
+}
+
+.ts-input {
+  width: 100%;
+  padding: 0.875rem 1.25rem;
+  border-radius: 1rem;
+  border: 1.5px solid #e2e8f0;
+  background-color: #f8fafc;
+  color: #1e293b;
+  font-size: 0.95rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+}
+
+.ts-input:focus {
+  border-color: #007BBD;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(0, 123, 189, 0.12);
+}
+
+.ts-input::placeholder {
+  color: #94a3b8;
+}
+
+.ts-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.875rem 1.75rem;
+  font-weight: 700;
+  font-size: 1rem;
+  color: #ffffff;
+  background: linear-gradient(135deg, #007BBD 0%, #005e91 100%);
+  border: none;
+  border-radius: 9999px;
+  box-shadow: 0 10px 20px -5px rgba(0, 123, 189, 0.3);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ts-btn-primary:hover {
+  background: linear-gradient(135deg, #008cd6 0%, #007BBD 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 15px 25px -5px rgba(0, 123, 189, 0.4);
+}
+
+.ts-btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 5px 10px -2px rgba(0, 123, 189, 0.3);
+}
+
+.ts-btn-primary:disabled {
+  opacity: 0.6;
+  pointer-events: none;
+  box-shadow: none;
+}
+
+.ts-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.875rem 1.75rem;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #007BBD;
+  background-color: transparent;
+  border: 1.5px solid #007BBD;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ts-btn-secondary:hover {
+  background-color: rgba(0, 123, 189, 0.05);
+  transform: translateY(-2px);
+}
+
+.ts-btn-secondary:active {
+  transform: translateY(0);
+}
+
+.ts-btn-secondary:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.ts-select {
+  width: 100%;
+  padding: 0.875rem 1.25rem;
+  border-radius: 1rem;
+  border: 1.5px solid #e2e8f0;
+  background-color: #f8fafc;
+  color: #1e293b;
+  font-size: 0.95rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.ts-select:focus {
+  border-color: #007BBD;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(0, 123, 189, 0.12);
+}
+
+.ts-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.375rem 0.875rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease;
+}
+
+.ts-badge-primary {
+  background-color: rgba(0, 123, 189, 0.1);
+  color: #007BBD;
+}
+
+.ts-badge-success {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.ts-badge-warning {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+
+.ts-badge-danger {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+/* =========================================
+   ngx-material-timepicker Overrides
+   ========================================= */
+
+/* Main modal container rounding & widening */
+.timepicker-backdrop-overlay {
+  /* Just in case we need global overlay targeting, though usually not needed */
+}
+
+.timepicker {
+  border-radius: 24px !important;
+  overflow: hidden !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+  width: 340px !important; /* Widen the modal */
+  max-width: 90vw !important;
+}
+
+/* Header (Blue area) */
+.timepicker__header {
+  border-top-left-radius: 24px !important;
+  border-top-right-radius: 24px !important;
+  padding: 30px 24px !important; 
+}
+
+/* Fix for the buggy transparent blue box behind numbers in the header */
+.timepicker-dial__item {
+  border-radius: 8px !important; 
+  /* Removed padding that caused the number to be hidden/cut off */
+}
+
+/* Body (White area with the clock) */
+.timepicker__body {
+  /* Removed the bottom border radius that caused the weird cut in the middle */
+  padding-top: 24px !important;
+  padding-bottom: 8px !important; 
+}
+
+.timepicker__actions {
+  border-bottom-left-radius: 24px !important;
+  border-bottom-right-radius: 24px !important;
+}
+
+/* Give the clock face more breathing room without breaking internal positioning */
+.clock-face {
+  margin: 24px auto !important; 
+}
+
+/* Style the OK/Cancel buttons to look a bit softer */
+.timepicker-button {
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  padding: 8px 16px !important;
+  margin: 0 4px !important;
+}
+
+
+

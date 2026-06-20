@@ -1,0 +1,78 @@
+<div class="p-0 h-screen bg-slate-50">
+
+  <div class="flex justify-between items-center h-full">
+
+    <!-- left Side -->
+    <div class="w-[50%] h-full hidden md:block">
+      <!-- <app-left-side></app-left-side> -->
+      <app-auth-left-side></app-auth-left-side>
+    </div>
+
+    <!-- Right Side -->
+    <div class="w-full md:w-[50%] p-[24px] sm:p-[40px] h-screen flex flex-col justify-between bg-gradient-to-tr from-[#f8fafc] via-[#f1f5f9] to-[#eff6ff] overflow-y-auto">
+
+      <!-- Header Logo  -->
+      <div class="w-full h-fit flex items-center justify-between">
+        <div class="w-[25px]"></div>
+        <app-auth-logo></app-auth-logo>
+        <i class="fa-solid fa-xmark text-[#899CC9] hover:text-slate-600 transition-colors duration-200 text-[25px] cursor-pointer" routerLink="/">
+        </i>
+      </div>
+
+
+      <!-- Content Centered Vertically -->
+      <div class="flex-1 flex flex-col justify-center w-[95%] md:w-[85%] lg:w-[75%] max-w-[420px] mx-auto py-8">
+
+        <div
+          class="w-full bg-white/95 backdrop-blur-md rounded-3xl border border-slate-100 shadow-2xl shadow-slate-200/50 p-6 sm:p-10 transition-all duration-300">
+
+          <h2 class="text-slate-800 text-[28px] sm:text-[32px] font-bold leading-tight tracking-tight">
+            Welcome Back
+          </h2>
+
+          <p class="text-slate-500 text-[14px] font-normal leading-normal mt-[8px]">
+            Sign in to your account
+          </p>
+
+          <form [formGroup]="mobileForm" (ngSubmit)="submit()" action="" class="mt-[30px]">
+
+            <!-- Phone -->
+            <div class="mb-[25px]">
+              <label class="block text-slate-700 text-[14px] font-semibold leading-normal mb-[10px]">
+                Phone Number
+              </label>
+
+              <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out" dir="ltr">
+                <input #phoneInput type="tel" placeholder="Enter phone number" maxlength="11" inputmode="numeric" pattern="[0-9]*"
+                  class="text-slate-800 text-[14px] font-normal bg-transparent w-full outline-none h-[48px]" />
+                <i class="fa-solid fa-mobile-screen text-[#899CC9]/80 text-[18px] mr-2 shrink-0"></i>
+              </div>
+            </div>
+
+            <!-- Submit -->
+            <div class="w-full mt-[30px]">
+              <button type="submit" [disabled]="isLoading" class="w-full bg-gradient-to-r from-(--primary-color) to-[#006ba5] text-white hover:from-[#006ba5] hover:to-[#005a8c] px-[20px] h-[54px] rounded-full text-[16px] font-bold leading-none flex items-center justify-center gap-2 shadow-lg shadow-(--primary-color)/15 hover:shadow-xl hover:shadow-(--primary-color)/25 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 ease-in-out cursor-pointer">
+                @if (isLoading) {
+                  <i class="fa-solid fa-spinner fa-spin mr-2"></i>
+                }
+                <span>Sign In</span>
+                <i class="fa-solid fa-arrow-right-to-bracket text-[15px] ml-1"></i>
+              </button>
+            </div>
+
+          </form>
+
+        </div>
+
+      </div>
+      
+      <!-- Footer Spacer/Copyright -->
+      <div class="w-full text-center text-xs text-slate-400">
+        &copy; 2026 teleSEHA. All rights reserved.
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

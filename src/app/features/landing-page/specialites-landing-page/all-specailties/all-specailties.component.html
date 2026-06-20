@@ -1,0 +1,58 @@
+<section>
+
+  <div class="container text-center ">
+    <div class="title w-full md:w-[90%] mx-auto ">
+      <h2
+        class="text-[#1F1F1F] text-[28px] md:text-[30px] lg:text-[40px] font-bold leading-[150%] tracking-[-0.02em] relative">
+        All Specialties at Your Fingertips
+
+      </h2>
+      <p class="text-[#555555] font-normal text-[16px] md:text-[18px] leading-[30px] mt-[20px] ">
+        Complete coverage of everything you need... Choose the <br> specialty and start your consultation.
+      </p>
+    </div>
+
+
+    <div class="mt-[32px]  ">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[30px] ">
+        @for (item of specialties; track $index) {
+        <div class="bg-[#FFFFFF] border border-[#D4D2E3] p-[30px] shadow-[0px_2px_8px_0px_#0000001A] rounded-[24px] ">
+          <div class="text-center flex flex-col justify-between items-center h-full ">
+            <div
+              class="  flex justify-center items-center w-[100px] h-[100px]  md:w-[130px] lg:w-[170px] md:h-[130px] lg:h-[170px] mx-auto ">
+              @if(item.icon){
+              <img class="w-full h-full" [src]="item.icon" loading="lazy" alt="img">
+              } @else {
+              <img class="w-full h-full" src="assets/images/heart.svg" loading="lazy" alt="img">
+              }
+            </div>
+            <h4 class="my-[16px] sm:my-[20px] text-[#0F123B] text-[22px] md:text-[28px] font-bold leading-[38px]  ">
+              {{item.specialityNameEn}}
+            </h4>
+            <!-- <p class="text-[#9A9BAE] font-normal text-[16px] md:text-[18px] leading-[20px] md:leading-[30px] ">
+                Connect with certified doctors through secure video or audio calls — anytime, anywhere.
+              </p> -->
+
+            <button (click)="bookNow(item.id)"
+              class="w-full text-[#007BBD] rounded-full border border-[#007BBD] text-[18px] font-normal leading-[18px] py-[15px] md:mt-[30px]  ">
+              Booking Now
+            </button>
+
+          </div>
+        </div>
+        }
+      </div>
+
+      <!-- <div class="">
+        <button routerLink="/patient/specialties"
+          class="w-full md:w-[30%] text-[#FFFFFF] bg-[#007BBD] rounded-full border border-[#007BBD] text-[20px] font-bold leading-[100%] py-[15px] mt-[30px]  ">
+          View All
+        </button>
+      </div> -->
+
+    </div>
+
+
+  </div>
+
+</section>

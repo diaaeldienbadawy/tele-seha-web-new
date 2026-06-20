@@ -1,0 +1,54 @@
+<div class="py-6">
+  <div class="container mx-auto px-4 text-center">
+    <!-- Title -->
+    <div class="max-w-3xl mx-auto mb-12">
+      <h2 class="text-slate-800 text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight">
+        {{ 'patientHome.specialtiesTitle' | translate }}
+      </h2>
+      <div class="w-16 h-1 bg-gradient-to-r from-(--primary-color) to-teal-500 mx-auto rounded-full mt-4"></div>
+      <p class="text-slate-500 text-sm sm:text-base md:text-lg font-normal leading-relaxed mt-4">
+        {{ 'patientHome.specialtiesSub' | translate }}
+      </p>
+    </div>
+
+    <!-- Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      @for (item of specialties; track $index) {
+      <div class="ts-card border border-slate-100 flex flex-col justify-between items-center h-full p-0 overflow-hidden hover:border-(--primary-color)/25 hover:shadow-xl hover:-translate-y-1 duration-300">
+        <!-- Icon Area with color tint -->
+        <div [style.background]="item.color || 'rgba(0,123,189,0.04)'"
+          class="w-full flex justify-center items-center p-8 relative min-h-[160px] md:min-h-[180px]">
+          <div class="flex justify-center items-center w-24 h-24 md:w-28 md:h-28 mx-auto">
+            @if(item.icon){
+            <img class="w-full h-full object-contain" [src]="item.icon" loading="lazy" alt="img">
+            } @else {
+            <img class="w-full h-full object-contain" src="assets/images/heart.svg" loading="lazy" alt="img">
+            }
+          </div>
+        </div>
+        
+        <!-- Info & Button -->
+        <div class="w-full p-6 sm:p-8 flex flex-col justify-between flex-1 gap-6">
+          <h4 class="text-slate-800 text-lg sm:text-xl font-bold leading-snug">
+            {{ (localStorageService.get('lang') === 'ar' ? item.specialityName : item.specialityNameEn) || item.specialityNameEn }}
+          </h4>
+          
+          <button (click)="bookNow(item.id)"
+            class="ts-btn-secondary w-full text-sm sm:text-base font-semibold py-2.5 hover:bg-(--primary-color)/5 active:scale-98 transition-all cursor-pointer">
+            {{ 'patientHome.bookingNow' | translate }}
+          </button>
+        </div>
+      </div>
+      }
+    </div>
+
+    <!-- View All Button -->
+    <div class="mt-12">
+      <button routerLink="/patient/specialties"
+        class="ts-btn-primary px-10 py-4 text-base md:text-lg font-bold shadow-lg shadow-(--primary-color)/25 hover:shadow-xl hover:shadow-(--primary-color)/35 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 ease-in-out cursor-pointer">
+        {{ 'patientHome.viewAll' | translate }}
+      </button>
+    </div>
+  </div>
+</div>
+

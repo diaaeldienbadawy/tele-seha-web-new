@@ -1,0 +1,184 @@
+<div class="py-8 md:py-12 bg-[#F7F9FE] min-h-screen">
+  <div class="container mx-auto px-4 md:px-6">
+    
+    <!-- Title Section -->
+    <div class="flex items-center gap-3 mb-8">
+      <div class="w-2.5 h-8 rounded-full bg-[#007BBD]"></div>
+      <div>
+        <h2 class="text-2xl md:text-3xl font-bold text-slate-800">
+          {{ 'doctor.schedule' | translate }}
+        </h2>
+        <p class="text-slate-400 text-xs md:text-sm mt-0.5">
+          {{ 'doctor.manageSchedule' | translate }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Appointments Content -->
+    @if(hasAppointments()) {
+      <div class="grid grid-cols-1 gap-4">
+        @for (session of allAppointments; track session.sessionId) {
+          @for (appointment of session.appointments; track appointment.id) {
+            
+            <!-- Modern Case Card -->
+            <div class="bg-white border border-slate-100 rounded-3xl p-5 flex flex-col lg:flex-row gap-5 items-stretch lg:items-center justify-between shadow-[0_10px_40px_rgba(0,0,0,0.03)] hover:border-[#007BBD]/30 hover:shadow-md transition-all duration-300">
+              
+              <!-- Patient Info -->
+              <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center flex-1">
+                <!-- Case Index Badge -->
+                <div class="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col items-center justify-center text-slate-400 font-bold shadow-sm flex-shrink-0">
+                  <span class="text-[9px] opacity-75 uppercase tracking-wide block">
+                    {{ 'doctor.case' | translate }}
+                  </span>
+                  <span class="text-base text-[#007BBD] leading-tight block">{{ $index + 1 }}</span>
+                </div>
+
+                <!-- Details -->
+                <div class="space-y-1.5">
+                  <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <span class="inline-block w-2 h-2 rounded-full bg-teal-500"></span>
+                    {{ appointment.patient?.name }}
+                  </h3>
+                  <div class="flex flex-wrap gap-2.5 items-center text-xs md:text-sm">
+                    <span class="px-2.5 py-0.5 rounded-full font-semibold"
+                          [ngClass]="appointment.isFollowUp ? 'bg-amber-50 text-amber-700' : 'bg-blue-50 text-blue-700'">
+                      {{ (appointment.isFollowUp ? 'doctor.followUp' : 'doctor.newConsultation') | translate }}
+                    </span>
+                    <span class="text-slate-300">|</span>
+                    <span class="text-slate-500 font-medium flex items-center gap-1.5">
+                      <i class="fa-regular fa-clock text-[#007BBD]"></i>
+                      {{ formatTime(session.sessionStart) }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Controls -->
+              <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-end min-w-[280px]">
+                <!-- Action Button -->
+                <button (click)="handleAction(appointment)" 
+                        [disabled]="isDisabled(appointment.status)" 
+                        [ngClass]="getButtonClass(appointment.status)" 
+                        class="flex-1 py-3 px-5 rounded-xl font-bold text-xs md:text-sm text-center shadow-sm cursor-pointer transition-all duration-200">
+                  {{ getButtonText(appointment.status) | translate }}
+                </button>
+
+                <!-- Secondary Controls -->
+                <div class="flex gap-2">
+                  <!-- Reschedule -->
+                  <button (click)="showModal(appointment)" 
+                          class="flex-1 sm:flex-initial py-3 px-4 rounded-xl border border-slate-200 text-slate-600 bg-white font-semibold text-xs md:text-sm hover:bg-slate-50 hover:border-slate-300 transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+                    <i class="fa-regular fa-calendar-plus text-[#007BBD]"></i> {{ 'doctor.reschedule' | translate }}
+                  </button>
+                  <!-- Cancel -->
+                  <button (click)="cancelAppointment(appointment.id)" 
+                          class="py-3 px-4 rounded-xl border border-rose-100 text-rose-600 bg-white hover:bg-rose-50 hover:border-rose-200 transition-colors flex items-center justify-center cursor-pointer">
+                    <i class="fa-regular fa-trash-can"></i>
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+          }
+        }
+      </div>
+    } @else {
+      <!-- Empty State -->
+      <div class="bg-white border border-slate-100 rounded-3xl p-10 text-center shadow-[0_10px_30px_rgba(0,0,0,0.01)]">
+        <div class="w-20 h-20 rounded-full bg-slate-50 flex items-center justify-center mx-auto text-3xl text-slate-300 mb-4">
+          <i class="fa-solid fa-hospital-user"></i>
+        </div>
+        <h3 class="text-lg font-bold text-slate-700 mb-1">
+          {{ 'doctor.noAppointments' | translate }}
+        </h3>
+        <p class="text-slate-400 text-sm max-w-md mx-auto mb-6">
+          {{ 'doctor.noAppointmentsSub' | translate }}
+        </p>
+        <a routerLink="/doctor/settings" class="ts-btn-primary py-2.5 px-6 text-sm flex items-center gap-1 mx-auto w-fit">
+          <i class="fa-solid fa-gear"></i> {{ 'doctor.settings' | translate }}
+        </a>
+      </div>
+    }
+
+  </div>
+</div>
+
+<!-- Modern Reschedule Modal -->
+@if (showPopup) {
+  <div class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[110] transition-opacity duration-300">
+    <div class="bg-white rounded-3xl shadow-2xl p-6 md:p-8 w-[90%] max-w-3xl max-h-[90vh] overflow-y-auto no-scrollbar relative border border-slate-100 transform scale-100 transition-transform duration-300">
+      
+      <!-- Modal Close -->
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-xl font-bold text-slate-800">
+          {{ 'doctor.rescheduleTitle' | translate }}
+        </h3>
+        <button (click)="showPopup = false" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Date selector -->
+      @if (uniqueDays.length > 0) {
+        <div class="mb-4">
+          <span class="text-sm font-bold text-slate-700 block mb-2">
+            {{ 'doctor.selectDate' | translate }}
+          </span>
+          <div class="flex gap-3 overflow-x-auto pb-3 no-scrollbar py-1">
+            @for (day of uniqueDays; track day.date) {
+              <div (click)="selectDay(day.date)" 
+                   [ngClass]="selectedDate === day.date ? 'bg-[#007BBD] text-white border-[#007BBD]' : 'bg-white text-slate-700 border-slate-200'"
+                   class="cursor-pointer border rounded-2xl p-4 text-center min-w-[100px] shadow-sm hover:border-[#007BBD] hover:-translate-y-0.5 transition-all duration-200 flex-shrink-0">
+                <span class="text-xs font-semibold block uppercase tracking-wide opacity-80">{{ getDayName(day.date) }}</span>
+                <span class="text-lg font-bold block mt-1.5">{{ getDayWithMonth(day.date) }}</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Time selector -->
+        <div class="mb-8">
+          <span class="text-sm font-bold text-slate-700 block mb-3">
+            {{ 'doctor.selectTime' | translate }}
+          </span>
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+            @for (s of getSessionsByDate(); track s.sessionId) {
+              <div (click)="selectSession(s.sessionId)" 
+                   [ngClass]="selectedSessionId === s.sessionId ? 'bg-[#007BBD] text-white border-[#007BBD] shadow-md' : 'bg-[#ABD3E980] text-[#007BBD] border-[#ABD3E9]/20 hover:bg-[#ABD3E980]/80'"
+                   class="cursor-pointer border rounded-xl p-3 text-center font-bold text-xs md:text-sm hover:border-[#007BBD] transition-all duration-200">
+                {{ formatTime(s.start) }} - {{ formatTime(s.end) }}
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Booking action -->
+        <div class="flex gap-3 justify-end">
+          <button (click)="showPopup = false" class="py-3 px-6 rounded-xl border border-slate-200 text-slate-600 font-semibold text-sm hover:bg-slate-50 transition-colors cursor-pointer">
+            {{ 'doctor.cancel' | translate }}
+          </button>
+          <button (click)="bookingSession()" 
+                  [disabled]="!selectedSessionId" 
+                  class="py-3 px-8 rounded-xl bg-[#007BBD] hover:bg-[#006ba5] text-white font-bold text-sm shadow-md disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none cursor-pointer transition-colors">
+            {{ 'doctor.confirmReschedule' | translate }}
+          </button>
+        </div>
+      } @else {
+        <!-- No Schedule Empty State -->
+        <div class="py-12 text-center">
+          <div class="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center mx-auto text-2xl text-slate-300 mb-3">
+            <i class="fa-regular fa-calendar-xmark"></i>
+          </div>
+          <h3 class="text-lg font-bold text-slate-700">
+            {{ 'doctor.noScheduleTitle' | translate }}
+          </h3>
+          <p class="text-slate-400 text-sm mt-1 max-w-sm mx-auto">
+            {{ 'doctor.noScheduleSub' | translate }}
+          </p>
+        </div>
+      }
+
+    </div>
+  </div>
+}

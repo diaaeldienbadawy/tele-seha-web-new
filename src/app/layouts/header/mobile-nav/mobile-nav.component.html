@@ -1,0 +1,35 @@
+@if (!userRole()) {
+<ul class="text-[19px] font-semibold">
+  <li><a (click)="scrollTop()" routerLink="/home" routerLinkActive="active">{{ 'nav.home' | translate }}</a></li>
+  <li><a (click)="scrollTop()" routerLink="/search-for-doctor" routerLinkActive="active">{{ 'nav.searchForDoctor' | translate }}</a></li>
+  <li><a (click)="scrollTop()" routerLink="/specialities" routerLinkActive="active">{{ 'nav.specialties' | translate }}</a></li>
+  <li><a (click)="scrollTop()" routerLink="/for-doctor" routerLinkActive="active">{{ 'nav.forDoctors' | translate }}</a></li>
+  <li><a (click)="scrollTop()" routerLink="/about-us" routerLinkActive="active">{{ 'nav.aboutUs' | translate }}</a></li>
+</ul>
+}
+
+@if (userRole() === 'Patient') {
+<ul class="text-[19px] font-semibold">
+  <li>
+    <a (click)="scrollTop()" routerLink="/patient/home" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      {{ 'nav.home' | translate }}
+    </a>
+  </li>
+  <li><a (click)="scrollTop()" routerLink="/patient/allDoctors" (click)="removeSpecialty()" routerLinkActive="active">{{ 'nav.doctors' | translate }}</a></li>
+  <li><a (click)="scrollTop()" routerLink="/patient/specialties" routerLinkActive="active">{{ 'nav.specialties' | translate }}</a></li>
+  <li><a (click)="scrollTop()" routerLink="/patient/allResent" routerLinkActive="active">{{ 'nav.recentAppointments' | translate }}</a></li>
+  <li><a (click)="scrollTop()" routerLink="/patient/reports" routerLinkActive="active">{{ 'nav.reports' | translate }}</a></li>
+</ul>
+}
+
+@if (userRole() === 'Doctor') {
+<ul class="text-[19px] font-semibold">
+  <li>
+    <a (click)="scrollTop()" routerLink="/doctor/home" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      {{ 'nav.home' | translate }}
+    </a>
+  </li>
+  <li><a (click)="scrollTop()" routerLink="/doctor/doctors" routerLinkActive="active">{{ 'nav.doctors' | translate }}</a></li>
+  <li><a (click)="scrollTop()" routerLink="/doctor/sessions" routerLinkActive="active">{{ 'nav.mySessions' | translate }}</a></li>
+</ul>
+}

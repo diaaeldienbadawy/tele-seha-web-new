@@ -1,0 +1,67 @@
+::ng-deep .iti {
+  width: 100%;
+}
+
+::ng-deep .iti__selected-flag {
+  border-radius: 9999px;
+  background: transparent !important;
+  padding-left: 8px !important;
+}
+
+::ng-deep .iti__selected-flag:hover,
+::ng-deep .iti__selected-flag:focus {
+  background: transparent !important;
+}
+
+::ng-deep .iti input {
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  width: 100%;
+  color: inherit;
+  padding-left: 56px !important; /* Ensure adequate space for flag */
+}
+
+/* Ensure the country dial code has a sleek separator or feels premium */
+::ng-deep .iti__selected-dial-code {
+  color: #475569 !important;
+  font-weight: 500;
+  font-size: 14px;
+  margin-left: 6px !important;
+}
+
+/* Dropdown list styling */
+::ng-deep .iti__dropdown-content {
+  z-index: 9999 !important;
+  margin-top: 8px !important;
+}
+
+::ng-deep .iti__country-list {
+  background-color: rgba(255, 255, 255, 0.98) !important;
+  backdrop-filter: blur(8px);
+  border: 1px solid #f1f5f9 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05) !important;
+  overflow: hidden;
+  padding: 6px 0 !important;
+}
+
+::ng-deep .iti__country {
+  padding: 10px 14px !important;
+  color: #334155 !important;
+  font-size: 14px !important;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+::ng-deep .iti__country:hover,
+::ng-deep .iti__country.iti__highlight {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+::ng-deep .iti__flag-box {
+  margin-right: 8px !important;
+}

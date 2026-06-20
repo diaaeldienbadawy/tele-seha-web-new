@@ -1,0 +1,168 @@
+<div class="flex flex-col lg:flex-row justify-between gap-6">
+
+  <!-- Left: Form Container -->
+  <div [ngClass]="{'lg:w-[74%]': schedules && schedules.length > 0, 'lg:w-[60%]': schedules && schedules.length == 0}"
+    class="w-full h-fit bg-white rounded-3xl border border-slate-100 shadow-[0_10px_40px_rgba(0,0,0,0.03)] p-6 sm:p-8 transition-all duration-300">
+    
+    <div class="w-full border-b border-slate-100 pb-5 mb-6">
+      <h3 class="text-slate-800 text-[18px] sm:text-[20px] font-bold">Add Recurring Schedule</h3>
+      <p class="text-slate-500 text-[13px] mt-0.5">Set up your weekly clinic working hours and capacity</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4 w-full">
+
+        <!-- Day -->
+        <div class="w-full">
+          <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+            Working Day
+          </label>
+
+          <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out">
+            <i class="fa-solid fa-calendar text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
+            <p-select class="custom-select w-full" formControlName="Day" [options]="days" optionLabel="name"
+              optionValue="value" placeholder="Select Day" appendTo="body">
+            </p-select>
+          </div>
+        </div>
+
+        <!-- Number of possible cases -->
+        <div class="w-full">
+          <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+            Number of Possible Cases
+          </label>
+          
+          <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out">
+            <i class="fa-solid fa-user-group text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
+            <input formControlName="Capacity" type="number" min="1" placeholder="Enter max capacity"
+              class="text-slate-800 text-[14px] font-normal bg-transparent w-full outline-none h-[44px]">
+          </div>
+
+          <div class="min-h-[22px] mt-[6px]">
+            @if(form.get('Capacity')?.touched && form.get('Capacity')?.invalid){
+            <span class="text-red-500 text-[12px] font-medium flex items-center gap-1">
+              <i class="fa-solid fa-circle-exclamation"></i>
+              Capacity is required
+            </span>
+            }
+          </div>
+        </div>
+
+        <!-- From Time -->
+        <div class="w-full">
+          <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+            Start Time
+          </label>
+
+          <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out pr-3">
+            <i class="fa-solid fa-clock text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
+            <input [ngxTimepicker]="startTimePicker" [format]="12" formControlName="StartTime" readonly 
+              class="w-full bg-transparent outline-none border-none text-slate-800 text-[14px] font-semibold p-0 cursor-pointer h-[44px]" 
+              placeholder="Select start time">
+            <ngx-material-timepicker #startTimePicker [theme]="timepickerTheme"></ngx-material-timepicker>
+          </div>
+
+          <div class="min-h-[22px] mt-[6px]">
+            @if(form.get('StartTime')?.touched && form.get('StartTime')?.invalid){
+            <span class="text-red-500 text-[12px] font-medium flex items-center gap-1">
+              <i class="fa-solid fa-circle-exclamation"></i>
+              Start time is required
+            </span>
+            }
+          </div>
+        </div>
+
+        <!-- To Time -->
+        <div class="w-full">
+          <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+            End Time
+          </label>
+
+          <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out pr-3">
+            <i class="fa-solid fa-clock text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
+            <input [ngxTimepicker]="endTimePicker" [format]="12" formControlName="EndTime" readonly 
+              class="w-full bg-transparent outline-none border-none text-slate-800 text-[14px] font-semibold p-0 cursor-pointer h-[44px]" 
+              placeholder="Select end time">
+            <ngx-material-timepicker #endTimePicker [theme]="timepickerTheme"></ngx-material-timepicker>
+          </div>
+
+          <div class="min-h-[22px] mt-[6px]">
+            @if(form.get('EndTime')?.touched && form.get('EndTime')?.invalid){
+            <span class="text-red-500 text-[12px] font-medium flex items-center gap-1">
+              <i class="fa-solid fa-circle-exclamation"></i>
+              End time is required
+            </span>
+            }
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Submit -->
+      <div class="w-full flex items-center justify-end mt-4 border-t border-slate-100 pt-6 gap-3">
+        @if (doctorScheduleId) {
+          <button type="button" (click)="cancel()" 
+            class="w-full sm:w-[120px] bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 px-6 h-[48px] rounded-full text-[15px] font-bold leading-none flex items-center justify-center gap-2 transition-all duration-300 ease-in-out cursor-pointer">
+            <i class="fa-solid fa-xmark"></i>
+            <span>Cancel</span>
+          </button>
+        }
+        <button type="submit" 
+          class="w-full sm:w-[150px] bg-gradient-to-r from-(--primary-color) to-[#006ba5] text-white hover:from-[#006ba5] hover:to-[#005a8c] px-6 h-[48px] rounded-full text-[15px] font-bold leading-none flex items-center justify-center gap-2 shadow-lg shadow-(--primary-color)/15 hover:shadow-xl hover:shadow-(--primary-color)/25 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 ease-in-out cursor-pointer">
+          <i class="fa-solid" [ngClass]="doctorScheduleId ? 'fa-check' : 'fa-calendar-plus'"></i>
+          <span>{{ doctorScheduleId ? 'Update Schedule' : 'Save Schedule' }}</span>
+        </button>
+      </div>
+
+    </form>
+
+  </div>
+
+  <!-- Right: Active Schedules List -->
+  @if(schedules && schedules.length > 0){
+  <div class="w-full lg:w-[24%] flex flex-col gap-4">
+    <h4 class="text-slate-800 text-[16px] font-bold border-b border-slate-100 pb-3 flex items-center gap-2">
+      <i class="fa-solid fa-clock-rotate-left text-(--primary-color)"></i>
+      <span>Active Weekly Working Days</span>
+    </h4>
+    
+    @for(item of schedules; track item.doctorScheduleId){
+    <div
+      class="bg-white border border-slate-100 shadow-sm rounded-2xl p-4 text-center transition-all duration-300 hover:shadow-md">
+      
+      <!-- Day Badge -->
+      <div class="inline-block bg-[#007BBD]/8 text-[#007BBD] font-bold px-3 py-1 rounded-full text-[13px] mb-3">
+        {{ item.day }}
+      </div>
+      
+      <!-- Time Range -->
+      <div class="flex justify-center items-center gap-1.5 mb-2 text-slate-700 font-semibold text-[14px]">
+        <span>{{ formatedTime(item.startTime) }}</span>
+        <span class="text-slate-400 font-normal text-xs">to</span>
+        <span>{{ formatedTime(item.endTime) }}</span>
+      </div>
+      
+      <!-- Capacity Badge -->
+      <div class="text-[12px] text-slate-500 mb-4 flex items-center justify-center gap-1">
+        <i class="fa-solid fa-user-group text-slate-400"></i>
+        <span>Max Cases: <strong>{{ item.capacity }}</strong></span>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex gap-2">
+        <button (click)="edit(item)"
+          class="w-full bg-[#007BBD]/15 text-[#007BBD] hover:bg-[#007BBD] hover:text-white py-2 rounded-full text-[12px] font-bold transition-all duration-200 cursor-pointer">
+          Edit
+        </button>
+        <button (click)="deleted(item.doctorScheduleId)"
+          class="w-full bg-red-50 text-red-500 hover:bg-red-500 hover:text-white py-2 rounded-full text-[12px] font-bold transition-all duration-200 cursor-pointer">
+          Delete
+        </button>
+      </div>
+    </div>
+    }
+
+  </div>
+  }
+</div>

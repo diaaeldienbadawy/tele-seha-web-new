@@ -1,0 +1,342 @@
+<section class="py-8 bg-slate-50/20">
+  <div class="container mx-auto px-4 max-w-3xl">
+
+    <!-- Step 1: Basic Info -->
+    @if(showStep1){
+    <div class="ts-card border border-slate-100 bg-white p-6 md:p-10 max-w-xl mx-auto rounded-3xl">
+      <!-- Title -->
+      <div class="text-center mb-8 pb-4 border-b border-slate-50">
+        <h3 class="text-slate-800 text-xl font-extrabold flex items-center justify-center gap-2">
+          <i class="fa-solid fa-user-plus text-(--primary-color)"></i>
+          {{ 'patientProfile.createNewProfile' | translate }}
+        </h3>
+      </div>
+
+      <form [formGroup]="basicInfoForm" class="space-y-6">
+        <!-- Full Name -->
+        <div class="flex flex-col gap-2">
+          <label class="text-slate-700 font-bold text-xs uppercase tracking-wider">
+            {{ 'patientProfile.fullName' | translate }}
+          </label>
+          <div class="relative flex items-center">
+            <i class="fa-regular fa-user absolute left-4 text-slate-400 text-sm"></i>
+            <input 
+              type="text" 
+              placeholder="{{ 'patientProfile.fullName' | translate }}" 
+              formControlName="Name"
+              class="ts-input pl-10 pr-4 py-3"
+            />
+          </div>
+          @if(basicInfoForm.get('Name')?.invalid && basicInfoForm.get('Name')?.touched){
+          <p class="text-rose-500 text-xs font-semibold mt-1">
+            {{ 'patientProfile.requiredName' | translate }}
+          </p>
+          }
+        </div>
+
+        <!-- Date of Birth -->
+        <div class="flex flex-col gap-2">
+          <label class="text-slate-700 font-bold text-xs uppercase tracking-wider">
+            {{ 'patientProfile.birthDate' | translate }}
+          </label>
+          <div class="relative flex items-center">
+            <i class="fa-regular fa-calendar absolute left-4 text-slate-400 text-sm"></i>
+            <input 
+              type="date" 
+              formControlName="BirthDate"
+              class="ts-input pl-10 pr-4 py-3"
+            />
+          </div>
+          @if(basicInfoForm.get('BirthDate')?.invalid && basicInfoForm.get('BirthDate')?.touched){
+          <p class="text-rose-500 text-xs font-semibold mt-1">
+            {{ 'patientProfile.requiredBirthDate' | translate }}
+          </p>
+          }
+        </div>
+
+        <!-- Gender Dropdown -->
+        <div class="flex flex-col gap-2">
+          <label class="text-slate-700 font-bold text-xs uppercase tracking-wider">
+            {{ 'patientProfile.gender' | translate }}
+          </label>
+          <p-select 
+            [options]="genders" 
+            optionLabel="name" 
+            optionValue="code" 
+            placeholder="{{ 'patientProfile.gender' | translate }}" 
+            formControlName="IsMale" 
+            styleClass="w-full !rounded-xl !border-slate-200 !bg-slate-50/50"
+          >
+            <ng-template #selectedItem let-selectedOption>
+              {{ (selectedOption.code ? 'patientProfile.male' : 'patientProfile.female') | translate }}
+            </ng-template>
+            <ng-template #item let-option>
+              {{ (option.code ? 'patientProfile.male' : 'patientProfile.female') | translate }}
+            </ng-template>
+          </p-select>
+          @if(basicInfoForm.get('IsMale')?.invalid && basicInfoForm.get('IsMale')?.touched){
+          <p class="text-rose-500 text-xs font-semibold mt-1">
+            {{ 'patientProfile.requiredGender' | translate }}
+          </p>
+          }
+        </div>
+
+        <!-- Step Indicator -->
+        <div class="flex justify-center items-center gap-2 pt-4">
+          <div class="w-5 h-1 bg-(--primary-color) rounded-full"></div>
+          <div class="w-5 h-1 bg-slate-100 rounded-full"></div>
+          <div class="w-5 h-1 bg-slate-100 rounded-full"></div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="pt-2">
+          <button 
+            type="button"
+            (click)="save()" 
+            class="ts-btn-primary w-full py-3.5 text-base font-bold shadow-md shadow-blue-500/10 hover:shadow-lg transition-all cursor-pointer"
+          >
+            {{ 'patientProfile.next' | translate }}
+          </button>
+        </div>
+      </form>
+    </div>
+    }
+
+    <!-- Step 2: Medical History -->
+    @if(showStep2){
+    <div class="ts-card border border-slate-100 bg-white p-6 md:p-10 rounded-3xl">
+      @if (currentSection) {
+        
+        <!-- Header -->
+        <div class="text-center mb-8 pb-4 border-b border-slate-50">
+          <h3 class="text-slate-800 text-xl font-extrabold flex items-center justify-center gap-2">
+            <i class="fa-solid fa-notes-medical text-(--primary-color)"></i>
+            {{ 'patientProfile.medicalHistory' | translate }}
+          </h3>
+        </div>
+
+        <!-- Question -->
+        <div class="space-y-4">
+          <h4 class="text-slate-700 text-base sm:text-lg font-bold leading-relaxed">
+            {{ currentSection.question }}
+          </h4>
+
+          <!-- Yes / No Options -->
+          <form [formGroup]="historyform">
+            <div class="flex flex-wrap gap-4 mt-2">
+              <!-- Yes -->
+              <label class="flex items-center gap-3 border border-slate-200 py-3 px-6 rounded-full cursor-pointer hover:bg-slate-50 transition-all sm:min-w-[140px]">
+                <input type="radio" value="Yes" formControlName="answer" class="hidden peer">
+                <div class="w-5 h-5 rounded-full border border-slate-300 flex items-center justify-center peer-checked:bg-(--primary-color) peer-checked:border-transparent transition-all">
+                  <i class="fa-solid fa-check text-white text-[10px] hidden peer-checked:block"></i>
+                </div>
+                <span class="text-sm font-bold text-slate-700">{{ 'patientBooking.yes' | translate }}</span>
+              </label>
+
+              <!-- No -->
+              <label class="flex items-center gap-3 border border-slate-200 py-3 px-6 rounded-full cursor-pointer hover:bg-slate-50 transition-all sm:min-w-[140px]">
+                <input type="radio" value="No" formControlName="answer" class="hidden peer">
+                <div class="w-5 h-5 rounded-full border border-slate-300 flex items-center justify-center peer-checked:bg-(--primary-color) peer-checked:border-transparent transition-all">
+                  <i class="fa-solid fa-check text-white text-[10px] hidden peer-checked:block"></i>
+                </div>
+                <span class="text-sm font-bold text-slate-700">{{ 'patientBooking.no' | translate }}</span>
+              </label>
+            </div>
+          </form>
+        </div>
+
+        <!-- Sub Sections Checkboxes (Only shown if Yes is selected) -->
+        @if (historyform.value.answer === 'Yes') {
+        <div class="mt-8 space-y-6 pt-6 border-t border-slate-100">
+          @for (sub of currentSection.subSection; track sub.subSectionId) {
+          <div class="space-y-3">
+            <h5 class="text-slate-700 text-sm font-extrabold flex items-center gap-2">
+              <span class="w-1 h-4 bg-(--primary-color) rounded-full"></span>
+              {{ sub.subSectionName }}
+            </h5>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              @for (item of sub.items; track item.itemName) {
+              <label class="flex items-center gap-3 border border-slate-100 bg-slate-50/50 py-2.5 px-4 rounded-2xl cursor-pointer hover:bg-slate-50 hover:border-slate-200 transition-all">
+                <input type="checkbox" [(ngModel)]="item.checked" class="hidden peer">
+                <div class="w-5 h-5 rounded border border-slate-300 flex items-center justify-center peer-checked:bg-(--primary-color) peer-checked:border-transparent transition-all">
+                  <i class="fa-solid fa-check text-white text-[10px] hidden peer-checked:block"></i>
+                </div>
+                <span class="text-xs sm:text-sm font-bold text-slate-700">{{ item.itemName }}</span>
+              </label>
+              }
+            </div>
+          </div>
+          }
+        </div>
+        }
+
+        <!-- Steps Progress Indicators -->
+        <div class="flex justify-center gap-2 mt-8 pt-4 border-t border-slate-50">
+          @for (s of sections; let i = $index; track i ) {
+          <div 
+            class="w-5 h-1 rounded-full transition-all duration-300" 
+            [class.bg-(--primary-color)]="i === currentIndex"
+            [class.bg-slate-200]="i !== currentIndex"
+          >
+          </div>
+          }
+        </div>
+
+        <!-- Next Action Button -->
+        <div class="pt-6 flex justify-center">
+          <button 
+            (click)="savehistoryform()" 
+            class="ts-btn-primary w-full sm:w-64 py-3.5 text-base font-bold shadow-md shadow-blue-500/10 hover:shadow-lg transition-all cursor-pointer"
+          >
+            {{ 'patientProfile.next' | translate }}
+          </button>
+        </div>
+
+      }
+    </div>
+    }
+
+    <!-- Step 3: Detailed Personal Info Form -->
+    @if(showStep3){
+    <div class="ts-card border border-slate-100 bg-white p-6 md:p-10 rounded-3xl">
+      <!-- Title -->
+      <div class="text-center mb-8 pb-4 border-b border-slate-50">
+        <h3 class="text-slate-800 text-xl font-extrabold flex items-center justify-center gap-2">
+          <i class="fa-solid fa-hospital-user text-(--primary-color)"></i>
+          {{ 'patientProfile.title' | translate }}
+        </h3>
+      </div>
+
+      <form [formGroup]="InfoForm" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <!-- Country -->
+          <div class="flex flex-col gap-2">
+            <label class="text-slate-700 font-bold text-xs uppercase tracking-wider">
+              {{ 'patientProfile.country' | translate }}
+            </label>
+            <p-select 
+              [options]="countries" 
+              optionLabel="countryName"
+              optionValue="countryId" 
+              formControlName="Country" 
+              placeholder="{{ 'patientProfile.country' | translate }}"
+              styleClass="w-full !rounded-xl !border-slate-200 !bg-slate-50/50"
+            >
+            </p-select>
+          </div>
+
+          <!-- Governorate -->
+          <div class="flex flex-col gap-2">
+            <label class="text-slate-700 font-bold text-xs uppercase tracking-wider">
+              {{ 'patientProfile.governorate' | translate }}
+            </label>
+            <p-select 
+              [options]="states" 
+              optionLabel="stateName" 
+              optionValue="stateId"
+              formControlName="State" 
+              placeholder="{{ 'patientProfile.governorate' | translate }}"
+              styleClass="w-full !rounded-xl !border-slate-200 !bg-slate-50/50"
+            >
+            </p-select>
+          </div>
+
+          <!-- City -->
+          <div class="flex flex-col gap-2">
+            <label class="text-slate-700 font-bold text-xs uppercase tracking-wider">
+              {{ 'patientProfile.city' | translate }}
+            </label>
+            <p-select 
+              [options]="cities" 
+              formControlName="City" 
+              placeholder="{{ 'patientProfile.city' | translate }}"
+              styleClass="w-full !rounded-xl !border-slate-200 !bg-slate-50/50"
+            >
+            </p-select>
+          </div>
+
+          <!-- Marital Status -->
+          <div class="flex flex-col gap-2">
+            <label class="text-slate-700 font-bold text-xs uppercase tracking-wider">
+              {{ 'patientProfile.maritalStatus' | translate }}
+            </label>
+            <p-select 
+              [options]="maritalStatus" 
+              formControlName="MaritalStatus"
+              placeholder="{{ 'patientProfile.maritalStatus' | translate }}"
+              styleClass="w-full !rounded-xl !border-slate-200 !bg-slate-50/50"
+            >
+            </p-select>
+          </div>
+
+          <!-- Job Title -->
+          <div class="flex flex-col gap-2">
+            <label class="text-slate-700 font-bold text-xs uppercase tracking-wider">
+              {{ 'patientProfile.jobTitle' | translate }}
+            </label>
+            <p-select 
+              [options]="jobTitles" 
+              formControlName="JobTitle"
+              placeholder="{{ 'patientProfile.jobTitle' | translate }}"
+              styleClass="w-full !rounded-xl !border-slate-200 !bg-slate-50/50"
+            >
+            </p-select>
+          </div>
+
+          <!-- Height & Weight -->
+          <div class="flex gap-4">
+            <!-- Height -->
+            <div class="w-1/2 flex flex-col gap-2">
+              <label class="text-slate-700 font-bold text-xs uppercase tracking-wider">
+                {{ 'patientProfile.height' | translate }}
+              </label>
+              <input 
+                type="number" 
+                formControlName="Height" 
+                placeholder="{{ 'patientProfile.heightPlaceholder' | translate }}"
+                class="ts-input py-3"
+              />
+            </div>
+
+            <!-- Weight -->
+            <div class="w-1/2 flex flex-col gap-2">
+              <label class="text-slate-700 font-bold text-xs uppercase tracking-wider">
+                {{ 'patientProfile.weight' | translate }}
+              </label>
+              <input 
+                type="number" 
+                formControlName="Weight" 
+                placeholder="{{ 'patientProfile.weightPlaceholder' | translate }}"
+                class="ts-input py-3"
+              />
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Step Indicator -->
+        <div class="flex justify-center items-center gap-2 pt-4">
+          <div class="w-5 h-1 bg-slate-100 rounded-full"></div>
+          <div class="w-5 h-1 bg-slate-100 rounded-full"></div>
+          <div class="w-5 h-1 bg-(--primary-color) rounded-full"></div>
+        </div>
+
+        <!-- Save Button -->
+        <div class="pt-2 flex justify-center">
+          <button 
+            type="button"
+            (click)="saveStep3()" 
+            class="ts-btn-primary w-full sm:w-64 py-3.5 text-base font-bold shadow-md shadow-blue-500/10 hover:shadow-lg transition-all cursor-pointer"
+          >
+            <i class="fa-solid fa-floppy-disk mr-2 rtl:ml-2"></i>
+            {{ 'patientProfile.save' | translate }}
+          </button>
+        </div>
+      </form>
+    </div>
+    }
+
+  </div>
+</section>

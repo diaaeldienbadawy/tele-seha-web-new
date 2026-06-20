@@ -1,0 +1,242 @@
+<div class="p-0 min-h-screen bg-slate-50">
+
+  <div class="flex justify-between items-stretch min-h-screen">
+
+    <!-- ================= Left Side ================= -->
+    <div class="w-[50%] hidden md:block min-h-screen">
+      <app-auth-left-side class="h-full w-full"></app-auth-left-side>
+    </div>
+
+    <!-- ================= Right Side ================= -->
+    <div class="w-full md:w-[50%] p-[16px] sm:p-[24px] min-h-screen flex flex-col justify-between bg-gradient-to-tr from-[#f8fafc] via-[#f1f5f9] to-[#eff6ff] overflow-y-auto">
+
+      <!-- Header -->
+      <div class="w-full h-fit flex items-center justify-center z-10">
+        <app-auth-logo></app-auth-logo>
+      </div>
+
+      <!-- ================= Content ================= -->
+      <div class="flex-1 flex flex-col justify-center my-4 w-[95%] md:w-[92%] lg:w-[90%] max-w-[700px] mx-auto py-2 z-10">
+
+        <div class="w-full bg-white/95 backdrop-blur-md rounded-3xl border border-slate-100 shadow-2xl shadow-slate-200/50 p-6 sm:p-8 transition-all duration-300">
+
+          <h2 class="text-slate-800 text-[28px] sm:text-[32px] font-bold leading-tight tracking-tight">
+            Join TeleSeha Network
+          </h2>
+
+          <p class="text-slate-500 text-[14px] font-normal leading-normal mt-[8px]">
+            Create your medical profile to start consulting
+          </p>
+
+          <form class="mt-[30px]" [formGroup]="basicInfoForm">
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-4">
+
+              <!-- Full Name -->
+              <div class="col-span-1">
+                <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+                  Full Name
+                  <span class="text-red-500 font-bold">*</span>
+                </label>
+
+                <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out">
+                  <i class="fa-solid fa-user text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
+                  <input type="text" formControlName="Name" placeholder="Abdelrahman Abdallah Mohamed"
+                    class="text-slate-800 text-[14px] font-normal bg-transparent w-full outline-none h-[44px]">
+                </div>
+                 <div class="min-h-[22px] mt-[6px]">
+                   @if (basicInfoForm.get('Name')?.touched && basicInfoForm.get('Name')?.errors) {
+                   <div class="text-red-500 text-[12px] font-medium flex items-center gap-1">
+                     <i class="fa-solid fa-circle-exclamation"></i>
+                     @if (basicInfoForm.get('Name')?.errors?.['required']) {
+                     Full Name is required
+                     }
+                   </div>
+                   }
+                 </div>
+              </div>
+
+              <!-- Thumbnail -->
+              <div class="col-span-1">
+                <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+                  Thumbnail ( Optional )
+                </label>
+
+                <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out cursor-pointer" (click)="fileInput.click()">
+                  @if (previewUrl) {
+                    <img [src]="previewUrl" alt="Thumbnail" class="w-8 h-8 rounded-full object-cover shrink-0 mr-2 border border-slate-200">
+                  } @else {
+                    <i class="fa-solid fa-image text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
+                  }
+                  <input type="text" readonly [value]="fileName" placeholder="Upload the thumbnail image"
+                    class="bg-transparent w-full text-slate-800 text-[14px] outline-none h-[44px] cursor-pointer">
+                  <i class="fa-solid fa-cloud-arrow-up text-[#899CC9] hover:text-(--primary-color) text-[18px] transition-colors duration-200"></i>
+                </div>
+
+                <input #fileInput type="file" accept="image/*" class="hidden" (change)="onFileSelected($event)">
+                <div class="min-h-[22px] mt-[6px]"></div>
+              </div>
+
+              <!-- Specialty Select -->
+              <div class="col-span-1">
+                <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+                  Specialty
+                  <span class="text-red-500 font-bold">*</span>
+                </label>
+
+                <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out">
+                  <i class="fa-solid fa-stethoscope text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
+                  <p-select class="custom-select w-full" formControlName="SpecialtyId" [options]="specialties"
+                    optionLabel="specialityNameEn" optionValue="id" placeholder="Select Specialty" appendTo="body">
+                  </p-select>
+                </div>
+
+                 <div class="min-h-[22px] mt-[6px]">
+                   @if (basicInfoForm.get('SpecialtyId')?.touched && basicInfoForm.get('SpecialtyId')?.errors) {
+                   <div class="text-red-500 text-[12px] font-medium flex items-center gap-1">
+                     <i class="fa-solid fa-circle-exclamation"></i>
+                     @if (basicInfoForm.get('SpecialtyId')?.errors?.['required']) {
+                     Specialty is required
+                     }
+                   </div>
+                   }
+                 </div>
+              </div>
+
+              <!-- Sub Specialty -->
+              <div class="col-span-1">
+                <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+                  Sub Specialty ( Optional )
+                </label>
+
+                <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out">
+                  <i class="fa-solid fa-heart-pulse text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
+                  <input type="text" formControlName="Subspecialty" placeholder="Enter the Subspecialty"
+                    class="text-slate-800 text-[14px] font-normal bg-transparent w-full outline-none h-[44px]">
+                </div>
+                <div class="min-h-[22px] mt-[6px]"></div>
+              </div>
+
+              <!-- Scientific Degree -->
+              <div class="col-span-1">
+                <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+                  Scientific Degree
+                  <span class="text-red-500 font-bold">*</span>
+                </label>
+
+                <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out">
+                  <i class="fa-solid fa-graduation-cap text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
+                  <p-select class="custom-select w-full" formControlName="ScientificDegree" [options]="scientificDegrees"
+                    optionLabel="label" optionValue="value" placeholder="Select Scientific Degree" appendTo="body">
+                  </p-select>
+                </div>
+
+                 <div class="min-h-[22px] mt-[6px]">
+                   @if (basicInfoForm.get('ScientificDegree')?.touched && basicInfoForm.get('ScientificDegree')?.errors) {
+                   <div class="text-red-500 text-[12px] font-medium flex items-center gap-1">
+                     <i class="fa-solid fa-circle-exclamation"></i>
+                     @if (basicInfoForm.get('ScientificDegree')?.errors?.['required']) {
+                     Scientific Degree is required
+                     }
+                   </div>
+                   }
+                 </div>
+              </div>
+
+              <!-- Job Title -->
+              <div class="col-span-1">
+                <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+                  Job Title
+                </label>
+
+                <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out">
+                  <i class="fa-solid fa-briefcase text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
+                  <p-select class="custom-select w-full" [options]="jobTitles" optionLabel="titleEn"
+                    formControlName="JobTitle" placeholder="Select Job Title" appendTo="body">
+                  </p-select>
+                </div>
+                <div class="min-h-[22px] mt-[6px]">
+                  @if (basicInfoForm.get('JobTitle')?.touched && basicInfoForm.get('JobTitle')?.errors) {
+                  <div class="text-red-500 text-[12px] font-medium flex items-center gap-1">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    @if (basicInfoForm.get('JobTitle')?.errors?.['required']) {
+                    Job Title is required
+                    }
+                  </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Consultation Fee -->
+              <div class="col-span-1">
+                <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+                  Consultation Fee
+                  <span class="text-red-500 font-bold">*</span>
+                </label>
+
+                <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out" dir="ltr">
+                  <input type="number" formControlName="Price" placeholder="Enter the consultation fee in EGP"
+                    class="text-slate-800 text-[14px] font-normal bg-transparent w-full outline-none h-[44px] order-last">
+                  <i class="fa-solid fa-money-bill-wave text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
+                </div>
+
+                 <div class="min-h-[22px] mt-[6px]" dir="ltr">
+                   @if (basicInfoForm.get('Price')?.touched && basicInfoForm.get('Price')?.errors) {
+                   <div class="text-red-500 text-[12px] font-medium flex items-center gap-1" dir="rtl">
+                     <i class="fa-solid fa-circle-exclamation"></i>
+                     @if (basicInfoForm.get('Price')?.errors?.['required']) {
+                     Consultation Fee is required
+                     }
+                   </div>
+                   }
+                 </div>
+               </div>
+
+               <!-- Follow-up Fee -->
+               <div class="col-span-1">
+                 <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+                   Follow-up Fee ( Optional )
+                 </label>
+
+                 <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out" dir="ltr">
+                   <input type="number" formControlName="FollowUpPrice" placeholder="Enter the follow-up fee in EGP"
+                     class="text-slate-800 text-[14px] font-normal bg-transparent w-full outline-none h-[44px] order-last">
+                   <i class="fa-solid fa-coins text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
+                 </div>
+                 <div class="min-h-[22px] mt-[6px]"></div>
+               </div>
+
+              <!-- Stepper Progress Dots -->
+              <div class="col-span-1 sm:col-span-2 flex justify-center items-center gap-1.5 my-6">
+                <div class="w-[24px] h-[6px] bg-(--primary-color) rounded-full shadow-sm shadow-(--primary-color)/25"></div>
+                <div class="w-[8px] h-[6px] bg-slate-200 rounded-full"></div>
+                <div class="w-[8px] h-[6px] bg-slate-200 rounded-full"></div>
+                <div class="w-[8px] h-[6px] bg-slate-200 rounded-full"></div>
+                <div class="w-[8px] h-[6px] bg-slate-200 rounded-full"></div>
+              </div>
+
+              <!-- Submit -->
+              <div class="col-span-1 sm:col-span-2 mt-[10px]">
+                <button type="button" (click)="save()" [disabled]="isLoading" class="w-full bg-gradient-to-r from-(--primary-color) to-[#006ba5] text-white hover:from-[#006ba5] hover:to-[#005a8c] px-[20px] h-[54px] rounded-full text-[16px] font-bold leading-none flex items-center justify-center gap-2 shadow-lg shadow-(--primary-color)/15 hover:shadow-xl hover:shadow-(--primary-color)/25 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 ease-in-out cursor-pointer">
+                  @if (isLoading) {
+                    <i class="fa-solid fa-spinner fa-spin mr-2"></i>
+                  }
+                  <span>Next Step</span>
+                  <i class="fa-solid fa-arrow-right text-[15px] ml-1"></i>
+                </button>
+              </div>
+
+            </div>
+
+          </form>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="w-full text-center text-xs text-slate-400 z-10">
+        &copy; 2026 teleSEHA. All rights reserved.
+      </div>
+
+    </div>
+  </div>
+</div>

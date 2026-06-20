@@ -1,0 +1,75 @@
+<div class=" ">
+
+  <div class="px-[20px]">
+    <div class=" flex flex-col lg:flex-row  gap-4 lg:gap-8 ">
+
+      <!-- Tabs Header -->
+      <div class="w-full lg:w-[280px] shrink-0">
+        <div class="flex flex-col gap-2 bg-slate-50/50 p-2 rounded-2xl border border-slate-100">
+          <button (click)="activeTab = 'tab1'"
+            [ngClass]="activeTab === 'tab1'
+              ? 'bg-[#007BBD]/10 text-[#007BBD] font-bold border-l-4 border-[#007BBD]'
+              : 'bg-transparent text-slate-600 hover:bg-slate-50 border-l-4 border-transparent'"
+            class="px-4 py-3 rounded-r-xl w-full text-left text-[15px] sm:text-[16px] flex justify-between items-center transition-all duration-200 whitespace-nowrap">
+            <span>{{ 'settings.generalInfo' | translate }}</span>
+            <i class="fa-solid fa-chevron-right text-[14px]"
+              [ngClass]="activeTab === 'tab1' ? 'text-[#007BBD]' : 'text-slate-400'"></i>
+          </button>
+
+          <button (click)="activeTab = 'tab4'"
+            [ngClass]="activeTab === 'tab4'
+              ? 'bg-[#007BBD]/10 text-[#007BBD] font-bold border-l-4 border-[#007BBD]'
+              : 'bg-transparent text-slate-600 hover:bg-slate-50 border-l-4 border-transparent'"
+            class="px-4 py-3 rounded-r-xl w-full text-left text-[15px] sm:text-[16px] flex justify-between items-center transition-all duration-200 whitespace-nowrap">
+            <span>{{ 'settings.recurringAppts' | translate }}</span>
+            <i class="fa-solid fa-chevron-right text-[14px]"
+              [ngClass]="activeTab === 'tab4' ? 'text-[#007BBD]' : 'text-slate-400'"></i>
+          </button>
+
+          <button (click)="activeTab = 'tab3'"
+            [ngClass]="activeTab === 'tab3'
+              ? 'bg-[#007BBD]/10 text-[#007BBD] font-bold border-l-4 border-[#007BBD]'
+              : 'bg-transparent text-slate-600 hover:bg-slate-50 border-l-4 border-transparent'"
+            class="px-4 py-3 rounded-r-xl w-full text-left text-[15px] sm:text-[16px] flex justify-between items-center transition-all duration-200 whitespace-nowrap">
+            <span>{{ 'settings.nonRecurringAppts' | translate }}</span>
+            <i class="fa-solid fa-chevron-right text-[14px]"
+              [ngClass]="activeTab === 'tab3' ? 'text-[#007BBD]' : 'text-slate-400'"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class=" flex-1 ">
+
+        @if (activeTab === 'tab1') {
+        <div class="animate-fadeIn">
+
+          <app-doctor-info></app-doctor-info>
+
+        </div>
+        }
+        @if (activeTab === 'tab2') {
+        <div class="animate-fadeIn">
+          <app-specialty-info></app-specialty-info>
+        </div>
+        }
+        @if (activeTab === 'tab3') {
+        <div class="animate-fadeIn">
+
+          <app-doctor-non-recurring-appointments></app-doctor-non-recurring-appointments>
+        </div>
+        }
+        @if (activeTab === 'tab4') {
+        <div class="animate-fadeIn">
+
+          <app-doctor-recurring-appointments></app-doctor-recurring-appointments>
+        </div>
+        }
+      </div>
+
+    </div>
+  </div>
+
+
+
+
+</div>

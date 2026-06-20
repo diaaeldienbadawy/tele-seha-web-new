@@ -1,0 +1,199 @@
+<div class="flex flex-col lg:flex-row gap-8 items-start">
+  
+  <!-- Form Section -->
+  <div class="w-full lg:w-[65%] bg-white rounded-3xl shadow-xl shadow-slate-200/40 border border-slate-100 p-6 md:p-8">
+    <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+      <i class="fa-solid fa-calendar-plus text-(--primary-color)"></i>
+      Add New Schedule
+    </h3>
+    <form [formGroup]="form" (ngSubmit)="submit()">
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5 w-full">
+
+        <!-- Day -->
+        <div class="w-full col-span-full">
+          <label class="block text-slate-700 text-[14px] font-semibold mb-[8px]">
+            Day
+            <span class="text-red-500 font-bold">*</span>
+          </label>
+
+          <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out">
+            <i class="fa-solid fa-calendar text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
+            <p-select class="custom-select w-full" styleClass="border-none shadow-none bg-transparent" formControlName="Day" [options]="days" optionLabel="name"
+              optionValue="value" placeholder="Select Day" appendTo="body">
+            </p-select>
+          </div>
+
+          <div class="min-h-[22px] mt-[6px]">
+            @if(form.get('Day')?.touched && form.get('Day')?.invalid){
+            <span class="text-red-500 text-[12px] font-semibold flex items-center gap-1">
+              <i class="fa-solid fa-circle-exclamation"></i>
+              Day is required
+            </span>
+            }
+          </div>
+        </div>
+
+        <!-- From Time -->
+        <div class="w-full">
+          <label class="block text-slate-700 text-[14px] font-semibold mb-[8px]">
+            From
+            <span class="text-red-500 font-bold">*</span>
+          </label>
+
+          <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out">
+            <i class="fa-solid fa-clock text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
+            <input [ngxTimepicker]="startTimePicker" [format]="12" formControlName="StartTime" readonly class="w-full bg-transparent outline-none border-none text-slate-700 font-semibold p-0 cursor-pointer h-[44px]" style="box-shadow: none;" placeholder="Select start time">
+            <ngx-material-timepicker #startTimePicker [theme]="timepickerTheme"></ngx-material-timepicker>
+          </div>
+
+          <div class="min-h-[22px] mt-[6px]">
+            @if(form.get('StartTime')?.touched && form.get('StartTime')?.invalid){
+            <span class="text-red-500 text-[12px] font-semibold flex items-center gap-1">
+              <i class="fa-solid fa-circle-exclamation"></i>
+              Start time is required
+            </span>
+            }
+          </div>
+        </div>
+
+        <!-- To Time -->
+        <div class="w-full">
+          <label class="block text-slate-700 text-[14px] font-semibold mb-[8px]">
+            To
+            <span class="text-red-500 font-bold">*</span>
+          </label>
+
+          <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out">
+            <i class="fa-solid fa-clock text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
+            <input [ngxTimepicker]="endTimePicker" [format]="12" formControlName="EndTime" readonly class="w-full bg-transparent outline-none border-none text-slate-700 font-semibold p-0 cursor-pointer h-[44px]" style="box-shadow: none;" placeholder="Select end time">
+            <ngx-material-timepicker #endTimePicker [theme]="timepickerTheme"></ngx-material-timepicker>
+          </div>
+
+          <div class="min-h-[22px] mt-[6px]">
+            @if(form.get('EndTime')?.touched && form.get('EndTime')?.invalid){
+            <span class="text-red-500 text-[12px] font-semibold flex items-center gap-1">
+              <i class="fa-solid fa-circle-exclamation"></i>
+              End time is required
+            </span>
+            }
+          </div>
+        </div>
+
+        <!-- Number of Cases -->
+        <div class="w-full">
+          <label class="block text-slate-700 text-[14px] font-semibold mb-[8px]">
+            Number of Cases
+            <span class="text-red-500 font-bold">*</span>
+          </label>
+
+          <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out">
+            <i class="fa-solid fa-users text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
+            <input type="number" formControlName="Capacity" class="w-full bg-transparent outline-none border-none text-slate-700 font-semibold p-0 h-[44px]" style="box-shadow: none;" placeholder="Number of cases">
+          </div>
+
+          <div class="min-h-[22px] mt-[6px]">
+            @if(form.get('Capacity')?.touched && form.get('Capacity')?.invalid){
+              <span class="text-red-500 text-[12px] font-semibold flex items-center gap-1">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                @if(form.get('Capacity')?.errors?.['required']) {
+                  Number of cases is required
+                } @else if(form.get('Capacity')?.errors?.['min']) {
+                  Must be at least 1
+                }
+              </span>
+            }
+            @if(form.errors?.['capacityExceeded'] && (form.get('Capacity')?.dirty || form.get('Capacity')?.touched)) {
+              <span class="text-red-500 text-[12px] font-semibold flex items-center gap-1">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                Cannot exceed {{form.errors?.['capacityExceeded'].max}} cases for the selected time range.
+              </span>
+            }
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Submit Buttons -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-[15px] mt-[30px]">
+        <div class="w-full order-last md:order-first">
+          <button type="button" (click)="cancel()" class="w-full bg-white border-2 border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50 px-[20px] h-[54px] rounded-full text-[16px] font-bold flex items-center justify-center gap-2 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 ease-in-out cursor-pointer">
+            <i class="fa-solid text-[15px] mr-1 opacity-70" [ngClass]="doctorScheduleId ? 'fa-xmark' : 'fa-eraser'"></i>
+            <span>{{ doctorScheduleId ? 'Cancel' : 'Clear Form' }}</span>
+          </button>
+        </div>
+        
+        <div class="w-full">
+          <button type="submit" class="w-full bg-gradient-to-r from-(--primary-color) to-[#006ba5] text-white hover:from-[#006ba5] hover:to-[#005a8c] px-[20px] h-[54px] rounded-full text-[16px] font-bold flex items-center justify-center gap-2 shadow-lg shadow-(--primary-color)/15 hover:shadow-xl hover:shadow-(--primary-color)/25 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 ease-in-out cursor-pointer">
+            <i class="fa-solid text-[15px] mr-1" [ngClass]="doctorScheduleId ? 'fa-check' : 'fa-plus'"></i>
+            <span>{{ doctorScheduleId ? 'Update Schedule' : 'Save Schedule' }}</span>
+          </button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Schedule List Section -->
+  <div class="w-full lg:w-[35%] bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl shadow-2xl p-6 md:p-8 text-white relative overflow-hidden flex flex-col min-h-[350px]">
+    <!-- Decorative background elements -->
+    <div class="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 rounded-full bg-white/5 blur-2xl"></div>
+    <div class="absolute bottom-0 left-0 -ml-8 -mb-8 w-32 h-32 rounded-full bg-(--primary-color)/20 blur-2xl"></div>
+    
+    <div class="relative z-10 flex flex-col h-full">
+      <h3 class="text-xl font-bold text-white mb-2 flex items-center gap-2">
+        <i class="fa-solid fa-list-check"></i>
+        Your Schedule
+      </h3>
+      <p class="text-slate-400 text-sm mb-6">Added recurring slots</p>
+
+      @if(schedules && schedules.length > 0) {
+        <div class="flex flex-col gap-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar flex-1">
+          @for(item of schedules; track item.doctorScheduleId) {
+             <div class="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl p-4 transition-all hover:bg-white/15">
+                <div class="flex justify-between items-center mb-3">
+                  <h3 class="text-white text-[15px] font-bold tracking-wide">
+                    {{ item.day }}
+                  </h3>
+                  <div class="flex items-center gap-2 text-slate-300 font-medium text-[13px] bg-black/20 px-2 py-1 rounded-lg">
+                    <i class="fa-regular fa-clock text-(--primary-color)"></i>
+                    <span>{{ formatedTime(item.startTime) }}</span>
+                    <span class="text-slate-500">-</span>
+                    <span>{{ formatedTime(item.endTime) }}</span>
+                  </div>
+                </div>
+                
+                <div class="flex justify-between items-center gap-2">
+                  <button (click)="edit(item)"
+                    class="flex-1 bg-white/5 hover:bg-white/10 text-white py-[6px] rounded-xl text-[12px] font-bold transition-colors border border-white/5">
+                    Edit
+                  </button>
+                  <button (click)="deleted(item.doctorScheduleId)"
+                    class="flex-1 bg-red-500/10 hover:bg-red-500/20 text-red-400 py-[6px] rounded-xl text-[12px] font-bold transition-colors border border-red-500/10">
+                    Delete
+                  </button>
+                </div>
+             </div>
+          }
+        </div>
+        <div class="mt-6 pt-6 border-t border-white/10">
+          <button (click)="goHome()" class="w-full bg-(--primary-color) hover:bg-[#006ba5] text-white py-4 rounded-full font-bold shadow-lg shadow-(--primary-color)/30 transition-all active:scale-95 flex items-center justify-center gap-2">
+            Finish & Go Dashboard
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      } @else {
+        <!-- Beautiful Empty State -->
+        <div class="flex flex-col items-center justify-center flex-1 text-center py-8">
+          <div class="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-4 border border-white/10">
+            <i class="fa-regular fa-calendar-xmark text-3xl text-slate-400"></i>
+          </div>
+          <h4 class="text-lg font-bold text-white">No schedules yet</h4>
+          <p class="text-slate-400 text-sm mt-2 max-w-[200px]">Start adding your available times using the form.</p>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+

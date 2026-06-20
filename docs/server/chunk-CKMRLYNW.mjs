@@ -1,0 +1,2 @@
+import './polyfills.server.mjs';
+import{a as p}from"./chunk-QIA424X5.mjs";import{y as a}from"./chunk-GX2DYMIX.mjs";import{L as e,Q as i}from"./chunk-5OMHZWNO.mjs";var m=class t{constructor(o){this.http=o}bookingSession(o,n){let r=new FormData;return r.append("PatientId",o.toString()),r.append("SessionId",n.toString()),this.http.post(`${p.apiUrl}/api/appointment`,r)}static \u0275fac=function(n){return new(n||t)(i(a))};static \u0275prov=e({token:t,factory:t.\u0275fac,providedIn:"root"})};export{m as a};

@@ -1,0 +1,192 @@
+<!-- <div class="flex items-center gap-2" >
+  <img class="w-[50px] h-[50px] rounded-full " src="../../../../../assets/images/pexels-mart-production-8217300 1.png" loading="lazy" alt="lang">
+
+  <h2 class="text-[#555555] text-[18px] font-medium leading-[18px]" >
+    Mohamed Ali
+  </h2>
+
+  <button routerLink="/auth/login"
+    class="btn-header border border-(--primary-color) bg-(--primary-color) text-[#F7F9FE] px-[20px] py-[15px] rounded-full text-[16px] font-bold leading-[18px]  ">
+    Join as a Doctor
+  </button>
+
+</div> -->
+
+
+
+<div class="flex items-center gap-2 relative">
+
+  @if (isLoggedIn() === null) {
+  <!-- ممكن تحط Skeleton هنا -->
+  }
+
+  @else if (isLoggedIn() && (patientName() || doctorName())) {
+
+  <div class="relative profile-menu">
+
+    <!-- ===== Profile Trigger ===== -->
+    <div class="flex items-center gap-3 cursor-pointer select-none px-3 py-1.5 rounded-full hover:bg-gray-50 transition-all duration-200 border border-transparent hover:border-gray-200" (click)="toggleActions()">
+
+      @if (doctorIamge()) {
+      <img [src]="doctorIamge()" class="w-[40px] h-[40px] rounded-full object-cover" alt="profile" />
+      }
+      @else if (doctorName() || patientName()) {
+      <div class="w-[35px] h-[35px] rounded-full bg-[#007BBD]/10 flex items-center justify-center">
+        <i class="fa-solid fa-user text-[#007BBD] text-[16px]"></i>
+      </div>
+      }
+
+      @if (patientName()) {
+      <h2 class="text-[#555555] text-[16px] font-medium truncate max-w-[120px] sm:max-w-none">
+        {{ patientName() }}
+      </h2>
+      }
+
+      @if (doctorName()) {
+      <h2 class="text-[#555555] text-[16px] font-medium truncate max-w-[120px] sm:max-w-none">
+        {{ doctorName() }}
+      </h2>
+      }
+
+      <i class="fa-solid fa-chevron-down text-[12px] transition-all duration-200" [class.rotate-180]="showActions"></i>
+
+    </div>
+
+    <!-- ===== Dropdown ===== -->
+    @if (showActions) {
+
+      <!-- ===== Patient Menu ===== -->
+      @if (patientName()) {
+      <div class="lg:absolute top-full mt-2 left-0 sm:right-0 sm:left-auto
+                    w-[220px] max-w-[90vw]
+                    bg-white rounded-[16px] shadow-xl
+                    p-4 z-50 border border-gray-100">
+
+        <button class="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-gray-100 transition"
+          routerLink="/patient/allResent" (click)="closeActions()">
+          <i class="fa-regular fa-calendar text-[#007BBD]"></i>
+          <span class="text-[15px] font-medium text-[#555]">
+            My Bookings
+          </span>
+        </button>
+
+        <button class="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-gray-100 transition"
+          routerLink="/patient/reports" (click)="closeActions()">
+          <i class="fa-regular fa-file text-[#007BBD]"></i>
+          <span class="text-[15px] font-medium text-[#555]">
+            My Reports
+          </span>
+        </button>
+
+        <button class="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-gray-100 transition"
+          routerLink="/patient/settings" (click)="closeActions()">
+          <i class="fa-solid fa-gear text-[#007BBD]"></i>
+          <span class="text-[15px] font-medium text-[#555]">
+            Setting
+          </span>
+        </button>
+
+        <hr class="my-2">
+
+        <button class="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-red-50 transition"
+          (click)="logout(); closeActions()">
+          <i class="fa-solid fa-right-from-bracket rotate-180 text-[#E74C3C]"></i>
+          <span class="text-[15px] font-medium text-[#E74C3C]">
+            Log Out
+          </span>
+        </button>
+
+      </div>
+      }
+
+      <!-- ===== Doctor Menu ===== -->
+      @if (doctorName()) {
+      <div class="lg:absolute top-full mt-2 right-0
+                    w-[230px]
+                    bg-white rounded-[16px] shadow-xl
+                    p-4 z-50 border border-gray-100">
+
+        <button class="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-gray-100 transition"
+          routerLink="/doctor/myAppointments" (click)="closeActions()">
+          <i class="fa-regular fa-calendar text-[#007BBD]"></i>
+          <span class="text-[15px] font-medium text-[#555]">
+            My Bookings
+          </span>
+        </button>
+
+        <button class="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-gray-100 transition"
+          routerLink="/doctor/reports" (click)="closeActions()">
+          <i class="fa-regular fa-file text-[#007BBD]"></i>
+          <span class="text-[15px] font-medium text-[#555]">
+            My Reports
+          </span>
+        </button>
+
+        <button class="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-gray-100 transition"
+          routerLink="/doctor/settings" (click)="closeActions()">
+          <i class="fa-solid fa-gear text-[#007BBD]"></i>
+          <span class="text-[15px] font-medium text-[#555]">
+            Setting
+          </span>
+        </button>
+
+        <button class="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-gray-100 transition"
+          routerLink="/doctor/sub-accounts" (click)="closeActions()">
+          <i class="fa-solid fa-users text-[#007BBD]"></i>
+          <span class="text-[15px] font-medium text-[#555]">
+            Sub-accounts
+          </span>
+        </button>
+
+        <hr class="my-2">
+
+        <button class="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-red-50 transition"
+          (click)="logout(); closeActions()">
+          <i class="fa-solid fa-right-from-bracket rotate-180 text-[#E74C3C]"></i>
+          <span class="text-[15px] font-medium text-[#E74C3C]">
+            Log Out
+          </span>
+        </button>
+
+      </div>
+      }
+
+    }
+
+  </div>
+
+  }
+
+  @else {
+
+  <div class="flex flex-col items-center gap-2">
+
+    <button (click)="openModal()" class="relative overflow-hidden bg-gradient-to-r from-[#007BBD] to-[#0068a1] text-white
+               px-6 md:px-8 py-2 md:py-2.5
+               rounded-full
+               text-[19px]
+               font-bold tracking-wide
+               shadow-[0_8px_20px_-6px_rgba(0,123,189,0.5)]
+               hover:shadow-[0_12px_24px_-8px_rgba(0,123,189,0.6)]
+               hover:-translate-y-[1px] transition-all duration-300 group">
+      <span class="relative z-10 flex items-center gap-2">
+        Get started
+        <i class="fa-solid fa-arrow-right text-[13px] group-hover:translate-x-1 transition-transform duration-300"></i>
+      </span>
+      <div class="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out rounded-full"></div>
+    </button>
+
+    <!-- <button (click)="openModal()" class="border border-(--primary-color)
+               text-(--primary-color)
+               px-3 py-[6px]
+               rounded-full
+               text-[14px] sm:text-[16px]
+               font-bold w-full">
+      Log In
+    </button> -->
+
+  </div>
+
+  }
+
+</div>

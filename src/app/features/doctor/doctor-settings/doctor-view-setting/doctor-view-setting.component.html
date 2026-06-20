@@ -1,0 +1,45 @@
+<section class="py-10 bg-slate-50/50 min-h-screen">
+  <div class="container mx-auto max-w-[1200px] px-4">
+
+    <div class="bg-white rounded-3xl border border-slate-100 shadow-[0_10px_40px_rgba(0,0,0,0.03)] p-4 sm:p-6 mb-6">
+      
+      <!-- Tabs Header -->
+      <div class="border-b border-slate-100 mb-6 pb-4">
+        <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
+          <button (click)="activeTab = 'profile'" 
+            [ngClass]="activeTab === 'profile'
+              ? 'text-[#007BBD] bg-[#007BBD]/8'
+              : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'"
+            class="px-5 py-2.5 rounded-full font-bold text-[14px] sm:text-[15px] transition-all duration-200 whitespace-nowrap cursor-pointer">
+            <i class="fa-solid fa-user-doctor mr-1.5"></i>
+            {{ 'settings.profileSettings' | translate }}
+          </button>
+
+          <button (click)="activeTab = 'Assistant'" 
+            [ngClass]="activeTab === 'Assistant'
+              ? 'text-[#007BBD] bg-[#007BBD]/8'
+              : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'"
+            class="px-5 py-2.5 rounded-full font-bold text-[14px] sm:text-[15px] transition-all duration-200 whitespace-nowrap cursor-pointer">
+            <i class="fa-solid fa-user-gear mr-1.5"></i>
+            {{ 'settings.assistantSettings' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="px-0 sm:px-2">
+        @if (activeTab === 'profile') {
+        <div class="animate-fadeIn">
+          <app-doctor-profile></app-doctor-profile>
+        </div>
+        }
+        @if (activeTab === 'Assistant') {
+        <div class="animate-fadeIn">
+          <app-assistant-setting></app-assistant-setting>
+        </div>
+        }
+      </div>
+
+    </div>
+  </div>
+</section>

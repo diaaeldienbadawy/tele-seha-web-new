@@ -1,0 +1,84 @@
+  <div>
+    <form [formGroup]="labTestForm" (ngSubmit)="submitLabTest()">
+
+      <div formArrayName="labAnalysisList">
+
+        @for (item of labTestMedicines.controls; track $index; let i = $index) {
+
+        <div class="mb-[20px] w-full relative" [formGroupName]="$index">
+
+          <!-- Label -->
+          <label class="block text-(--text-color) text-[12px] font-semibold mb-[10px]">
+            Test Name {{ $index + 1 }}
+          </label>
+
+          <!-- Select -->
+          <div class="border border-(--primary-color) rounded-full p-[10px] flex items-center gap-[10px]">
+
+    <p-select
+  class="custom-select w-full"
+  formControlName="id"
+  [options]="labTest"
+  optionLabel="name"
+  optionValue="id"
+
+  [filter]="true"
+  (onFilter)="onLabTestSearch($event)"
+  (onChange)="onLabTestSelect($event, i)"
+  placeholder="Select the lab test">
+</p-select>
+
+          </div>
+
+          <!-- Remove Button -->
+          @if (labTestMedicines.length > 1) {
+          <button type="button" (click)="removeLabTest($index)" class="absolute -top-2 -right-2
+               w-[28px] h-[28px]
+               flex items-center justify-center
+               rounded-full
+               bg-red-50
+               text-red-600
+               border border-red-200
+               hover:bg-red-100
+               transition">
+
+            ✕
+
+          </button>
+          }
+
+        </div>
+
+        }
+
+      </div>
+
+      <!-- Add -->
+      <div class="w-full mb-[15px]">
+        <button type="button" (click)="addLabTest()" class="w-full btn-header border border-(--primary-color)
+             text-(--primary-color) rounded-full py-3 font-bold">
+          Add another medicine
+        </button>
+      </div>
+
+      <!-- Notes -->
+      <div class="mb-[15px] w-full">
+        <label class="block text-(--text-color) text-[12px] font-semibold mb-[10px]">
+          Notes (optional)
+        </label>
+        <div class="border border-(--primary-color) rounded-full p-[16px] flex items-center gap-[10px]">
+          <input type="text" formControlName="notes" placeholder="Enter notes or unlisted radiology"
+            class="text-(--text-color) text-[14px] bg-transparent w-full">
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div class="w-full flex justify-center">
+        <button type="submit" class="w-full md:w-1/2 bg-(--primary-color)
+             text-white rounded-full py-4 font-bold">
+          Send
+        </button>
+      </div>
+
+    </form>
+  </div>

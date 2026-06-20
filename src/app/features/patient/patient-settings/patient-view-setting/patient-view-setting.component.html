@@ -1,0 +1,123 @@
+<section class="mt-[50px] ">
+  <div class="container mx-auto">
+    <div class="bg-white rounded-[20px] md:rounded-[30px] py-5 md:py-[20px]">
+
+      <!-- Tabs Header -->
+      <div class="overflow-x-auto no-scrollbar mb-6 border-b-[4px] border-[#8080801F]">
+        <div class="flex justify-between gap-4 md:gap-[10px] px-4 md:px-[60px] ">
+          <button (click)="activeTab = 'profile'" [ngClass]="activeTab === 'profile'
+              ? 'text-[#007BBD] border-b-[4px] border-[#007BBD]'
+              : 'text-[#555555]'"
+            class="px-4 md:px-[20px] py-2 md:py-[10px] font-bold text-[14px] transition whitespace-nowrap">
+            {{ 'settings.profile' | translate }}
+          </button>
+          <button (click)="activeTab = 'createAccount'" [ngClass]="activeTab === 'createAccount'
+              ? 'text-[#007BBD] border-b-[4px] border-[#007BBD]'
+              : 'text-[#555555]'"
+            class="px-4 md:px-[20px] py-2 md:py-[10px] font-bold text-[14px] transition whitespace-nowrap">
+            {{ 'settings.createAccount' | translate }}
+          </button>
+
+          <button (click)="activeTab = 'privacyPolicy'" [ngClass]="activeTab === 'privacyPolicy'
+              ? 'text-[#007BBD] border-b-[4px] border-[#007BBD]'
+              : 'text-[#555555]'"
+            class="px-4 md:px-[20px] py-2 md:py-[10px] font-bold text-[14px] transition whitespace-nowrap">
+            {{ 'settings.privacyPolicy' | translate }}
+          </button>
+
+          <button (click)="activeTab = 'medicalHistory'" [ngClass]="activeTab === 'medicalHistory'
+              ? 'text-[#007BBD] border-b-[4px] border-[#007BBD]'
+              : 'text-[#555555]'"
+            class="px-4 md:px-[20px] py-2 md:py-[10px] font-bold text-[14px] transition whitespace-nowrap">
+            {{ 'settings.medicalHistory' | translate }}
+          </button>
+
+          <button (click)="activeTab = 'policies'" [ngClass]="activeTab === 'policies'
+              ? 'text-[#007BBD] border-b-[4px] border-[#007BBD]'
+              : 'text-[#555555]'"
+            class="px-4 md:px-[20px] py-2 md:py-[10px] font-bold text-[14px] transition whitespace-nowrap">
+            {{ 'settings.policies' | translate }}
+          </button>
+
+          <button (click)="activeTab = 'terms'" [ngClass]="activeTab === 'terms'
+              ? 'text-[#007BBD] border-b-[4px] border-[#007BBD]'
+              : 'text-[#555555]'"
+            class="px-4 md:px-[20px] py-2 md:py-[10px] font-bold text-[14px] transition whitespace-nowrap">
+            {{ 'settings.terms' | translate }}
+          </button>
+
+          <button (click)="activeTab = 'privacy'" [ngClass]="activeTab === 'privacy'
+              ? 'text-[#007BBD] border-b-[4px] border-[#007BBD]'
+              : 'text-[#555555]'"
+            class="px-4 md:px-[20px] py-2 md:py-[10px] font-bold text-[14px] transition whitespace-nowrap">
+            {{ 'settings.privacy' | translate }}
+          </button>
+
+          <button (click)="activeTab = 'support'" [ngClass]="activeTab === 'support'
+              ? 'text-[#007BBD] border-b-[4px] border-[#007BBD]'
+              : 'text-[#555555]'"
+            class="px-4 md:px-[20px] py-2 md:py-[10px] font-bold text-[14px] transition whitespace-nowrap">
+            {{ 'settings.support' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="px-2 md:px-[30px]">
+        @if (activeTab === 'profile'){
+        <div class="animate-fadeIn">
+          <app-patient-profile></app-patient-profile>
+        </div>
+        }
+        @if (activeTab === 'createAccount'){
+        <div class="animate-fadeIn">
+          <app-patient-create-new-profile></app-patient-create-new-profile>
+        </div>
+        }
+
+        @if (activeTab === 'privacyPolicy'){
+        <div class="animate-fadeIn">
+          <app-patient-privacy-policy></app-patient-privacy-policy>
+        </div>
+        }
+
+        @if (activeTab === 'medicalHistory'){
+        <div class="animate-fadeIn">
+          <app-patient-medical-history></app-patient-medical-history>
+        </div>
+        }
+
+        @if (activeTab === 'policies'){
+        <div class="animate-fadeIn">
+          <app-patient-policies-and-procedures></app-patient-policies-and-procedures>
+        </div>
+        }
+
+        @if (activeTab === 'terms'){
+        <div class="animate-fadeIn">
+          <app-patient-term-and-conditions></app-patient-term-and-conditions>
+        </div>
+        }
+
+        @if (activeTab === 'privacy'){
+        <div class="animate-fadeIn">
+          <app-patient-privacy-and-security></app-patient-privacy-and-security>
+        </div>
+        }
+
+        @if (activeTab === 'support'){
+        <div class="animate-fadeIn">
+          <app-patient-support></app-patient-support>
+        </div>
+        }
+
+        <!-- @if (activeTab === 'payment'){
+          <div class="animate-fadeIn">
+            <app-patient-payment-records></app-patient-payment-records>
+          </div>
+        } -->
+      </div>
+
+    </div>
+  </div>
+</section>

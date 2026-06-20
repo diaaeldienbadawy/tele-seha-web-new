@@ -1,0 +1,215 @@
+<div class="mt-8 space-y-12">
+
+  <!-- Header -->
+  <div class="text-center mb-8 pb-4 border-b border-slate-50">
+    <h3 class="text-slate-800 text-xl font-extrabold flex items-center justify-center gap-2">
+      <i class="fa-solid fa-headset text-(--primary-color)"></i>
+      {{ 'support.title' | translate }}
+    </h3>
+  </div>
+
+  <!-- Contact Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+    <!-- Contact Info Card (Left) -->
+    <div class="lg:col-span-5">
+      <div class="bg-gradient-to-br from-(--primary-color) to-blue-600 rounded-3xl p-8 text-white relative shadow-xl shadow-blue-500/10 overflow-hidden min-h-[460px] flex flex-col justify-between">
+        <!-- Abstract background pattern decoration -->
+        <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-2xl"></div>
+        <div class="absolute -top-10 -left-10 w-40 h-40 bg-white/5 rounded-full blur-2xl"></div>
+        
+        <div class="space-y-4 relative z-10">
+          <h3 class="text-xl sm:text-2xl font-extrabold">
+            {{ 'support.contactInfo' | translate }}
+          </h3>
+          <p class="text-blue-100 text-sm sm:text-base font-medium">
+            {{ 'support.contactSub' | translate }}
+          </p>
+
+          <div class="space-y-6 pt-8">
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
+                <i class="fa-solid fa-phone text-sm"></i>
+              </div>
+              <div>
+                <span class="text-xs text-blue-100 font-bold block">{{ 'support.phone' | translate }}</span>
+                <span class="text-sm sm:text-base font-bold">+20-1012344792</span>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
+                <i class="fa-solid fa-envelope text-sm"></i>
+              </div>
+              <div>
+                <span class="text-xs text-blue-100 font-bold block">{{ 'support.email' | translate }}</span>
+                <span class="text-sm sm:text-base font-bold">demo&#64;gmail.com</span>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <i class="fa-solid fa-location-dot text-sm"></i>
+              </div>
+              <div>
+                <span class="text-xs text-blue-100 font-bold block">{{ 'support.address' | translate }}</span>
+                <span class="text-sm sm:text-base font-bold leading-relaxed block">
+                  132 Dartmouth Street Boston, Massachusetts 02156 United States
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Social Media Links -->
+        <div class="flex gap-3 pt-8 relative z-10">
+          <a href="#" class="bg-white/10 hover:bg-white/20 transition-colors rounded-full w-9 h-9 flex justify-center items-center text-white">
+            <i class="fa-brands fa-twitter text-sm"></i>
+          </a>
+          <a href="#" class="bg-white/10 hover:bg-white/20 transition-colors rounded-full w-9 h-9 flex justify-center items-center text-white">
+            <i class="fa-brands fa-instagram text-sm"></i>
+          </a>
+          <a href="#" class="bg-white/10 hover:bg-white/20 transition-colors rounded-full w-9 h-9 flex justify-center items-center text-white">
+            <i class="fa-brands fa-facebook-f text-sm"></i>
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Contact Form (Right) -->
+    <div class="lg:col-span-7">
+      <div class="ts-card border border-slate-100 bg-white p-6 md:p-8 rounded-3xl shadow-sm">
+        <form [formGroup]="supportForm" (ngSubmit)="onSubmit()" class="space-y-5">
+          <!-- Full Name -->
+          <div class="flex flex-col gap-2">
+            <label class="text-slate-700 font-bold text-xs uppercase tracking-wider">
+              {{ 'support.fullName' | translate }}
+            </label>
+            <div class="relative flex items-center">
+              <i class="fa-regular fa-user absolute left-4 text-slate-400 text-sm"></i>
+              <input 
+                type="text" 
+                placeholder="John Doe" 
+                formControlName="name"
+                class="ts-input pl-10 pr-4 py-3"
+              />
+            </div>
+          </div>
+
+          <!-- Phone -->
+          <div class="flex flex-col gap-2">
+            <label class="text-slate-700 font-bold text-xs uppercase tracking-wider">
+              {{ 'support.phone' | translate }}
+            </label>
+            <div class="relative flex items-center">
+              <i class="fa-solid fa-phone absolute left-4 text-slate-400 text-sm"></i>
+              <input 
+                type="number" 
+                placeholder="+20-102245596" 
+                formControlName="mobile"
+                class="ts-input pl-10 pr-4 py-3"
+              />
+            </div>
+          </div>
+
+          <!-- Subject -->
+          <div class="flex flex-col gap-2">
+            <label class="text-slate-700 font-bold text-xs uppercase tracking-wider">
+              {{ 'support.subject' | translate }}
+            </label>
+            <div class="relative flex items-center">
+              <i class="fa-regular fa-pen-to-square absolute left-4 text-slate-400 text-sm"></i>
+              <input 
+                type="text" 
+                placeholder="{{ 'support.subject' | translate }}" 
+                formControlName="subject"
+                class="ts-input pl-10 pr-4 py-3"
+              />
+            </div>
+          </div>
+
+          <!-- Message -->
+          <div class="flex flex-col gap-2">
+            <label class="text-slate-700 font-bold text-xs uppercase tracking-wider">
+              {{ 'support.message' | translate }}
+            </label>
+            <textarea 
+              rows="5" 
+              formControlName="message"
+              placeholder="{{ 'support.messagePlaceholder' | translate }}"
+              class="ts-input py-3 resize-none !rounded-2xl"
+            ></textarea>
+          </div>
+
+          <!-- Submit -->
+          <div class="pt-2">
+            <button 
+              type="submit"
+              class="ts-btn-primary w-full py-3.5 text-base font-bold shadow-md shadow-blue-500/10 hover:shadow-lg transition-all cursor-pointer"
+            >
+              <i class="fa-regular fa-paper-plane mr-2 rtl:ml-2"></i>
+              {{ 'support.send' | translate }}
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FAQ Accordion Section -->
+  <div class="space-y-6 pt-8 border-t border-slate-100 text-center max-w-4xl mx-auto">
+    <div class="space-y-2 max-w-2xl mx-auto">
+      <h3 class="text-slate-800 text-2xl sm:text-3xl font-extrabold tracking-tight">
+        {{ 'support.faqTitle' | translate }}
+      </h3>
+      <p class="text-slate-400 text-sm sm:text-base font-medium leading-relaxed">
+        {{ 'support.faqSub' | translate }}
+      </p>
+    </div>
+
+    <!-- Accordion List -->
+    <div class="space-y-3 pt-6 text-left rtl:text-right">
+      @for (faq of faqs; track $index) {
+      <div 
+        [ngClass]="faq.open ? 'border-blue-200 bg-blue-50/10 shadow-sm' : 'border-slate-100 bg-white hover:border-slate-200'"
+        class="border rounded-2xl p-5 md:p-6 transition-all duration-300 ts-card"
+      >
+        <!-- Header Toggle -->
+        <button 
+          type="button"
+          (click)="toggleFaq(faq)" 
+          class="flex justify-between items-center w-full cursor-pointer bg-transparent border-none p-0 outline-none text-left rtl:text-right"
+        >
+          <h3 class="text-slate-700 font-extrabold text-sm sm:text-base md:text-lg pr-4 rtl:pl-4">
+            {{ faq.question | translate }}
+          </h3>
+
+          <div 
+            [ngClass]="faq.open ? 'bg-(--primary-color) text-white' : 'bg-slate-50 text-slate-400'"
+            class="w-8 h-8 rounded-full transition-all duration-300 flex justify-center items-center flex-shrink-0"
+          >
+            <i 
+              [ngClass]="faq.open ? 'fa-chevron-down' : 'fa-chevron-right rtl:rotate-180'"
+              class="fa-solid text-xs transition-transform duration-300"
+            ></i>
+          </div>
+        </button>
+
+        <!-- Expandable Content -->
+        <div 
+          [ngClass]="faq.open ? 'mt-4 max-h-40 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'"
+          class="transition-all duration-300"
+        >
+          <p class="text-slate-500 text-xs sm:text-sm font-medium leading-relaxed pt-2 border-t border-slate-100/50">
+            {{ faq.answer | translate }}
+          </p>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+
+</div>

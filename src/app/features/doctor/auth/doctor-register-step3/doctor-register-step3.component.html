@@ -1,0 +1,367 @@
+<div class="p-0 min-h-screen bg-slate-50">
+
+  <div class="flex justify-between items-stretch min-h-screen">
+
+    <!-- ================= Left Side ================= -->
+    <div class="w-[50%] hidden md:block min-h-screen">
+      <app-auth-left-side class="h-full w-full"></app-auth-left-side>
+    </div>
+
+    <!-- ================= Right Side ================= -->
+    <div class="w-full md:w-[50%] p-[16px] sm:p-[24px] min-h-screen flex flex-col justify-between bg-gradient-to-tr from-[#f8fafc] via-[#f1f5f9] to-[#eff6ff] overflow-y-auto">
+
+      <!-- Header -->
+      <div class="w-full h-fit flex items-center justify-between z-10">
+        <div class="w-[25px]"></div>
+        <app-auth-logo></app-auth-logo>
+        <i class="fa-solid fa-xmark text-[#899CC9] hover:text-red-500 text-[25px] cursor-pointer transition-colors duration-200" (click)="clearLocalStorage()"></i>
+      </div>
+
+      <!-- ================= Content ================= -->
+      <div class="flex-1 flex flex-col justify-center my-4 w-[95%] md:w-[92%] lg:w-[90%] max-w-[700px] mx-auto py-2 z-10">
+
+        <div class="w-full bg-white/95 backdrop-blur-md rounded-3xl border border-slate-100 shadow-2xl shadow-slate-200/50 p-6 sm:p-8 transition-all duration-300">
+
+          <h2 class="text-slate-800 text-[28px] sm:text-[32px] font-bold leading-tight tracking-tight">
+            Upload Documents
+          </h2>
+
+          <p class="text-slate-500 text-[14px] font-normal leading-normal mt-[8px]">
+            Please provide clear copies of your professional documents
+          </p>
+
+          <form class="mt-[30px]" [formGroup]="basicInfoForm" (ngSubmit)="save()">
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-4">
+
+              <!-- NationalIdFrontUrl -->
+              <div class="col-span-1">
+                <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+                  National ID (Front)
+                  <span class="text-red-500 font-bold">*</span>
+                </label>
+
+                <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out cursor-pointer"
+                  [style.borderColor]="basicInfoForm.get('NationalIdFrontUrl')?.invalid && basicInfoForm.get('NationalIdFrontUrl')?.touched ? '#ef4444' : ''"
+                  [style.backgroundColor]="basicInfoForm.get('NationalIdFrontUrl')?.invalid && basicInfoForm.get('NationalIdFrontUrl')?.touched ? '#fef2f2' : ''"
+                  (click)="fileInputNationalIdFrontUrl.click()">
+                  @if (isImage(previewUrlNationalIdFrontUrl)) {
+                    <img [src]="previewUrlNationalIdFrontUrl" alt="Front ID" class="w-8 h-8 rounded-md object-cover shrink-0 mr-2 border border-slate-200">
+                  } @else {
+                    <i class="fa-solid fa-id-card text-[#899CC9]/80 text-[18px] shrink-0 mr-2"
+                      [style.color]="basicInfoForm.get('NationalIdFrontUrl')?.invalid && basicInfoForm.get('NationalIdFrontUrl')?.touched ? '#ef4444' : ''"></i>
+                  }
+                  <input type="text" readonly [value]="NationalIdFrontUrl" placeholder="Upload Front ID"
+                    class="bg-transparent w-full text-slate-800 text-[14px] outline-none h-[44px] cursor-pointer text-ellipsis"
+                    [style.color]="basicInfoForm.get('NationalIdFrontUrl')?.invalid && basicInfoForm.get('NationalIdFrontUrl')?.touched ? '#ef4444' : ''">
+                  <i class="fa-solid fa-cloud-arrow-up text-[#899CC9] hover:text-(--primary-color) text-[18px] transition-colors duration-200"
+                    [style.color]="basicInfoForm.get('NationalIdFrontUrl')?.invalid && basicInfoForm.get('NationalIdFrontUrl')?.touched ? '#ef4444' : ''"></i>
+                </div>
+
+                <input #fileInputNationalIdFrontUrl type="file" accept="image/*,.pdf" class="hidden"
+                  (change)="onFileSelectedNationalId($event)">
+                <div class="min-h-[22px] mt-[6px]">
+                  @if (basicInfoForm.get('NationalIdFrontUrl')?.invalid && basicInfoForm.get('NationalIdFrontUrl')?.touched) {
+                  <div class="text-red-500 text-[12px] font-medium flex items-center gap-1">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    @if (basicInfoForm.get('NationalIdFrontUrl')?.errors?.['serverError']) {
+                      {{ basicInfoForm.get('NationalIdFrontUrl')?.errors?.['serverError'] }}
+                    } @else {
+                      National ID (Front) is required
+                    }
+                  </div>
+                  }
+                </div>
+              </div>
+
+              <!-- NationalIdBackUrl -->
+              <div class="col-span-1">
+                <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+                  National ID (Back)
+                  <span class="text-red-500 font-bold">*</span>
+                </label>
+
+                <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out cursor-pointer"
+                  [style.borderColor]="basicInfoForm.get('NationalIdBackUrl')?.invalid && basicInfoForm.get('NationalIdBackUrl')?.touched ? '#ef4444' : ''"
+                  [style.backgroundColor]="basicInfoForm.get('NationalIdBackUrl')?.invalid && basicInfoForm.get('NationalIdBackUrl')?.touched ? '#fef2f2' : ''"
+                  (click)="fileInputNationalIdBackUrl.click()">
+                  @if (isImage(previewUrlNationalIdBackUrl)) {
+                    <img [src]="previewUrlNationalIdBackUrl" alt="Back ID" class="w-8 h-8 rounded-md object-cover shrink-0 mr-2 border border-slate-200">
+                  } @else {
+                    <i class="fa-solid fa-id-card text-[#899CC9]/80 text-[18px] shrink-0 mr-2"
+                      [style.color]="basicInfoForm.get('NationalIdBackUrl')?.invalid && basicInfoForm.get('NationalIdBackUrl')?.touched ? '#ef4444' : ''"></i>
+                  }
+                  <input type="text" readonly [value]="NationalIdBackUrl" placeholder="Upload Back ID"
+                    class="bg-transparent w-full text-slate-800 text-[14px] outline-none h-[44px] cursor-pointer text-ellipsis"
+                    [style.color]="basicInfoForm.get('NationalIdBackUrl')?.invalid && basicInfoForm.get('NationalIdBackUrl')?.touched ? '#ef4444' : ''">
+                  <i class="fa-solid fa-cloud-arrow-up text-[#899CC9] hover:text-(--primary-color) text-[18px] transition-colors duration-200"
+                    [style.color]="basicInfoForm.get('NationalIdBackUrl')?.invalid && basicInfoForm.get('NationalIdBackUrl')?.touched ? '#ef4444' : ''"></i>
+                </div>
+
+                <input #fileInputNationalIdBackUrl type="file" accept="image/*,.pdf" class="hidden"
+                  (change)="onFileSelectedNationalIdBackUrl($event)">
+                <div class="min-h-[22px] mt-[6px]">
+                  @if (basicInfoForm.get('NationalIdBackUrl')?.invalid && basicInfoForm.get('NationalIdBackUrl')?.touched) {
+                  <div class="text-red-500 text-[12px] font-medium flex items-center gap-1">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    @if (basicInfoForm.get('NationalIdBackUrl')?.errors?.['serverError']) {
+                      {{ basicInfoForm.get('NationalIdBackUrl')?.errors?.['serverError'] }}
+                    } @else {
+                      National ID (Back) is required
+                    }
+                  </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Bachelor Certificate -->
+              <div class="col-span-1">
+                <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+                  Bachelor Certificate
+                  <span class="text-red-500 font-bold">*</span>
+                </label>
+
+                <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out cursor-pointer"
+                  [style.borderColor]="basicInfoForm.get('BachelorCerificate')?.invalid && basicInfoForm.get('BachelorCerificate')?.touched ? '#ef4444' : ''"
+                  [style.backgroundColor]="basicInfoForm.get('BachelorCerificate')?.invalid && basicInfoForm.get('BachelorCerificate')?.touched ? '#fef2f2' : ''"
+                  (click)="fileInputBachelorCerificate.click()">
+                  @if (isImage(previewUrlBachelorCerificate)) {
+                    <img [src]="previewUrlBachelorCerificate" alt="Bachelor Certificate" class="w-8 h-8 rounded-md object-cover shrink-0 mr-2 border border-slate-200">
+                  } @else {
+                    <i class="fa-solid fa-graduation-cap text-[#899CC9]/80 text-[18px] shrink-0 mr-2"
+                      [style.color]="basicInfoForm.get('BachelorCerificate')?.invalid && basicInfoForm.get('BachelorCerificate')?.touched ? '#ef4444' : ''"></i>
+                  }
+                  <input type="text" readonly [value]="BachelorCerificate" placeholder="Upload Certificate"
+                    class="bg-transparent w-full text-slate-800 text-[14px] outline-none h-[44px] cursor-pointer text-ellipsis"
+                    [style.color]="basicInfoForm.get('BachelorCerificate')?.invalid && basicInfoForm.get('BachelorCerificate')?.touched ? '#ef4444' : ''">
+                  <i class="fa-solid fa-cloud-arrow-up text-[#899CC9] hover:text-(--primary-color) text-[18px] transition-colors duration-200"
+                    [style.color]="basicInfoForm.get('BachelorCerificate')?.invalid && basicInfoForm.get('BachelorCerificate')?.touched ? '#ef4444' : ''"></i>
+                </div>
+
+                <input #fileInputBachelorCerificate type="file" accept="image/*,.pdf" class="hidden"
+                  (change)="onFileSelectedBachelorCerificate($event)">
+                <div class="min-h-[22px] mt-[6px]">
+                  @if (basicInfoForm.get('BachelorCerificate')?.invalid && basicInfoForm.get('BachelorCerificate')?.touched) {
+                  <div class="text-red-500 text-[12px] font-medium flex items-center gap-1">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    @if (basicInfoForm.get('BachelorCerificate')?.errors?.['serverError']) {
+                      {{ basicInfoForm.get('BachelorCerificate')?.errors?.['serverError'] }}
+                    } @else {
+                      Bachelor Certificate is required
+                    }
+                  </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Internship Certificate -->
+              <div class="col-span-1">
+                <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+                  Internship Certificate
+                  <span class="text-red-500 font-bold">*</span>
+                </label>
+
+                <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out cursor-pointer"
+                  [style.borderColor]="basicInfoForm.get('ExelenceCertificate')?.invalid && basicInfoForm.get('ExelenceCertificate')?.touched ? '#ef4444' : ''"
+                  [style.backgroundColor]="basicInfoForm.get('ExelenceCertificate')?.invalid && basicInfoForm.get('ExelenceCertificate')?.touched ? '#fef2f2' : ''"
+                  (click)="fileInputExelenceCertificate.click()">
+                  @if (isImage(previewUrlExelenceCertificate)) {
+                    <img [src]="previewUrlExelenceCertificate" alt="Internship Certificate" class="w-8 h-8 rounded-md object-cover shrink-0 mr-2 border border-slate-200">
+                  } @else {
+                    <i class="fa-solid fa-award text-[#899CC9]/80 text-[18px] shrink-0 mr-2"
+                      [style.color]="basicInfoForm.get('ExelenceCertificate')?.invalid && basicInfoForm.get('ExelenceCertificate')?.touched ? '#ef4444' : ''"></i>
+                  }
+                  <input type="text" readonly [value]="ExelenceCertificate" placeholder="Upload Certificate"
+                    class="bg-transparent w-full text-slate-800 text-[14px] outline-none h-[44px] cursor-pointer text-ellipsis"
+                    [style.color]="basicInfoForm.get('ExelenceCertificate')?.invalid && basicInfoForm.get('ExelenceCertificate')?.touched ? '#ef4444' : ''">
+                  <i class="fa-solid fa-cloud-arrow-up text-[#899CC9] hover:text-(--primary-color) text-[18px] transition-colors duration-200"
+                    [style.color]="basicInfoForm.get('ExelenceCertificate')?.invalid && basicInfoForm.get('ExelenceCertificate')?.touched ? '#ef4444' : ''"></i>
+                </div>
+
+                <input #fileInputExelenceCertificate type="file" accept="image/*,.pdf" class="hidden"
+                  (change)="onFileSelectedExelenceCertificate($event)">
+                <div class="min-h-[22px] mt-[6px]">
+                  @if (basicInfoForm.get('ExelenceCertificate')?.invalid && basicInfoForm.get('ExelenceCertificate')?.touched) {
+                  <div class="text-red-500 text-[12px] font-medium flex items-center gap-1">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    @if (basicInfoForm.get('ExelenceCertificate')?.errors?.['serverError']) {
+                      {{ basicInfoForm.get('ExelenceCertificate')?.errors?.['serverError'] }}
+                    } @else {
+                      Internship Certificate is required
+                    }
+                  </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Medical Syndicate -->
+              <div class="col-span-1">
+                <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+                  Medical Syndicate Card
+                  <span class="text-red-500 font-bold">*</span>
+                </label>
+
+                <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out cursor-pointer"
+                  [style.borderColor]="basicInfoForm.get('MedicalSyndicateId')?.invalid && basicInfoForm.get('MedicalSyndicateId')?.touched ? '#ef4444' : ''"
+                  [style.backgroundColor]="basicInfoForm.get('MedicalSyndicateId')?.invalid && basicInfoForm.get('MedicalSyndicateId')?.touched ? '#fef2f2' : ''"
+                  (click)="fileInputMedicalSyndicateId.click()">
+                  @if (isImage(previewUrlMedicalSyndicateId)) {
+                    <img [src]="previewUrlMedicalSyndicateId" alt="Syndicate Card" class="w-8 h-8 rounded-md object-cover shrink-0 mr-2 border border-slate-200">
+                  } @else {
+                    <i class="fa-solid fa-address-card text-[#899CC9]/80 text-[18px] shrink-0 mr-2"
+                      [style.color]="basicInfoForm.get('MedicalSyndicateId')?.invalid && basicInfoForm.get('MedicalSyndicateId')?.touched ? '#ef4444' : ''"></i>
+                  }
+                  <input type="text" readonly [value]="MedicalSyndicateId" placeholder="Upload Syndicate Card"
+                    class="bg-transparent w-full text-slate-800 text-[14px] outline-none h-[44px] cursor-pointer text-ellipsis"
+                    [style.color]="basicInfoForm.get('MedicalSyndicateId')?.invalid && basicInfoForm.get('MedicalSyndicateId')?.touched ? '#ef4444' : ''">
+                  <i class="fa-solid fa-cloud-arrow-up text-[#899CC9] hover:text-(--primary-color) text-[18px] transition-colors duration-200"
+                    [style.color]="basicInfoForm.get('MedicalSyndicateId')?.invalid && basicInfoForm.get('MedicalSyndicateId')?.touched ? '#ef4444' : ''"></i>
+                </div>
+
+                <input #fileInputMedicalSyndicateId type="file" accept="image/*,.pdf" class="hidden"
+                  (change)="onFileSelectedMedicalSyndicateId($event)">
+                <div class="min-h-[22px] mt-[6px]">
+                  @if (basicInfoForm.get('MedicalSyndicateId')?.invalid && basicInfoForm.get('MedicalSyndicateId')?.touched) {
+                  <div class="text-red-500 text-[12px] font-medium flex items-center gap-1">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    @if (basicInfoForm.get('MedicalSyndicateId')?.errors?.['serverError']) {
+                      {{ basicInfoForm.get('MedicalSyndicateId')?.errors?.['serverError'] }}
+                    } @else {
+                      Medical Syndicate Card is required
+                    }
+                  </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Medical License -->
+              <div class="col-span-1">
+                <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+                  Practice License ( Optional )
+                </label>
+
+                <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out cursor-pointer"
+                  [style.borderColor]="basicInfoForm.get('MedicalLicense')?.invalid && basicInfoForm.get('MedicalLicense')?.touched ? '#ef4444' : ''"
+                  [style.backgroundColor]="basicInfoForm.get('MedicalLicense')?.invalid && basicInfoForm.get('MedicalLicense')?.touched ? '#fef2f2' : ''"
+                  (click)="fileInputMedicalLicense.click()">
+                  @if (isImage(previewUrlMedicalLicense)) {
+                    <img [src]="previewUrlMedicalLicense" alt="Medical License" class="w-8 h-8 rounded-md object-cover shrink-0 mr-2 border border-slate-200">
+                  } @else {
+                    <i class="fa-solid fa-file-medical text-[#899CC9]/80 text-[18px] shrink-0 mr-2"
+                      [style.color]="basicInfoForm.get('MedicalLicense')?.invalid && basicInfoForm.get('MedicalLicense')?.touched ? '#ef4444' : ''"></i>
+                  }
+                  <input type="text" readonly [value]="MedicalLicense" placeholder="Upload Practice License"
+                    class="bg-transparent w-full text-slate-800 text-[14px] outline-none h-[44px] cursor-pointer text-ellipsis"
+                    [style.color]="basicInfoForm.get('MedicalLicense')?.invalid && basicInfoForm.get('MedicalLicense')?.touched ? '#ef4444' : ''">
+                  <i class="fa-solid fa-cloud-arrow-up text-[#899CC9] hover:text-(--primary-color) text-[18px] transition-colors duration-200"
+                    [style.color]="basicInfoForm.get('MedicalLicense')?.invalid && basicInfoForm.get('MedicalLicense')?.touched ? '#ef4444' : ''"></i>
+                </div>
+
+                <input #fileInputMedicalLicense type="file" accept="image/*,.pdf" class="hidden"
+                  (change)="onFileSelectedMedicalLicense($event)">
+                <div class="min-h-[22px] mt-[6px]">
+                  @if (basicInfoForm.get('MedicalLicense')?.invalid && basicInfoForm.get('MedicalLicense')?.touched) {
+                  <div class="text-red-500 text-[12px] font-medium flex items-center gap-1">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    {{ basicInfoForm.get('MedicalLicense')?.errors?.['serverError'] }}
+                  </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Other Certificates -->
+              <div class="col-span-1 sm:col-span-2 mt-2">
+                <div class="flex flex-col mb-[12px]">
+                  <label class="text-slate-700 text-[14px] font-semibold">
+                    Other Documents ( Optional )
+                  </label>
+                  <p class="text-slate-500 text-[13px] m-0 mt-1">
+                    Click the plus button to upload additional documents. You can upload multiple files (Images or PDFs).
+                  </p>
+                </div>
+
+                <div class="border-2 border-dashed border-slate-300 bg-slate-50/40 rounded-[20px] p-[16px] flex flex-wrap gap-4 transition-all duration-300 ease-in-out min-h-[120px]" 
+                  [style.borderColor]="basicInfoForm.get('OtherCertificates')?.invalid && basicInfoForm.get('OtherCertificates')?.touched ? '#ef4444' : ''"
+                  [style.backgroundColor]="basicInfoForm.get('OtherCertificates')?.invalid && basicInfoForm.get('OtherCertificates')?.touched ? '#fef2f2' : ''">
+                  
+                  <!-- Add Button -->
+                  <div class="w-[90px] h-[90px] sm:w-[100px] sm:h-[100px] rounded-2xl border-2 border-dashed border-slate-300 bg-white hover:bg-blue-50/50 hover:border-(--primary-color) flex flex-col items-center justify-center cursor-pointer transition-all duration-300 group shadow-sm hover:shadow-md"
+                    (click)="fileInputOtherCertificates.click()">
+                    <div class="w-10 h-10 rounded-full bg-slate-50 group-hover:bg-white flex items-center justify-center transition-colors mb-1">
+                      <i class="fa-solid fa-plus text-[#899CC9] group-hover:text-(--primary-color) text-[20px] transition-colors"></i>
+                    </div>
+                    <span class="text-[12px] text-slate-500 font-medium group-hover:text-(--primary-color) transition-colors">Add file</span>
+                  </div>
+
+                  <!-- Selected Files Preview -->
+                  @for (file of selectedOtherCertificates; track file.name; let i = $index) {
+                  <div class="relative w-[90px] h-[90px] sm:w-[100px] sm:h-[100px] rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-shadow flex flex-col items-center justify-center p-2 group">
+                    @if (isImage(previewUrlOtherCertificates[i])) {
+                      <img [src]="previewUrlOtherCertificates[i]" [alt]="file.name" class="w-12 h-12 rounded-lg object-cover mb-2 border border-slate-200 shadow-sm transition-transform group-hover:scale-110 shrink-0">
+                    } @else {
+                      <i class="fa-solid fa-file-lines text-[#899CC9]/80 text-[30px] mb-2 transition-transform group-hover:scale-110 shrink-0"></i>
+                    }
+                    <span class="text-[11px] text-slate-700 font-medium w-full text-center px-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" [title]="file.name">{{ file.name }}</span>
+                    
+                    <!-- Delete Button Overlay -->
+                    <button type="button" class="absolute -top-2 -right-2 bg-red-100 text-red-500 hover:bg-red-500 hover:text-white w-7 h-7 rounded-full flex items-center justify-center shadow-md transition-all opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100 z-10" (click)="removeOtherCertificate(i); $event.stopPropagation()">
+                      <i class="fa-solid fa-xmark text-[14px]"></i>
+                    </button>
+                  </div>
+                  }
+
+                </div>
+
+                <input #fileInputOtherCertificates type="file" accept="image/*,.pdf" multiple class="hidden"
+                  (change)="onFileSelectedOtherCertificates($event)">
+                
+                <div class="min-h-[22px] mt-[6px]">
+                  @if (basicInfoForm.get('OtherCertificates')?.invalid && basicInfoForm.get('OtherCertificates')?.touched) {
+                  <div class="text-red-500 text-[12px] font-medium flex items-center gap-1">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    {{ basicInfoForm.get('OtherCertificates')?.errors?.['serverError'] }}
+                  </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Stepper Progress Dots -->
+              <div class="col-span-1 sm:col-span-2 flex justify-center items-center gap-1.5 my-6">
+                <div class="w-[8px] h-[6px] bg-slate-200 rounded-full"></div>
+                <div class="w-[8px] h-[6px] bg-slate-200 rounded-full"></div>
+                <div class="w-[24px] h-[6px] bg-(--primary-color) rounded-full shadow-sm shadow-(--primary-color)/25"></div>
+                <div class="w-[8px] h-[6px] bg-slate-200 rounded-full"></div>
+                <div class="w-[8px] h-[6px] bg-slate-200 rounded-full"></div>
+              </div>
+
+              <!-- Actions -->
+              <div class="col-span-1 sm:col-span-2 mt-[10px] flex gap-4">
+                <button type="button" routerLink="/doctor/auth/register/createProfile" [disabled]="isLoading" class="w-[30%] bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 px-[20px] h-[54px] rounded-full text-[16px] font-bold leading-none flex items-center justify-center gap-2 shadow-sm transition-all duration-300 ease-in-out cursor-pointer disabled:opacity-50">
+                  <i class="fa-solid fa-arrow-left text-[15px] mr-1"></i>
+                  <span>Previous</span>
+                </button>
+
+                <button type="submit" [disabled]="isLoading" class="flex-1 bg-gradient-to-r from-(--primary-color) to-[#006ba5] text-white hover:from-[#006ba5] hover:to-[#005a8c] px-[20px] h-[54px] rounded-full text-[16px] font-bold leading-none flex items-center justify-center gap-2 shadow-lg shadow-(--primary-color)/15 hover:shadow-xl hover:shadow-(--primary-color)/25 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 ease-in-out cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none">
+                  @if (isLoading) {
+                    <i class="fa-solid fa-spinner fa-spin mr-2"></i>
+                  }
+                  <span>Complete Registration</span>
+                  <i class="fa-solid fa-arrow-right text-[15px] ml-1"></i>
+                </button>
+              </div>
+
+            </div>
+
+          </form>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="w-full text-center text-xs text-slate-400 z-10 mt-4">
+        &copy; 2026 teleSEHA. All rights reserved.
+      </div>
+
+    </div>
+  </div>
+
+</div>

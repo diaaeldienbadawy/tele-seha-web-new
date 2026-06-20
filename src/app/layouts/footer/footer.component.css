@@ -1,0 +1,19 @@
+.footer {
+  padding-bottom: 0px !important;
+}
+
+@media (max-width: 768px) {
+  .bgBotton {
+    border-top-left-radius: 300px;
+    border-top-right-radius: 300px;
+  }
+}
+
+
+
+@media (min-width: 768px) {
+  .bgBotton {
+    border-top-left-radius: 120% 200px;
+    border-top-right-radius: 120% 200px;
+  }
+}

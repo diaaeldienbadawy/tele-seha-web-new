@@ -1,0 +1,45 @@
+<!-- <div class="w-full">
+  <div class="flex items-center gap-3  ">
+    <div class="image w-[122px] h-[80px] rounded-[10px] ">
+      <img class="w-full h-full rounded-[10px] " src="../../../../../assets/images/doctor-9 1.png" loading="lazy"
+        alt="img">
+    </div>
+    <div class="image w-[122px] h-[80px] rounded-[10px] ">
+      <img class="w-full h-full rounded-[10px] " src="../../../../../assets/images/doctor-9 1.png" loading="lazy"
+        alt="img">
+    </div>
+    <div class="image w-[122px] h-[80px] rounded-[10px] ">
+      <img class="w-full h-full rounded-[10px] " src="../../../../../assets/images/doctor-9 1.png" loading="lazy"
+        alt="img">
+    </div>
+    <div class="image w-[122px] h-[80px] rounded-[10px] ">
+      <img class="w-full h-full rounded-[10px] " src="../../../../../assets/images/doctor-9 1.png" loading="lazy"
+        alt="img">
+    </div>
+  </div>
+</div> -->
+
+<p-carousel
+  [value]="images"
+  [numVisible]="4"
+  [numScroll]="1"
+  [circular]="true"
+  [showIndicators]="false"
+  [showNavigators]="true"
+  [responsiveOptions]="responsiveOptions"
+>
+
+<ng-template let-image pTemplate="item">
+  <div class="px-1">
+    <div class="image h-[80px] rounded-[10px] overflow-hidden">
+      <img
+        [src]="image.src"
+        [alt]="image.alt"
+        class="w-full h-full object-cover rounded-[10px]"
+        loading="lazy"
+      />
+    </div>
+  </div>
+</ng-template>
+
+</p-carousel>

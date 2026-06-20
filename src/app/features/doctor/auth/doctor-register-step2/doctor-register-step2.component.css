@@ -1,0 +1,143 @@
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  display: none;
+}
+
+/* Ensure the host select component takes full width */
+.custom-select {
+  width: 100% !important;
+  font-size: 14px;
+  background-color: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* Force PrimeNG internal structure to be borderless and full width */
+::ng-deep .custom-select.p-select,
+::ng-deep .custom-select .p-select {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  width: 100% !important;
+  display: flex !important;
+}
+
+/* Styling the active selected value text - clear and high-contrast dark slate */
+::ng-deep .custom-select .p-select-label {
+  padding: 0 !important;
+  color: #1e293b !important; /* High contrast dark text */
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  display: flex !important;
+  align-items: center !important;
+  height: 44px !important;
+  background: transparent !important;
+}
+
+/* Styling the placeholder text - sharp slate-400 */
+::ng-deep .custom-select .p-select-placeholder {
+  color: #94a3b8 !important; /* Sharp and readable placeholder */
+  font-size: 14px !important;
+  font-weight: 400 !important;
+}
+
+/* Styling the drop-down arrow trigger */
+::ng-deep .custom-select .p-select-trigger {
+  width: 24px !important;
+  color: #64748b !important;
+  background: transparent !important;
+}
+
+/* PrimeNG Dropdown Overlay Popup Panel */
+::ng-deep .p-select-overlay {
+  position: absolute !important;
+  z-index: 99999 !important; /* Ensure it floats above all inputs */
+  background: #ffffff !important; /* Solid background for maximum clarity */
+  border: 1px solid #cbd5e1 !important; /* Clear high-contrast border */
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.05) !important;
+  border-radius: 12px !important;
+  padding: 4px !important;
+  margin-top: 4px !important;
+  box-sizing: border-box !important;
+  
+  /* Apply tight constraints so overlay never exceeds input size or overflows screen */
+  max-width: 290px !important;
+}
+
+/* Reset inner list padding */
+::ng-deep .p-select-list {
+  padding: 0 !important;
+}
+
+/* Styling individual options inside dropdown list */
+::ng-deep .p-select-option {
+  padding: 10px 14px !important;
+  font-size: 14px !important;
+  color: #334155 !important; /* Slate-700 for maximum legibility */
+  border-radius: 8px !important;
+  margin: 2px 0 !important;
+  transition: all 0.15s ease !important;
+  font-weight: 500 !important;
+  
+  /* Wrap long text options instead of stretching overlay */
+  white-space: normal !important;
+  word-break: break-word !important;
+  line-height: 1.4 !important;
+}
+
+/* Option hover / active keyboard navigation state */
+::ng-deep .p-select-option:hover,
+::ng-deep .p-select-option.p-select-option-focus {
+  background: #f1f5f9 !important; /* Soft high-contrast light gray backdrop */
+  color: #0f172a !important; /* Deep dark text */
+}
+
+/* Selected option highlight matching the brand color */
+::ng-deep .p-select-option.p-select-option-selected {
+  background: rgba(0, 123, 189, 0.08) !important;
+  color: #007BBD !important; /* Brand primary color */
+  font-weight: 600 !important;
+}
+
+/* Custom Datepicker container styling */
+::ng-deep .custom-datepicker {
+  width: 100% !important;
+  display: flex !important;
+}
+
+/* Force datepicker inputs to be borderless and align properly */
+::ng-deep .custom-datepicker .p-datepicker-input,
+::ng-deep .custom-datepicker input {
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  width: 100% !important;
+  color: #1e293b !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  height: 44px !important;
+  padding: 0 !important;
+}
+
+/* Custom styling for datepicker placeholder */
+::ng-deep .custom-datepicker input::placeholder {
+  color: #94a3b8 !important;
+  font-weight: 400 !important;
+}
+
+/* Datepicker Overlay matching dropdown overlays */
+::ng-deep .p-datepicker-panel {
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.05) !important;
+  border-radius: 12px !important;
+  padding: 8px !important;
+  margin-top: 4px !important;
+  box-sizing: border-box !important;
+}
+
+

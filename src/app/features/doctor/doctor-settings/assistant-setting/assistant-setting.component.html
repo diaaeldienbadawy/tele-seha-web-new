@@ -1,0 +1,140 @@
+<div class="w-full md:w-[95%] lg:w-[90%] mx-auto">
+
+  <div class="w-full bg-white rounded-3xl border border-slate-100 shadow-[0_10px_40px_rgba(0,0,0,0.03)] p-6 sm:p-8 transition-all duration-300">
+    
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6 border-b border-slate-100 pb-5">
+      <div>
+        <h3 class="text-slate-800 text-[18px] sm:text-[20px] font-bold">Assistant Settings</h3>
+        <p class="text-slate-500 text-[13px] mt-0.5">Manage your clinic assistants and their login access</p>
+      </div>
+      <button (click)="toggleAssistantForm()"
+        class="bg-gradient-to-r from-(--primary-color) to-[#006ba5] text-white hover:from-[#006ba5] hover:to-[#005a8c] px-5 sm:px-6 h-[40px] rounded-full text-[14px] font-bold leading-none flex items-center justify-center gap-2 shadow-md shadow-(--primary-color)/15 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer">
+        <i class="fa-solid fa-user-plus"></i>
+        <span>Add Assistant</span>
+      </button>
+    </div>
+
+    <!-- Assistants List -->
+    <div class="flex flex-col gap-4 mt-6">
+      @for (assistant of assistantSetting; track assistant.id) {
+      <div class="flex items-center justify-between border border-slate-100 bg-slate-50/30 rounded-2xl p-4 sm:p-5 transition-all duration-200 hover:shadow-sm">
+        
+        <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+          <p class="text-[14px] text-slate-500 font-medium flex items-center gap-1.5" dir="ltr">
+            <i class="fa-solid fa-phone text-slate-400 text-[13px]"></i>
+            <span>{{ assistant.mobile }}</span>
+          </p>
+          <p class="text-[17px] font-bold text-slate-800">{{ assistant.fullName }}</p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button (click)="editAssistant(assistant.id)"
+            class="bg-[#007BBD]/10 text-[#007BBD] hover:bg-[#007BBD] hover:text-white px-4 h-[34px] rounded-full text-[13px] font-bold transition-all duration-200 cursor-pointer">
+            Edit
+          </button>
+          <button (click)="deleteAssistant(assistant.id)"
+            class="w-[34px] h-[34px] flex justify-center items-center rounded-full bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-200 cursor-pointer">
+            <i class="fa-solid fa-trash-can text-[13px]"></i>
+          </button>
+        </div>
+
+      </div>
+      } @empty {
+      <div class="text-center py-12 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
+        <i class="fa-solid fa-users-slash text-slate-300 text-[40px] mb-3"></i>
+        <p class="text-[15px] font-semibold text-slate-500">No assistants found</p>
+        <p class="text-[13px] text-slate-400 mt-1">Add assistants to give them access to clinic tasks.</p>
+      </div>
+      }
+    </div>
+
+  </div>
+</div>
+
+<!-- Add/Edit Assistant Dialog Popup -->
+@if (isAddingAssistant === true) {
+  <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-[999999] animate-fadeIn">
+
+    <!-- Popup Card -->
+    <div class="bg-white rounded-3xl border border-slate-100 shadow-2xl p-6 sm:p-8 w-[95%] max-w-[500px] max-h-[90vh] overflow-y-auto no-scrollbar relative flex flex-col">
+
+      <!-- Close Icon -->
+      <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
+        <h3 class="text-slate-800 text-[18px] font-bold">
+          {{ editingId ? 'Edit Assistant' : 'Add New Assistant' }}
+        </h3>
+        <button (click)="toggleAssistantForm()" class="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">
+          <i class="fa-solid fa-xmark text-[20px]"></i>
+        </button>
+      </div>
+
+      <!-- Scrollable Form Content -->
+      <form [formGroup]="assistantForm" (ngSubmit)="submit()" class="flex flex-col gap-4">
+
+        <!-- Assistant Name -->
+        <div>
+          <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+            Assistant Name
+            <span class="text-red-500 font-bold">*</span>
+          </label>
+          <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out">
+            <i class="fa-solid fa-user text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
+            <input formControlName="fullName" type="text" placeholder="Write name"
+              class="text-slate-800 text-[14px] font-normal bg-transparent w-full outline-none h-[44px]">
+          </div>
+          <div class="min-h-[22px] mt-[6px]">
+            @if (assistantForm.get('fullName')?.touched && assistantForm.get('fullName')?.errors) {
+            <div class="text-red-500 text-[12px] font-medium flex items-center gap-1">
+              <i class="fa-solid fa-circle-exclamation"></i>
+              @if (assistantForm.get('fullName')?.errors?.['required']) {
+              Name is required
+              }
+              @if (assistantForm.get('fullName')?.errors?.['minlength']) {
+              Name must be at least 3 characters
+              }
+            </div>
+            }
+          </div>
+        </div>
+
+        <!-- Assistant Phone -->
+        <div>
+          <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+            Phone Number
+            <span class="text-red-500 font-bold">*</span>
+          </label>
+          <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out" dir="ltr">
+            <input #phoneInput type="tel" placeholder="Enter phone number" maxlength="11" inputmode="numeric" pattern="[0-9]*"
+              class="text-slate-800 text-[14px] font-normal bg-transparent w-full outline-none h-[44px]" />
+            <i class="fa-solid fa-mobile-screen text-[#899CC9]/80 text-[18px] mr-2 shrink-0"></i>
+          </div>
+          <div class="min-h-[22px] mt-[6px]">
+            @if (assistantForm.get('mobile')?.touched && assistantForm.get('mobile')?.errors) {
+            <div class="text-red-500 text-[12px] font-medium flex items-center gap-1">
+              <i class="fa-solid fa-circle-exclamation"></i>
+              @if (assistantForm.get('mobile')?.errors?.['required']) {
+              Phone number is required
+              }
+            </div>
+            }
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <div class="w-full flex justify-end gap-3 border-t border-slate-100 pt-5 mt-2">
+          <button type="button" (click)="toggleAssistantForm()"
+            class="bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 px-5 h-[44px] rounded-full text-[14px] font-bold leading-none flex items-center justify-center shadow-sm transition-all duration-300 cursor-pointer">
+            Cancel
+          </button>
+          <button type="submit"
+            class="bg-gradient-to-r from-(--primary-color) to-[#006ba5] text-white hover:from-[#006ba5] hover:to-[#005a8c] px-6 h-[44px] rounded-full text-[14px] font-bold leading-none flex items-center justify-center gap-2 shadow-lg shadow-(--primary-color)/15 hover:shadow-xl hover:shadow-(--primary-color)/25 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 ease-in-out cursor-pointer">
+            <i class="fa-solid fa-check"></i>
+            <span>Save Assistant</span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+}

@@ -1,0 +1,108 @@
+<!-- OVERLAY -->
+@if(menuOpen){
+
+<!-- OVERLAY -->
+<div class="fixed lg:hidden inset-0 bg-slate-900/60 backdrop-blur-sm z-[100]
+         transition-opacity duration-300" [class.opacity-100]="menuOpen" [class.opacity-0]="!menuOpen" [class.pointer-events-none]="!menuOpen"
+  (click)="closeMenu()">
+</div>
+
+<!-- DRAWER -->
+<div class="fixed top-0 h-full lg:hidden
+         w-[85%] sm:w-[350px]
+         bg-white/95 backdrop-blur-xl z-[101]
+         shadow-[0_0_40px_rgba(0,0,0,0.15)]
+         transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]
+         will-change-transform" [class.right-0]="!isRtl" [class.left-0]="isRtl" [class.translate-x-0]="menuOpen"
+  [class.translate-x-full]="!menuOpen && !isRtl" [class.-translate-x-full]="!menuOpen && isRtl">
+
+  <!-- HEADER -->
+  <div class="flex justify-between items-center p-6 border-b border-gray-100">
+    <app-header-logo></app-header-logo>
+
+    <button (click)="closeMenu()" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-50 text-[--primary-color] hover:bg-red-50 hover:text-red-500 hover:rotate-90 transition-all duration-300">
+      <i class="fa-solid fa-xmark text-xl"></i>
+    </button>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="p-6 space-y-8 overflow-auto h-[calc(100%-80px)]">
+
+    <div>
+      <app-mobile-nav (navigate)="closeMenu()"></app-mobile-nav>
+    </div>
+
+    <div class="w-full flex items-center justify-between border-t border-gray-100 pt-6">
+      <div class="flex items-center gap-4">
+        <app-header-notification></app-header-notification>
+        <app-header-language></app-header-language>
+      </div>
+    </div>
+
+    <div class="pb-6">
+      <app-header-profile (openAccountModal)="openAccountModal()">
+      </app-header-profile>
+    </div>
+
+  </div>
+
+</div>
+}
+
+
+
+
+@if (showAccountModal) {
+<div class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[999999999] flex items-center justify-center p-4">
+
+  <!-- Card Container -->
+  <div class="bg-white rounded-[2rem] p-8 md:p-12 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] w-full max-w-2xl relative animate-fadeIn border border-white/20">
+
+    <button (click)="closeAccountModal()" class="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-500 hover:rotate-90 transition-all duration-300">
+      <i class="fa-solid fa-xmark text-xl"></i>
+    </button>
+
+    <h2 class="text-center text-[24px] md:text-[30px] font-bold text-gray-800 mb-2">
+      {{ 'header.joinPlatform' | translate }}
+    </h2>
+    <p class="text-center text-gray-500 mb-10 text-sm md:text-base">{{ 'header.selectAccountType' | translate }}</p>
+
+    <div class="flex flex-col sm:flex-row gap-6 justify-center">
+
+      <!-- Patient -->
+      <div routerLink="/patient/auth/login" class="group cursor-pointer flex-1 h-[180px] bg-white
+          flex flex-col items-center justify-center
+          border-2 border-gray-100 rounded-3xl
+          transition-all duration-300 ease-out
+          hover:border-[#007BBD] hover:bg-[#007BBD]/5
+          hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(0,123,189,0.2)]">
+
+        <i class="fa-solid fa-user text-[40px] text-[#4F46E5] mb-4
+            group-hover:scale-110 transition"></i>
+
+        <p class="text-[20px] font-semibold text-[#333]">
+          {{ 'header.patient' | translate }}
+        </p>
+      </div>
+
+      <!-- Doctor -->
+      <div routerLink="/doctor/auth/login" class="group cursor-pointer flex-1 h-[180px] bg-white
+          flex flex-col items-center justify-center
+          border-2 border-gray-100 rounded-3xl
+          transition-all duration-300 ease-out
+          hover:border-[#0D9488] hover:bg-[#0D9488]/5
+          hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(13,148,136,0.2)]">
+
+        <i class="fa-solid fa-user-doctor text-[40px] text-[#16A34A] mb-4
+            group-hover:scale-110 transition"></i>
+
+        <p class="text-[20px] font-semibold text-[#333]">
+          {{ 'header.doctor' | translate }}
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+}

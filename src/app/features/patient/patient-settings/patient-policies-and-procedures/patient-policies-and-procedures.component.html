@@ -1,0 +1,29 @@
+<div class="mt-6">
+  <div class="ts-card border border-slate-100 bg-white p-6 md:p-10 max-w-4xl mx-auto rounded-3xl">
+    <!-- Document Title & Header -->
+    <div class="text-center pb-6 border-b border-slate-100 mb-8">
+      <h2 class="text-slate-800 text-2xl sm:text-3xl font-extrabold leading-tight">
+        {{ data?.title }}
+      </h2>
+      <div class="w-12 h-1 bg-gradient-to-r from-(--primary-color) to-teal-500 mx-auto rounded-full mt-3"></div>
+      <p class="text-slate-500 text-sm sm:text-base font-medium mt-4 max-w-2xl mx-auto leading-relaxed">
+        {{ data?.prief }}
+      </p>
+    </div>
+
+    <!-- Articles List -->
+    <div class="space-y-8">
+      @for (item of data?.infos; track $index) {
+      <div class="space-y-3">
+        <h3 class="text-slate-800 text-base sm:text-lg font-bold flex items-center gap-2">
+          <span class="w-1.5 h-5 bg-(--primary-color) rounded-full flex-shrink-0"></span>
+          {{ item?.title }}
+        </h3>
+        <p class="text-slate-600 text-sm sm:text-base leading-relaxed font-medium whitespace-pre-line bg-slate-50/50 border border-slate-100 rounded-2xl p-4 sm:p-6">
+          {{ item?.content }}
+        </p>
+      </div>
+      }
+    </div>
+  </div>
+</div>

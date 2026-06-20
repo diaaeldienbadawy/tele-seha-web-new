@@ -1,0 +1,119 @@
+/* Ensure the host select component takes full width */
+.custom-select {
+  width: 100% !important;
+  font-size: 14px;
+  background-color: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* Force PrimeNG internal structure to be borderless and full width */
+::ng-deep .custom-select.p-select,
+::ng-deep .custom-select .p-select {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  width: 100% !important;
+  display: flex !important;
+}
+
+/* Styling the active selected value text */
+::ng-deep .custom-select .p-select-label {
+  padding: 0 !important;
+  color: #1e293b !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  display: flex !important;
+  align-items: center !important;
+  height: 44px !important;
+  background: transparent !important;
+}
+
+/* Styling the placeholder text */
+::ng-deep .custom-select .p-select-placeholder {
+  color: #94a3b8 !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+}
+
+/* Styling the drop-down arrow trigger */
+::ng-deep .custom-select .p-select-trigger {
+  width: 24px !important;
+  color: #64748b !important;
+  background: transparent !important;
+}
+
+/* PrimeNG Dropdown Overlay Popup Panel */
+::ng-deep .p-select-overlay {
+  position: absolute !important;
+  z-index: 99999 !important;
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.05) !important;
+  border-radius: 12px !important;
+  padding: 4px !important;
+  margin-top: 4px !important;
+  box-sizing: border-box !important;
+  max-width: 290px !important;
+}
+
+/* Reset inner list padding */
+::ng-deep .p-select-list {
+  padding: 0 !important;
+}
+
+/* Styling individual options inside dropdown list */
+::ng-deep .p-select-option {
+  padding: 10px 14px !important;
+  font-size: 14px !important;
+  color: #334155 !important;
+  border-radius: 8px !important;
+  margin: 2px 0 !important;
+  transition: all 0.15s ease !important;
+  font-weight: 500 !important;
+  white-space: normal !important;
+  word-break: break-word !important;
+  line-height: 1.4 !important;
+}
+
+/* Option hover state */
+::ng-deep .p-select-option:hover,
+::ng-deep .p-select-option.p-select-option-focus {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+/* Selected option highlight */
+::ng-deep .p-select-option.p-select-option-selected {
+  background: rgba(0, 123, 189, 0.08) !important;
+  color: #007BBD !important;
+  font-weight: 600 !important;
+}
+
+/* PrimeNG Datepicker input field borderless styling */
+::ng-deep .p-datepicker {
+  width: 100% !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+::ng-deep .custom-datepicker.p-datepicker input,
+::ng-deep .p-datepicker input {
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  width: 100% !important;
+  color: #1e293b !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  padding: 0 !important;
+  height: 44px !important;
+  box-shadow: none !important;
+}
+
+::ng-deep .p-datepicker-placeholder {
+  color: #94a3b8 !important;
+}

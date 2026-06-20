@@ -1,0 +1,55 @@
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  display: none;
+}
+
+
+.custom-select {
+  width: 100% !important;
+  font-size: 14px;
+  background-color: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  display: flex !important;
+  align-items: center !important;
+  height: 48px !important;
+}
+
+/* Force PrimeNG internal structure to be borderless and full width */
+::ng-deep .custom-select.p-select,
+::ng-deep .custom-select .p-select {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  width: 100% !important;
+  display: flex !important;
+  height: 48px !important;
+  align-items: center !important;
+}
+
+/* Styling the active selected value text */
+::ng-deep .custom-select .p-select-label {
+  padding: 0 !important;
+  color: #1e293b !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  display: flex !important;
+  align-items: center !important;
+  height: 48px !important;
+  background: transparent !important;
+}
+
+/* Styling the placeholder text */
+::ng-deep .custom-select .p-select-placeholder {
+  color: #94a3b8 !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+}
+
+/* Styling the drop-down arrow trigger */
+::ng-deep .custom-select .p-select-trigger {
+  width: 24px !important;
+  color: #64748b !important;
+  background: transparent !important;
+}

@@ -1,0 +1,29 @@
+<!-- <div class="flex items-center">
+  <img
+    class="w-[20px] h-[20px] mx-[6px]"
+    loading="lazy"
+    src="../../../assets/images/Vector.png"
+    alt="lang">
+
+  <select
+    class="text-[#555555] bg-transparent text-[16px] md:text-[18px]
+           font-normal border-none outline-none">
+    <option value="en">EN</option>
+    <option value="ar">AR</option>
+  </select>
+</div> -->
+
+
+<div class="flex items-center  h-[40px]">
+  <img src="assets/images/Vector.png" class="w-5 h-5 shrink-0" />
+
+  <p-select
+    [options]="languages"
+    optionLabel="label"
+    optionValue="value"
+    [(ngModel)]="selectedLang"
+    (ngModelChange)="switchLanguage($event)"
+    class="custom-select"
+  ></p-select>
+</div>
+

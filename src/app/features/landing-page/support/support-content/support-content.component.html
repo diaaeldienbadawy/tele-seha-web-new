@@ -1,0 +1,187 @@
+<section>
+  <div class="relative container">
+
+
+
+    <div class="title w-full md:w-[90%] mx-auto  text-center">
+      <h2
+        class="text-[#1F1F1F] text-[22px] sm:text-[28px] md:text-[30px] lg:text-[40px] font-bold leading-[150%] tracking-[-0.02em] relative">
+        Support
+
+      </h2>
+    </div>
+
+    <div class="flex flex-col md:flex-row justify-between items-center gap-3  mt-[30px]">
+
+      <div class="w-full md:w-[45%]   ">
+        <div class="bg-[#007BBD] rounded-[10px] p-[30px] relative">
+          <img class="absolute bottom-0 right-0 " src="assets/images/Vector3.png" loading="lazy" alt="">
+          <h3 class="text-[#FFFFFF] text-[24px] md:text-[28px] font-semibold leading-[100%] ">
+            Contact Information
+          </h3>
+          <p class="text-[#FFFFFF] text-[16px] md:text-[18px] font-normal leading-[30px] mt-[10px] ">
+            Say something to start a live chat!
+          </p>
+
+          <div class="mt-[60px]  ">
+            <div>
+              <h4 class="text-[#FFFFFF] text-[16px] md:text-[18px] font-normal leading-[30px] mt-[20px] ">
+                <i
+                  class="fa-solid fa-phone text-[#FFFFFF] text-[16px] md:text-[18px] font-normal leading-[30px] mt-[20px] "></i>
+                +20-1012344792
+              </h4>
+            </div>
+            <div>
+              <h4 class="text-[#FFFFFF] text-[16px] md:text-[18px] font-normal leading-[30px] mt-[20px] ">
+                <i
+                  class="fa-solid fa-envelope text-[#FFFFFF] text-[16px] md:text-[18px] font-normal leading-[30px] mt-[20px] "></i>
+                demo&#64;gmail.com
+              </h4>
+            </div>
+            <div class="flex gap-2  mt-[20px] ">
+              <i
+                class="fa-solid fa-location-dot text-[#FFFFFF] text-[16px] md:text-[18px] font-normal leading-[30px] mt-[8px] "></i>
+              <div>
+                <h4 class="text-[#FFFFFF] text-[16px] md:text-[18px] font-normal leading-[30px]  ">
+                  132 Dartmouth Street Boston,
+                </h4>
+                <h4 class="text-[#FFFFFF] text-[16px] md:text-[18px] font-normal leading-[30px]  ">
+                  Massachusetts 02156 United States
+                </h4>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="flex gap-2  mt-[100px] ">
+            <div class=" bg-[#F7F9FE] rounded-full w-[30px] h-[30px]  cursor-pointer flex justify-center items-center ">
+              <i class="fa-brands fa-twitter text-[#007BBD] hover:  "></i>
+            </div>
+            <div class=" bg-[#F7F9FE] rounded-full w-[30px] h-[30px] cursor-pointer flex justify-center items-center  ">
+              <i class="fa-brands fa-instagram text-[#007BBD] hover:  "></i>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+      <div class="w-full md:w-[45%]  ">
+        <form action="" [formGroup]="supportForm" (ngSubmit)="onSubmit()">
+          <!-- Full Name -->
+          <div class="mb-[25px]">
+            <label class="block text-(--text-color) text-[12px] font-semibold leading-[100%] mb-[10px]">
+              Full Name
+            </label>
+            <div class="border border-(--primary-color) rounded-full p-[16px] flex items-center gap-[10px]">
+              <i class="fa-solid fa-user text-(--primary-color) text-[20px]"></i>
+              <input type="text" placeholder="John Doe" formControlName="name"
+                class="text-(--text-color) text-[14px] font-normal leading-[100%] bg-transparent w-full">
+
+            </div>
+
+          </div>
+          <!-- Phone -->
+          <div class="mb-[25px]">
+            <label class="block text-(--text-color) text-[12px] font-semibold leading-[100%] mb-[10px]">
+              Phone
+            </label>
+            <div class="border border-(--primary-color) rounded-full p-[16px] flex items-center gap-[10px]">
+              <i class="fa-solid fa-phone text-(--primary-color) text-[20px]"></i>
+              <input type="number" placeholder="+20-102245596" formControlName="mobile"
+                class="text-(--text-color) text-[14px] font-normal leading-[100%] bg-transparent w-full">
+
+            </div>
+
+          </div>
+          <!-- subject -->
+          <div class="mb-[25px]">
+            <label class="block text-(--text-color) text-[12px] font-semibold leading-[100%] mb-[10px]">
+              Subject
+            </label>
+            <div class="border border-(--primary-color) rounded-full p-[16px] flex items-center gap-[10px]">
+              <i class="fa-solid fa-pen text-(--primary-color) text-[20px]"></i>
+              <input type="text" placeholder="+20-102245596" formControlName="subject"
+                class="text-(--text-color) text-[14px] font-normal leading-[100%] bg-transparent w-full">
+
+            </div>
+
+          </div>
+          <!-- Message -->
+          <div class="mb-[25px]">
+            <label class="block text-(--text-color) text-[12px] font-semibold leading-[100%] mb-[10px]">
+              Message
+            </label>
+            <div class="border border-(--primary-color) rounded-[30px] p-[16px] flex items-center gap-[10px]">
+              <textarea name="" id="" rows="8" formControlName="message"
+                class="text-(--text-color) text-[14px] font-normal leading-[100%] bg-transparent w-full"
+                placeholder=" Write your Massage"></textarea>
+
+            </div>
+
+          </div>
+
+          <div class=" ">
+            <button type="submit" (click)="onSubmit()"
+              class="w-full  bg-[#007BBD] text-white py-[14px] rounded-full font-bold">
+              Send
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+    </div>
+
+    <!-- FAQ -->
+
+    <div class="mt-[100px] text-center mt-[50px]">
+      <h3 class="text-[#1F1F1F]   text-[24px] md:text-[28px] lg:text-[36px] font-bold leading-[46px]">
+        Frequently Asked Questions
+      </h3>
+      <p class="text-[#555555] text-[16px] md:text-[18px] font-normal leading-[30px] mt-[20px] ">
+        Get clear answers to the most common questions from patients and doctors.
+      </p>
+
+      <div class="w-full mt-[30px]">
+
+        <div class="space-y-2">
+          @for (faq of faqs; track $index) {
+          <div class="bg-[#FFFFFF] border  rounded-[16px] p-[10px] md:p-[40px] transition-all duration-300"
+            [ngClass]="faq.open ? 'border-[#5D5A88] ' : 'border-[#D4D2E3]'">
+
+            <!-- Header -->
+            <div class="flex justify-between items-center cursor-pointer" (click)="toggleFaq(faq)">
+              <h3 class="text-[#1F1F1F] font-semibold text-left text-[16px] md:text-[18px] lg:text-[20px] leading-[100%]">
+                {{ faq.question }}
+              </h3>
+
+              <div
+                class="w-[35px] h-[35px] max-w-[35px] max-h-[35px] p-2 rounded-full transition-all duration-300 flex justify-center items-center"
+                [ngClass]="faq.open ? 'bg-[#0078C7]' : 'bg-[#FFFFFF]'">
+                <i class="fa-solid text-[16px] md:text-[18px] lg:text-[18px] transition-transform duration-300"
+                  [ngClass]="faq.open ? 'fa-chevron-down text-white' : 'fa-chevron-right text-[#1F1F1F]'">
+                </i>
+              </div>
+            </div>
+
+            <!-- Content -->
+            <div class="overflow-hidden transition-all duration-300 text-left "
+              [ngClass]="faq.open ? ' mt-3 opacity-100' : 'max-h-0 opacity-0'">
+              <p class="text-[#555555] text-[14px] md:text-[16px]">
+                {{ faq.answer }}
+              </p>
+            </div>
+          </div>
+          }
+        </div>
+
+
+      </div>
+
+
+    </div>
+
+
+  </div>
+</section>

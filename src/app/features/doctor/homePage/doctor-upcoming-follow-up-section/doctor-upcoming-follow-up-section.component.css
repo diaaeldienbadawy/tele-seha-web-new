@@ -1,0 +1,23 @@
+.card {
+  position: relative;
+  padding: 30px;
+  border-radius: 28px;
+  background: radial-gradient(114.87% 113.36% at 40.95% -10.45%,
+      #FFFFFF 32.81%,
+      #F8FDFF 97.64%);
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  inset: 0;
+  padding: 2px;
+  border-radius: inherit;
+  background: linear-gradient(96.34deg, #95DDFF 0.94%, #C5ECFF 96.46%);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}

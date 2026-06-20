@@ -1,0 +1,63 @@
+.getStarted {
+  background: linear-gradient(
+    135deg,
+    #084B8A 0%,
+    #0E79B2 30%,
+    #1B8BC5 60%,
+    #5BADD6 100%
+  );
+  position: relative;
+}
+
+.getStarted::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -15%;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  pointer-events: none;
+}
+
+.getStarted::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -10%;
+  width: 350px;
+  height: 350px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
+  pointer-events: none;
+}
+
+/* Store button hover */
+:host ::ng-deep a {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  display: inline-block;
+}
+
+:host ::ng-deep a:hover {
+  transform: translateY(-3px) scale(1.05);
+  opacity: 0.95;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .getStarted {
+    background: linear-gradient(
+      180deg,
+      #084B8A 0%,
+      #0E79B2 40%,
+      #1B8BC5 70%,
+      #5BADD6 100%
+    );
+  }
+
+  .getStarted::before,
+  .getStarted::after {
+    display: none;
+  }
+}

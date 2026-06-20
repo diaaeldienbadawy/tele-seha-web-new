@@ -1,0 +1,90 @@
+<div class="p-0 h-screen bg-slate-50">
+
+  <div class="flex justify-between items-center h-full">
+
+    <!-- Left Side -->
+    <div class="w-[50%] h-full hidden md:block">
+      <app-auth-left-side></app-auth-left-side>
+    </div>
+
+    <!-- Right Side -->
+    <div class="w-full md:w-[50%] p-[24px] sm:p-[40px] h-screen flex flex-col justify-between bg-gradient-to-tr from-[#f8fafc] via-[#f1f5f9] to-[#eff6ff] overflow-y-auto">
+
+      <!-- HEADER (Logo + X) -->
+      <div class="w-full h-fit flex items-center justify-between">
+        <div class="w-[25px]"></div>
+
+        <!-- Logo -->
+        <app-auth-logo></app-auth-logo>
+
+        <!-- X button -->
+        <i class="fa-solid fa-xmark text-[#899CC9] hover:text-slate-600 transition-colors duration-200 text-[25px] cursor-pointer" routerLink="/doctor">
+        </i>
+      </div>
+
+      <!-- MAIN CONTENT (centered vertically) -->
+      <div class="flex-1 flex flex-col justify-center w-[95%] md:w-[85%] lg:w-[75%] max-w-[420px] mx-auto py-8">
+
+        <div class="w-full bg-white/95 backdrop-blur-md rounded-3xl border border-slate-100 shadow-2xl shadow-slate-200/50 p-5 sm:p-8 transition-all duration-300">
+
+          <h2 class="text-slate-800 text-[28px] sm:text-[32px] font-bold leading-tight tracking-tight">
+            OTP Verification
+          </h2>
+
+          <p class="text-slate-500 text-[14px] font-normal leading-normal mt-[8px]">
+            Check your email to see the verification code
+          </p>
+
+          <form [formGroup]="otpForm" (ngSubmit)="submitOtp()" class="mt-[30px]">
+
+            <!-- OTP Inputs -->
+            <div class="flex justify-between items-center gap-2 sm:gap-2.5">
+              <div *ngFor="let c of controls; let i = index">
+                <div
+                  class="rounded-2xl w-[38px] h-[38px] sm:w-[44px] sm:h-[44px] md:w-[48px] md:h-[48px] flex items-center justify-center border bg-slate-50/30 transition-all duration-300 focus-within:bg-white focus-within:ring-4 focus-within:ring-(--primary-color)/15"
+                  [ngClass]="{
+                    'border-(--primary-color) shadow-md shadow-(--primary-color)/5': otpArray[i] && !showError,
+                    'border-red-500 bg-red-50/20': showError,
+                    'border-slate-200': !otpArray[i] && !showError
+                  }">
+                  <input type="text" maxlength="1" class="text-slate-800 text-[16px] sm:text-[18px] font-bold
+                      bg-transparent w-full text-center outline-none h-full" (input)="onInput($event, i)"
+                    (keydown)="onKeyDown($event, i)" #otpInput>
+                </div>
+              </div>
+            </div>
+
+
+            <!-- Error Message -->
+            <p *ngIf="showError" class="text-red-500 mt-3 text-[14px] flex items-center gap-1.5 font-medium">
+              <i class="fa-solid fa-circle-exclamation text-red-500"></i>
+              Invalid OTP. Please enter a valid OTP.
+            </p>
+
+            <!-- Verify Button -->
+            <div class="w-full mt-[30px]">
+              <button type="submit" [disabled]="isLoading" class="w-full bg-gradient-to-r from-(--primary-color) to-[#006ba5] text-white hover:from-[#006ba5] hover:to-[#005a8c] px-[20px] h-[54px] rounded-full text-[16px] font-bold leading-none flex items-center justify-center gap-2 shadow-lg shadow-(--primary-color)/15 hover:shadow-xl hover:shadow-(--primary-color)/25 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 ease-in-out cursor-pointer">
+                @if (isLoading) {
+                  <i class="fa-solid fa-spinner fa-spin mr-2"></i>
+                }
+                <span>Verify Code</span>
+                <i class="fa-solid fa-circle-check text-[15px] ml-1"></i>
+              </button>
+            </div>
+
+          </form>
+
+        </div>
+
+      </div>
+      
+      <!-- Footer Spacer/Copyright -->
+      <div class="w-full text-center text-xs text-slate-400">
+        &copy; 2026 teleSEHA. All rights reserved.
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

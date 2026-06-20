@@ -1,0 +1,53 @@
+<div class="relative h-full ">
+
+  @if (callTimerLabel()) {
+  <div class="w-fit  absolute top-[20px] left-[20px]">
+    <p class="text-[#555555]  text-[20px] md:text-[24px] lg:text-[36px] font-bold leading-[15px]">
+      {{ callTimerLabel() }}
+    </p>
+  </div>
+  }
+  <div class="absolute top-[20px] right-[20px] bg-black rounded-full
+         w-[60px] h-[60px] md:hidden flex justify-center items-center z-50" (click)="openWhatsApp()">
+    <i class="fa-brands fa-whatsapp text-green-600 text-[35px] cursor-pointer"></i>
+  </div>
+
+
+  <div class="w-full h-full flex flex-col min-h-0">
+    <div class="bg-white rounded-2xl p-4 w-full h-full flex flex-col min-h-0 ">
+      <div class="flex justify-between items-center mb-4 flex-shrink-0">
+        <h3 class="font-bold text-lg"></h3>
+        <span class="flex items-center gap-2 text-sm text-gray-500">
+          <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+          Live
+        </span>
+      </div>
+      <div class="relative rounded-xl overflow-hidden bg-black flex-1 min-h-0">
+        <div id="remote-video" class="w-full h-full flex items-center justify-center text-white/40 text-sm">
+          @if (showWaitingForOtherParticipant()) {
+            <span>Waiting for other participant</span>
+          }
+        </div>
+        <div id="local-video" class="absolute bottom-3 right-3 w-32 h-24 bg-gray-900 rounded-lg border-2 border-white overflow-hidden"></div>
+      </div>
+      <div class="flex justify-center items-center gap-6 mt-5 flex-shrink-0">
+        <button type="button" (click)="toggleMic()"
+          [class]="micMuted ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-700'"
+          class="w-12 h-12 rounded-full flex items-center justify-center transition-colors hover:opacity-80" title="Toggle mic">
+          <i [class]="micMuted ? 'fa-solid fa-microphone-slash' : 'fa-solid fa-microphone'"></i>
+        </button>
+        <button type="button" (click)="endCall()"
+          class="bg-red-600 hover:bg-red-700 text-white w-14 h-14 rounded-full flex items-center justify-center transition-colors" title="End call">
+          <i class="fa-solid fa-phone-slash text-xl"></i>
+        </button>
+        <button type="button" (click)="toggleCamera()"
+          [class]="cameraOff ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-700'"
+          class="w-12 h-12 rounded-full flex items-center justify-center transition-colors hover:opacity-80" title="Toggle camera">
+          <i [class]="cameraOff ? 'fa-solid fa-video-slash' : 'fa-solid fa-video'"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+</div>

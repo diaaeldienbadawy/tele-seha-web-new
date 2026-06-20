@@ -1,0 +1,72 @@
+<app-header></app-header>
+<!-- Hero Section -->
+<app-landing-page-hero-section></app-landing-page-hero-section>
+<!-- Partner Section -->
+<app-landing-page-partners></app-landing-page-partners>
+<!-- Why choose tele seha -->
+<app-landing-page-why-tele-seha></app-landing-page-why-tele-seha>
+<!-- Simple Steps -->
+<app-landing-page-simple-steps></app-landing-page-simple-steps>
+<!-- Comprehensive Care -->
+<app-landing-page-comprehensive-care></app-landing-page-comprehensive-care>
+<!-- Get started -->
+<app-landing-page-get-started></app-landing-page-get-started>
+<!-- For Doctors -->
+<div class="bg-[#D0EDFF40]">
+  <app-landing-page-for-doctors></app-landing-page-for-doctors>
+  <app-landing-page-full-clinic></app-landing-page-full-clinic>
+
+</div>
+<!-- Start Seeing -->
+<app-landing-page-start-seeing></app-landing-page-start-seeing>
+<!-- Faq -->
+<div class="container ">
+  <div class="mt-[100px] text-center mt-[50px]">
+    <h3 class="text-[#1F1F1F]   text-[24px] md:text-[28px] lg:text-[36px] font-bold leading-[46px]">
+      Frequently Asked Questions
+    </h3>
+    <p class="text-[#555555] text-[16px] md:text-[18px] font-normal leading-[30px] mt-[20px] ">
+      Get clear answers to the most common questions from patients and doctors.
+    </p>
+
+    <div class="w-full mt-[30px]">
+
+      <div class="space-y-2">
+        @for (faq of faqs; track $index) {
+        <div class="bg-[#FFFFFF] rounded-3xl p-[10px] md:p-[40px] transition-all duration-300 shadow-[0_10px_40px_rgba(0,0,0,0.04)]"
+          [ngClass]="faq.open ? 'shadow-[0_10px_40px_rgba(0,123,189,0.15)] ' : ''">
+
+          <!-- Header -->
+          <div class="flex justify-between items-center cursor-pointer" (click)="toggleFaq(faq)">
+            <h3 class="text-[#1F1F1F] font-semibold text-left text-[16px] md:text-[18px] lg:text-[20px] leading-[100%]">
+              {{ faq.question }}
+            </h3>
+
+            <div
+              class="w-[35px] h-[35px] max-w-[35px] max-h-[35px] p-2 rounded-full transition-all duration-300 flex justify-center items-center"
+              [ngClass]="faq.open ? 'bg-[#0078C7]' : 'bg-[#FFFFFF]'">
+              <i class="fa-solid text-[16px] md:text-[18px] lg:text-[18px] transition-transform duration-300"
+                [ngClass]="faq.open ? 'fa-chevron-down text-white' : 'fa-chevron-right text-[#1F1F1F]'">
+              </i>
+            </div>
+          </div>
+
+          <!-- Content -->
+          <div class="overflow-hidden transition-all duration-300 text-left "
+            [ngClass]="faq.open ? ' mt-3 opacity-100' : 'max-h-0 opacity-0'">
+            <p class="text-[#555555] text-[14px] md:text-[16px]">
+              {{ faq.answer }}
+            </p>
+          </div>
+        </div>
+        }
+      </div>
+
+
+    </div>
+
+
+  </div>
+</div>
+<!-- Footer -->
+<app-footer></app-footer>

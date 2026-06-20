@@ -1,0 +1,4 @@
+/* إذا استخدمت no-scrollbar custom class */
+.no-scrollbar::-webkit-scrollbar {
+  height: 8px;
+}

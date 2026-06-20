@@ -1,0 +1,97 @@
+@if(showPopup){
+
+<div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+
+  <div
+    class="bg-white rounded-3xl shadow-2xl p-6 md:p-8 text-center w-full max-w-2xl max-h-[90vh] overflow-y-auto no-scrollbar relative animate-scale-up border border-slate-100">
+
+    <!-- Close button -->
+    <button 
+      (click)="closeModal()"
+      class="absolute top-4 right-4 rtl:left-4 rtl:right-auto text-slate-400 hover:text-slate-600 transition-colors w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center cursor-pointer"
+    >
+      <i class="fa-solid fa-xmark text-lg"></i>
+    </button>
+
+    @if(uniqueDays.length > 0){
+
+    <!-- Date selector section -->
+    <div class="text-left rtl:text-right mb-6">
+      <h3 class="text-slate-800 text-xl font-extrabold flex items-center gap-2">
+        <i class="fa-solid fa-calendar text-(--primary-color) text-base"></i>
+        {{ 'doctor.selectDate' | translate }}
+      </h3>
+    </div>
+
+    <!-- Date selector timeline -->
+    <div class="mb-8 flex gap-3 overflow-x-auto no-scrollbar py-3 px-1 scroll-smooth">
+      @for (day of uniqueDays; track $index) {
+      <button 
+        (click)="selectDay(day.date)" 
+        [ngClass]="selectedDate === day.date ? 'bg-(--primary-color) text-white shadow-md shadow-blue-500/20' : 'bg-white text-slate-700 border-slate-200/80 hover:bg-slate-50'"
+        class="flex-shrink-0 min-w-[100px] border rounded-2xl p-3 text-center cursor-pointer transition-all duration-300"
+      >
+        <h4 
+          [ngClass]="selectedDate === day.date ? 'text-blue-100' : 'text-slate-400'"
+          class="text-xs font-bold tracking-wide uppercase"
+        >
+          {{ getDayName(day.date) }}
+        </h4>
+        <p class="text-lg sm:text-xl font-extrabold mt-1">
+          {{ getDayWithMonth(day.date) }}
+        </p>
+      </button>
+      }
+    </div>
+
+    <!-- Time slots section -->
+    <div class="text-left rtl:text-right mb-4">
+      <h3 class="text-slate-800 text-xl font-extrabold flex items-center gap-2">
+        <i class="fa-regular fa-clock text-(--primary-color) text-base"></i>
+        {{ 'doctor.selectTime' | translate }}
+      </h3>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
+      @for (session of getSessionsByDate(); track $index) {
+      <button 
+        (click)="selectSession(session.sessionId)" 
+        [ngClass]="selectedSessionId === session.sessionId ? 'bg-(--primary-color) text-white shadow-md shadow-blue-500/20 border-transparent' : 'bg-blue-50/50 text-slate-700 border-blue-100/50 hover:bg-blue-50/80'"
+        class="border rounded-2xl py-4 px-6 text-center cursor-pointer transition-all duration-300 font-extrabold text-sm sm:text-base flex items-center justify-center gap-2"
+      >
+        <i class="fa-regular fa-clock text-xs opacity-75"></i>
+        <span dir="ltr">{{ formatTime(session.start) }} - {{ formatTime(session.end) }}</span>
+      </button>
+      }
+    </div>
+
+    <!-- Confirm button -->
+    <div class="flex flex-col sm:flex-row justify-center gap-4">
+      <button 
+        (click)="bookingSession()"
+        class="ts-btn-primary w-full sm:w-64 py-4 text-base font-bold shadow-lg shadow-blue-500/25 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer"
+      >
+        <i class="fa-regular fa-calendar-check mr-2 rtl:ml-2"></i>
+        {{ 'doctorsList.booking' | translate }}
+      </button>
+    </div>
+
+    }
+
+    @if(uniqueDays.length === 0){
+    <div class="flex flex-col items-center justify-center py-12 text-center">
+      <div class="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center text-slate-300 mb-4 animate-pulse">
+        <i class="fa-regular fa-calendar-times text-2xl"></i>
+      </div>
+      <h3 class="text-slate-700 text-base sm:text-lg font-bold">
+        {{ 'doctorsList.noSchedule' | translate }}
+      </h3>
+      <p class="text-slate-400 text-xs mt-1">
+        This doctor does not have any active availability slots for booking right now.
+      </p>
+    </div>
+    }
+
+  </div>
+</div>
+}

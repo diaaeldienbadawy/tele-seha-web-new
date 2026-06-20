@@ -1,0 +1,2 @@
+import './polyfills.server.mjs';
+import{y as o}from"./chunk-GX2DYMIX.mjs";import{L as i,Q as r}from"./chunk-5OMHZWNO.mjs";var e=class{static production=!1;static apiUrl="https://teleseha2-001-site1.qtempurl.com"};var a=class t{constructor(p){this.http=p}getSpecialties(){return this.http.get(`${e.apiUrl}/api/speciality`)}static \u0275fac=function(c){return new(c||t)(r(o))};static \u0275prov=i({token:t,factory:t.\u0275fac,providedIn:"root"})};export{a};

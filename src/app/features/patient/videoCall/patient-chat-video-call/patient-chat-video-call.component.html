@@ -1,0 +1,122 @@
+<div class="flex flex-col h-full">
+  <div #chatContainer class="flex-1 overflow-y-auto no-scrollbar ">
+    <div class="w-full text-center my-[20px] ">
+      <div class="w-fit mx-auto bg-[#5555552E] rounded-[12px] py-[4px] px-[12px] ">
+        <p class="text-[#555555] text-[14px] lg:text-[16px] font-normal leading-[20px] ">
+          Today
+        </p>
+      </div>
+    </div>
+
+    @for (msg of messages(); track msg.id) {
+      @if (msg.isFromDoctor) {
+        <div class="w-fit mb-[20px]">
+          <div class="flex items-center gap-3">
+            <div class="w-fit">
+              <img class="w-[35px] h-[35px] lg:w-[55px] lg:h-[55px] rounded-full "
+                src="../../../../../assets/images/doctor-9 1.png" loading="lazy" alt="img">
+            </div>
+            <div class="w-fit">
+              @if (msg.messageType === 'Text') {
+                <div class="bg-[#007BBD] rounded-[8px] lg:rounded-[12px] p-[5px] lg:p-[12px] ">
+                  <p class="text-[#F7F9FE] text-[14px] lg:text-[16px] font-normal leading-[20px]">
+                    {{ msg.message }}
+                  </p>
+                </div>
+              } @else if (msg.messageType === 'Image' || msg.messageType === 'SpecialImage') {
+                <div
+                  class="bg-[#007BBD] rounded-[8px] lg:rounded-[12px] p-[5px] lg:p-[12px] min-h-[80px] max-h-[200px] lg:max-h-[240px] flex items-center gap-3 overflow-hidden">
+                  <img class="max-w-[200px] lg:max-w-[280px] max-h-[180px] lg:max-h-[220px] w-auto h-auto rounded-[8px] lg:rounded-[20px] object-contain"
+                    [src]="msg.message" loading="lazy" alt="Image attachment">
+                </div>
+              } @else if (msg.messageType === 'File' || msg.messageType === 'Pdf' || msg.message.contains('.pdf')) {
+                <div class="bg-[#FFFFFF] rounded-[8px] lg:rounded-[12px] p-[8px] lg:p-[12px] ">
+                  <a [href]="msg.message" target="_blank" rel="noopener noreferrer"
+                    class="inline-flex items-center gap-2 text-[#007BBD] text-[14px] lg:text-[16px] underline break-all">
+                    <i class="fa-solid fa-file-pdf text-[20px] lg:text-[24px] shrink-0 text-[#E53935]" aria-hidden="true"></i>
+                    <span>Open file</span>
+                  </a>
+                </div>
+              } @else {
+                <div
+                  class="bg-[#007BBD] rounded-[8px] lg:rounded-[12px] p-[5px] lg:p-[12px] min-h-[80px] max-h-[200px] flex items-center gap-3 overflow-hidden">
+                  <img class="max-w-[200px] max-h-[180px] w-auto h-auto rounded-[8px] object-contain"
+                    [src]="msg.message" loading="lazy" alt="Attachment">
+                </div>
+              }
+            </div>
+          </div>
+          <div class="text-right mt-[5px] ">
+            <p class="text-[#555555] text-[10px] font-semibold leading-[15px] ">
+              <span class="mx-[5px] text-[#007BBD] ">
+                <i class="fa-solid fa-check text-[12px]"></i>
+                <i class="fa-solid fa-check text-[12px] mx-[-8px] lg:mx-[-4px]"></i>
+              </span>
+            </p>
+          </div>
+        </div>
+      } @else {
+        <div class="w-full flex justify-end items-center gap-3 mb-[20px] ">
+          <div class="w-fit">
+            @if (msg.messageType === 'Text') {
+              <div class="bg-[#FFFFFF] rounded-[8px] lg:rounded-[12px] p-[5px] lg:p-[12px] ">
+                <p class="text-[#007BBD] text-[14px] lg:text-[16px] font-normal leading-[20px]">
+                  {{ msg.message }}
+                </p>
+              </div>
+            } @else if (msg.messageType === 'Image' || msg.messageType === 'SpecialImage') {
+              <div
+                class="bg-[#FFFFFF] rounded-[8px] lg:rounded-[12px] p-[5px] lg:p-[12px] min-h-[80px] max-h-[200px] lg:max-h-[240px] flex items-center gap-3 overflow-hidden">
+                <img class="max-w-[200px] lg:max-w-[280px] max-h-[180px] lg:max-h-[220px] w-auto h-auto rounded-[8px] lg:rounded-[20px] object-contain"
+                  [src]="msg.message" loading="lazy" alt="Image attachment">
+              </div>
+            } @else if (msg.messageType === 'File' || msg.messageType === 'Pdf' || msg.message.contains('.pdf')) {
+              <div class="bg-[#FFFFFF] rounded-[8px] lg:rounded-[12px] p-[8px] lg:p-[12px] ">
+                <a [href]="msg.message" target="_blank" rel="noopener noreferrer"
+                  class="inline-flex items-center gap-2 text-[#007BBD] text-[14px] lg:text-[16px] underline break-all">
+                  <i class="fa-solid fa-file-pdf text-[20px] lg:text-[24px] shrink-0 text-[#E53935]" aria-hidden="true"></i>
+                  <span>Open file</span>
+                </a>
+              </div>
+            } @else {
+              <div
+                class="bg-[#FFFFFF] rounded-[8px] lg:rounded-[12px] p-[5px] lg:p-[12px] min-h-[80px] max-h-[200px] flex items-center gap-3 overflow-hidden">
+                <img class="max-w-[200px] max-h-[180px] w-auto h-auto rounded-[8px] object-contain"
+                  [src]="msg.message" loading="lazy" alt="Attachment">
+              </div>
+            }
+          </div>
+          <div class="w-fit">
+            <img class="w-[35px] h-[35px] lg:w-[55px] lg:h-[55px] rounded-full "
+              src="../../../../../assets/images/doctor-9 1.png" loading="lazy" alt="img">
+          </div>
+        </div>
+      }
+    }
+
+  </div>
+  <div class=" my-[30px] w-full">
+    <div class="bg-[#FFFFFF] border-[2px] border-[#5555553B] rounded-[12px]
+             py-[8px] lg:py-[12px] px-[12px] lg:px-[16px]
+             flex items-center gap-2 w-full">
+
+
+      <input #fileInput type="file" class="hidden" tabindex="-1"
+        accept="image/*,application/pdf,.doc,.docx,.docm,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        (change)="onFileSelected($event)" />
+
+      <button type="button" class="p-1 rounded hover:bg-[#55555514] cursor-pointer" (click)="onAttachClick()"
+        title="Attach file" aria-label="Attach file">
+        <i class="fa-solid fa-paperclip text-[#CDCFCE] text-[16px] lg:text-[20px] pointer-events-none"></i>
+      </button>
+
+      <input #messageInput type="text" placeholder="Type a message" class="text-[#1F1F1F]  text-[14px] lg:text-[16px] font-normal leading-[20px]
+               bg-transparent flex-1 outline-none"
+             (keydown.enter)="onSend(messageInput)" />
+
+      <i class="fa-solid fa-paper-plane text-[#007BBD] text-[16px] lg:text-[20px] cursor-pointer"
+         (click)="onSend(messageInput)"></i>
+
+    </div>
+  </div>
+</div>

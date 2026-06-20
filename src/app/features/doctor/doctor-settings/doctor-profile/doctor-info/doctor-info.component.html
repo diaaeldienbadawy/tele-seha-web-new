@@ -1,0 +1,270 @@
+<div class="w-full md:w-[95%] lg:w-[90%] mx-auto">
+
+  <div class="mb-8">
+    <app-specialty-info></app-specialty-info>
+  </div>
+
+  <div class="w-full bg-white rounded-3xl border border-slate-100 shadow-[0_10px_40px_rgba(0,0,0,0.03)] p-6 sm:p-8 transition-all duration-300">
+
+    <!-- Header & Action Buttons Toggle -->
+    @if (!showBtnSave()) {
+    <div class="flex justify-between items-center mb-6 border-b border-slate-100 pb-5">
+      <div>
+        <h3 class="text-slate-800 text-[18px] sm:text-[20px] font-bold">General Information</h3>
+        <p class="text-slate-500 text-[13px] mt-0.5">Manage your personal and contact details</p>
+      </div>
+      <button type="button" (click)="edit()"
+        class="bg-gradient-to-r from-(--primary-color) to-[#006ba5] text-white hover:from-[#006ba5] hover:to-[#005a8c] px-5 sm:px-6 h-[40px] rounded-full text-[14px] font-bold leading-none flex items-center justify-center gap-2 shadow-md shadow-(--primary-color)/15 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer">
+        <i class="fa-solid fa-pen-to-square"></i>
+        <span>Edit Profile</span>
+      </button>
+    </div>
+    } @else {
+    <div class="flex justify-between items-center mb-6 border-b border-slate-100 pb-5">
+      <div>
+        <h3 class="text-slate-800 text-[18px] sm:text-[20px] font-bold text-(--primary-color)">Edit General Information</h3>
+        <p class="text-slate-500 text-[13px] mt-0.5">Modify your personal and contact details below</p>
+      </div>
+      <div class="flex gap-2">
+        <button type="button" (click)="cancel()"
+          class="bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 px-4 sm:px-5 h-[40px] rounded-full text-[13px] sm:text-[14px] font-bold leading-none flex items-center justify-center shadow-sm transition-all duration-300 cursor-pointer">
+          Cancel
+        </button>
+        <button type="button" (click)="save()"
+          class="bg-gradient-to-r from-(--primary-color) to-[#006ba5] text-white hover:from-[#006ba5] hover:to-[#005a8c] px-5 sm:px-6 h-[40px] rounded-full text-[13px] sm:text-[14px] font-bold leading-none flex items-center justify-center gap-2 shadow-md shadow-(--primary-color)/15 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer">
+          <i class="fa-solid fa-check"></i>
+          <span>Save Changes</span>
+        </button>
+      </div>
+    </div>
+    }
+
+    <form class="mt-6" [formGroup]="basicInfoForm" (ngSubmit)="save()">
+
+      <!-- Profile Image -->
+      <div class="mb-8 flex flex-col items-center">
+        <label class="block text-slate-700 text-[14px] font-semibold mb-[15px] self-start">
+          Profile Image
+        </label>
+
+        <div class="relative group">
+          <div
+            class="w-[120px] h-[120px] rounded-full overflow-hidden border-4 border-white shadow-xl cursor-pointer transition-transform duration-300"
+            [ngClass]="{'hover:scale-[1.02]': !basicInfoForm.disabled}"
+            (click)="!basicInfoForm.disabled && fileInput.click()">
+            @if (imagePreview) {
+            <img [src]="imagePreview" class="w-full h-full object-cover" />
+            } @else {
+            <div class="w-full h-full flex items-center justify-center bg-slate-100">
+              <i class="fa-solid fa-user text-[48px] text-slate-300"></i>
+            </div>
+            }
+            
+            <!-- Hover overlay -->
+            @if (!basicInfoForm.disabled) {
+              <div class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                <i class="fa-solid fa-camera text-white text-[24px]"></i>
+              </div>
+            }
+          </div>
+
+          @if (!basicInfoForm.disabled) {
+            <div class="absolute bottom-1 right-1 bg-gradient-to-r from-(--primary-color) to-[#006ba5] text-white w-[34px] h-[34px]
+              rounded-full flex items-center justify-center shadow-lg border-2 border-white cursor-pointer
+              hover:scale-110 transition-transform duration-200" (click)="fileInput.click()">
+              <i class="fa-solid fa-pen text-[12px]"></i>
+            </div>
+          }
+        </div>
+
+        @if (fileName) {
+        <p class="mt-[10px] text-[12px] text-slate-500 font-medium">{{ fileName }}</p>
+        }
+
+        <input #fileInput type="file" accept="image/*" class="hidden" (change)="onFileSelected($event)" />
+
+        @if(basicInfoForm.get('Image')?.invalid && basicInfoForm.get('Image')?.touched) {
+        <p class="text-red-500 text-[12px] mt-2 font-medium flex items-center gap-1">
+          <i class="fa-solid fa-circle-exclamation"></i> Image is required
+        </p>
+        }
+      </div>
+
+      <!-- Form Inputs Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-4">
+
+        <!-- Country -->
+        <div class="col-span-1">
+          <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+            Country ( Optional )
+          </label>
+
+          <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out"
+               [ngClass]="{'opacity-75 bg-slate-100/50 cursor-not-allowed': basicInfoForm.disabled}">
+            <i class="fa-solid fa-globe text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
+            <p-select class="custom-select w-full" [options]="countries" optionLabel="countryName"
+              optionValue="countryName" formControlName="Country" placeholder="Select Country" appendTo="body">
+            </p-select>
+          </div>
+          <div class="min-h-[22px] mt-[6px]">
+            @if(basicInfoForm.get('Country')?.invalid && basicInfoForm.get('Country')?.touched) {
+            <div class="text-red-500 text-[12px] font-medium flex items-center gap-1">
+              <i class="fa-solid fa-circle-exclamation"></i>
+              Country is required
+            </div>
+            }
+          </div>
+        </div>
+
+        <!-- Governorate -->
+        <div class="col-span-1">
+          <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+            Governorate ( Optional )
+          </label>
+
+          <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out"
+               [ngClass]="{'opacity-75 bg-slate-100/50 cursor-not-allowed': basicInfoForm.disabled}">
+            <i class="fa-solid fa-map text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
+            <p-select class="custom-select w-full" [options]="states" optionLabel="stateName" optionValue="stateName"
+              formControlName="State" placeholder="Select Governorate" appendTo="body">
+            </p-select>
+          </div>
+          <div class="min-h-[22px] mt-[6px]">
+            @if(basicInfoForm.get('State')?.invalid && basicInfoForm.get('State')?.touched) {
+            <div class="text-red-500 text-[12px] font-medium flex items-center gap-1">
+              <i class="fa-solid fa-circle-exclamation"></i>
+              Governorate is required
+            </div>
+            }
+          </div>
+        </div>
+
+        <!-- City -->
+        <div class="col-span-1">
+          <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+            City ( Optional )
+          </label>
+
+          <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out"
+               [ngClass]="{'opacity-75 bg-slate-100/50 cursor-not-allowed': basicInfoForm.disabled}">
+            <i class="fa-solid fa-city text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
+            <p-select class="custom-select w-full" [options]="cities" optionLabel="cityName" optionValue="cityName"
+              formControlName="City" placeholder="Select City" appendTo="body">
+            </p-select>
+          </div>
+          <div class="min-h-[22px] mt-[6px]">
+            @if(basicInfoForm.get('City')?.invalid && basicInfoForm.get('City')?.touched) {
+            <div class="text-red-500 text-[12px] font-medium flex items-center gap-1">
+              <i class="fa-solid fa-circle-exclamation"></i>
+              City is required
+            </div>
+            }
+          </div>
+        </div>
+
+        <!-- Date of Birth -->
+        <div class="col-span-1">
+          <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+            Date of Birth
+            <span class="text-red-500 font-bold">*</span>
+          </label>
+          <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out"
+               [ngClass]="{'opacity-75 bg-slate-100/50 cursor-not-allowed': basicInfoForm.disabled}">
+            <i class="fa-solid fa-calendar-days text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
+            <p-datepicker class="custom-datepicker w-full" formControlName="BirthDate" [showButtonBar]="true"
+              placeholder="Select birth date" dateFormat="dd/mm/yy" [maxDate]="today" appendTo="body">
+            </p-datepicker>
+          </div>
+          <div class="min-h-[22px] mt-[6px]">
+            @if(basicInfoForm.get('BirthDate')?.invalid && basicInfoForm.get('BirthDate')?.touched){
+            <div class="text-red-500 text-[12px] font-medium flex items-center gap-1">
+              <i class="fa-solid fa-circle-exclamation"></i>
+              Birth Date is required
+            </div>
+            }
+          </div>
+        </div>
+
+        <!-- Gender -->
+        <div class="col-span-1">
+          <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+            Gender
+            <span class="text-red-500 font-bold">*</span>
+          </label>
+          <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out"
+               [ngClass]="{'opacity-75 bg-slate-100/50 cursor-not-allowed': basicInfoForm.disabled}">
+            <i class="fa-solid fa-venus-mars text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
+            <p-select [options]="genders" optionLabel="name" optionValue="code" placeholder="Select Gender"
+              formControlName="IsMale" class="custom-select w-full" appendTo="body"></p-select>
+          </div>
+          <div class="min-h-[22px] mt-[6px]">
+            @if(basicInfoForm.get('IsMale')?.invalid && basicInfoForm.get('IsMale')?.touched){
+            <div class="text-red-500 text-[12px] font-medium flex items-center gap-1">
+              <i class="fa-solid fa-circle-exclamation"></i>
+              Gender is required
+            </div>
+            }
+          </div>
+        </div>
+
+        <!-- University -->
+        <div class="col-span-1">
+          <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+            University ( Optional )
+          </label>
+          <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out"
+               [ngClass]="{'opacity-75 bg-slate-100/50 cursor-not-allowed': basicInfoForm.disabled}">
+            <i class="fa-solid fa-graduation-cap text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
+            <p-select class="custom-select w-full" formControlName="University" [options]="University"
+              optionLabel="universityName" placeholder="Select University" appendTo="body">
+            </p-select>
+          </div>
+          <div class="min-h-[22px] mt-[6px]"></div>
+        </div>
+
+        <!-- Description -->
+        <div class="col-span-1 sm:col-span-2">
+          <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+            Description ( Optional )
+          </label>
+          <div class="border border-slate-200 bg-slate-50/40 rounded-[20px] px-[18px] py-[12px] flex items-start w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out"
+               [ngClass]="{'opacity-75 bg-slate-100/50 cursor-not-allowed': basicInfoForm.disabled}">
+            <i class="fa-solid fa-file-lines text-[#899CC9]/80 text-[18px] shrink-0 mr-2 mt-1"></i>
+            <textarea formControlName="Description" placeholder="Enter your description..."
+              class="text-slate-800 text-[14px] font-normal bg-transparent w-full outline-none resize-none h-[100px]"></textarea>
+          </div>
+          <div class="min-h-[22px] mt-[6px]">
+            @if(basicInfoForm.get('Description')?.invalid && basicInfoForm.get('Description')?.touched){
+            <div class="text-red-500 text-[12px] font-medium flex items-center gap-1">
+              <i class="fa-solid fa-circle-exclamation"></i>
+              Description is required
+            </div>
+            }
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bottom Action Buttons Toggle -->
+      @if(showBtnSave()) {
+      <div class="text-right mt-8 flex flex-col-reverse sm:flex-row gap-4 items-center justify-end border-t border-slate-100 pt-6">
+        <button type="button" (click)="cancel()"
+          class="w-full sm:w-[150px] bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 px-5 h-[48px] rounded-full text-[15px] font-bold leading-none flex items-center justify-center shadow-sm transition-all duration-300 cursor-pointer">
+          Cancel
+        </button>
+        <button type="submit"
+          class="w-full sm:w-[150px] bg-gradient-to-r from-(--primary-color) to-[#006ba5] text-white hover:from-[#006ba5] hover:to-[#005a8c] px-6 h-[48px] rounded-full text-[15px] font-bold leading-none flex items-center justify-center gap-2 shadow-lg shadow-(--primary-color)/15 hover:shadow-xl hover:shadow-(--primary-color)/25 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 ease-in-out cursor-pointer">
+          <i class="fa-solid fa-check"></i>
+          <span>Save</span>
+        </button>
+      </div>
+      }
+    </form>
+  </div>
+
+  <div class="mt-8">
+    <app-certificates-info></app-certificates-info>
+  </div>
+</div>
+
+

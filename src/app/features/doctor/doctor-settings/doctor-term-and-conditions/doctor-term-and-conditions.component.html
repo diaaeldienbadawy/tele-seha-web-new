@@ -1,0 +1,25 @@
+<section class="container py-8 max-w-4xl mx-auto px-4">
+  <div class="ts-card mb-8 text-center bg-gradient-to-br from-white to-slate-50/50 border border-slate-100">
+    <h2 class="text-slate-800 text-2xl sm:text-3xl md:text-4xl font-extrabold leading-tight tracking-tight mb-4">
+      {{ data?.title }}
+    </h2>
+    <div class="w-16 h-1 bg-gradient-to-r from-(--primary-color) to-teal-500 mx-auto rounded-full mb-6"></div>
+    <p class="text-slate-600 text-sm sm:text-base md:text-lg font-normal leading-relaxed max-w-2xl mx-auto">
+      {{ data?.prief }}
+    </p>
+  </div>
+
+  <div class="space-y-6">
+    @for (item of data?.infos; track $index) {
+    <div class="ts-card border border-slate-100/80 hover:border-(--primary-color)/20 hover:shadow-lg transition-all duration-300">
+      <h3 class="text-slate-800 text-lg sm:text-xl font-bold mb-3 flex items-center gap-2">
+        <span class="inline-block w-2.5 h-2.5 rounded-full bg-(--primary-color)"></span>
+        {{ item?.title }}
+      </h3>
+      <p class="text-slate-600 text-[15px] sm:text-base font-normal leading-relaxed pl-4 border-l-2 border-slate-100">
+        {{ item?.content }}
+      </p>
+    </div>
+    }
+  </div>
+</section>

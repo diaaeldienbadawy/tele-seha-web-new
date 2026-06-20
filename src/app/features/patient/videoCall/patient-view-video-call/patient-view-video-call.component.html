@@ -1,0 +1,383 @@
+<section class="videocall relative h-screen overflow-hidden">
+
+  <!-- Meeting Layout -->
+  <div class="flex justify-between items-center h-full">
+    <div class="w-full md:w-[60%] h-[calc(100vh-100px)]">
+      <app-patient-meeting-video-call (sessionEnded)="showPopupSessionSuccess = true"
+        (openWhatsapp)="showWhatsapp = true">
+      </app-patient-meeting-video-call>
+
+    </div>
+
+    <div class="hidden md:block w-full md:w-[40%] h-[calc(100vh-100px)] px-[20px]">
+      <div class="h-[70vh] ">
+        <app-patient-chat-video-call></app-patient-chat-video-call>
+      </div>
+      <div>
+        <app-patient-send-picture-video-call></app-patient-send-picture-video-call>
+      </div>
+    </div>
+  </div>
+
+
+</section>
+
+<!-- WhatsApp Overlay -->
+@if(showWhatsapp){
+<div class="fixed inset-0 bg-[#000]/90 z-[9999] flex flex-col p-[20px] ">
+
+  <!-- Close Button -->
+  <button class="absolute top-4 right-4 text-white text-2xl" (click)="showWhatsapp = false">
+    ✕
+  </button>
+
+  <!-- WhatsApp Content -->
+  <div class="w-full h-[80vh] ">
+    <app-patient-chat-video-call></app-patient-chat-video-call>
+  </div>
+  <div>
+    <app-patient-send-picture-video-call></app-patient-send-picture-video-call>
+  </div>
+
+</div>
+}
+
+
+
+<!-- popup -->
+@if(showPopupSessionSuccess){
+<div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+
+  <div class=" p-[20px] md:p-[40px] text-center w-full md:w-[60%] h-[60vh] relative  ">
+    <div class="image w-[140px] h-[120px] md:w-[163px] md:h-[163px] mx-auto mb-[20px] ">
+      <img class="w-full h-full" src="../../../../../assets/images/Confetti Selector.png" loading="lazy" alt="img">
+    </div>
+    <h3 class="text-[#FFFFFF] text-[25px] md:text-[32px] font-bold leading-[100%] my-[30px]">
+      Thank you! Your session has ended successfully!
+    </h3>
+
+    <div class="mt-[15px] w-full md:w-[50%] mx-auto">
+      <button (click)="openshowPopupRating()"
+        class="btn-header w-full text-[#007BBD] bg-[#F7F9FE] px-[25px] py-[20px] rounded-full text-[24px] font-bold leading-[100%]">
+        Doctor's Rating
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+
+<!-- Doctor Rating -->
+@if(showPopupRating){
+
+<div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+
+
+  <div
+    class="bg-white rounded-xl shadow-lg p-[40px] text-center w-[95%] md:w-[80%] lg:w-[60%] h-[95vh] overflow-auto no-scrollbar relative  ">
+    <div class="w-full h-fit text-left ">
+      <i class="fa-solid fa-xmark text-[#899CC9] text-[25px] cursor-pointer " (click)="showPopupRating = false"></i>
+    </div>
+
+    <form [formGroup]="ratingForm">
+
+      <div class="w-full md:w-[80%] mt-[15px] mx-auto">
+
+        <!-- Doctor Info -->
+        <div class="w-full flex flex-col md:flex-row justify-center md:justify-start items-center gap-[30px]">
+          <img class="w-[96px] h-[83px] rounded-[30px]" src="../../../../../assets/images/Group 76674.png"
+            loading="lazy" alt="img">
+
+          <div class="text-left">
+            <div class="w-fit flex items-center gap-2 mb-[10px]">
+              <h3 class="text-[#1F1F1F] text-[16px] font-bold">
+                Dr Mohamed Ali
+              </h3>
+
+              <h5 class="text-[#6C757D] text-[16px] font-bold">
+                4.9 <i class="fa-solid fa-star text-[#FFC107]"></i>
+              </h5>
+            </div>
+
+            <h4 class="text-[#555555] text-[14px] font-semibold mb-[10px]">
+              General Internal Medicine
+            </h4>
+
+            <p class="text-[#555555] text-[12px]">
+              ( Number of Consultations:233 )
+            </p>
+          </div>
+        </div>
+
+        <!-- Rating Doctor -->
+        <div class="my-[15px] text-center">
+          <h3 class="text-[#555555] text-[16px] md:text-[20px] font-semibold mb-[20px]">
+            Rate your session with the doctor
+          </h3>
+
+          <div class="flex justify-center items-center gap-3">
+
+            @for (star of [1,2,3,4,5]; track $index) {
+            <i class="fa-solid fa-star text-[25px] md:text-[35px] cursor-pointer"
+              [class.text-[#FFC107]]="star <= selectedRating" [class.text-[#DADADA]]="star > selectedRating"
+              (click)="setRating(star)">
+            </i>
+            }
+
+          </div>
+        </div>
+
+        <!-- Advantages -->
+        <div class="flex flex-col sm:flex-row gap-2 lg:gap-5 mt-[15px]">
+
+          <!-- First -->
+          <div (click)="toggleAdvantage('is_first_advantage')"
+            [class.bg-[#007BBD]]="ratingForm.value.is_first_advantage"
+            [class.text-white]="ratingForm.value.is_first_advantage" class="w-[70%] sm:w-fit text-left mx-auto sm:m-0 cursor-pointer border border-[#0000000D]
+           rounded-[30px] py-[12px] px-[16px] transition">
+
+            <h5 class="flex items-center gap-2 text-[14px] lg:text-[16px] font-bold">
+              <i class="fa-regular fa-message"></i>
+              Explains clearly
+            </h5>
+          </div>
+
+          <!-- Second -->
+          <div (click)="toggleAdvantage('is_second_advantage')"
+            [class.bg-[#007BBD]]="ratingForm.value.is_second_advantage"
+            [class.text-white]="ratingForm.value.is_second_advantage" class="w-[70%] sm:w-fit text-left mx-auto sm:m-0 cursor-pointer border border-[#0000000D]
+           rounded-[30px] py-[12px] px-[16px] transition">
+
+            <h5 class="flex items-center gap-2 text-[14px] lg:text-[16px] font-bold">
+              <i class="fa-regular fa-headphones"></i>
+              Good listener
+            </h5>
+          </div>
+
+          <!-- Third -->
+          <div (click)="toggleAdvantage('is_third_advantage')"
+            [class.bg-[#007BBD]]="ratingForm.value.is_third_advantage"
+            [class.text-white]="ratingForm.value.is_third_advantage" class="w-[70%] sm:w-fit text-left mx-auto sm:m-0 cursor-pointer border border-[#0000000D]
+           rounded-[30px] py-[12px] px-[16px] transition">
+
+            <h5 class="flex items-center gap-2 text-[14px] lg:text-[16px] font-bold">
+              <i class="fa-regular fa-face-smile"></i>
+              Friendly
+            </h5>
+          </div>
+
+        </div>
+
+        <!-- Review -->
+        <div class="my-[15px] text-center md:text-left">
+
+          <h3 class="text-[#555555] text-[18px] md:text-[20px] font-semibold">
+            What’s your feedback on the session?
+          </h3>
+
+          <div class="mt-[15px] flex items-center gap-4 border-[2px] rounded-[12px]
+              px-[16px] py-[8px] border-[#5555553B]">
+
+            <i class="fa-regular fa-face-smile text-[#5555553B]"></i>
+
+            <input formControlName="review" type="text" placeholder="Write your answer"
+              class="text-[#1F1F1F] text-[14px] bg-transparent w-full outline-none">
+
+          </div>
+
+        </div>
+
+        <!-- Call Time Rating -->
+        <div class="my-[15px] text-left">
+
+          <h3 class="text-[#555555] text-[18px] md:text-[20px] font-semibold">
+            How sufficient was the consultation time?
+          </h3>
+
+          <div class="mt-[15px] flex justify-center items-center gap-3">
+
+            @for (star of [1,2,3,4,5]; track $index) {
+            <i class="fa-solid fa-star text-[25px] md:text-[35px] cursor-pointer"
+              [class.text-[#FFC107]]="star <= selectedCallTimeRating"
+              [class.text-[#DADADA]]="star > selectedCallTimeRating" (click)="setCallTimeRating(star)">
+            </i>
+            }
+
+          </div>
+
+        </div>
+
+        <!-- Submit -->
+        <div class="w-full md:w-[50%] mx-auto mt-[35px]">
+
+          <button type="button" (click)="ratingReview()" class="w-full px-[30px] py-[15px] text-white bg-[#007BBD]
+           rounded-full border border-[#007BBD] text-[20px] font-bold">
+
+            Send
+
+          </button>
+
+        </div>
+
+      </div>
+
+    </form>
+
+  </div>
+</div>
+}
+
+
+<!-- Prescription Popup -->
+@if(showPopupPrescription){
+<div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+
+  <div
+    class="bg-white rounded-xl shadow-lg p-[20px] md:p-[40px] text-center w-[95%] md:w-[80%] lg:w-[60%] max-h-[95vh] overflow-auto no-scrollbar relative">
+
+    <!-- Close Button -->
+    <div class="w-full h-fit text-left">
+      <i class="fa-solid fa-xmark text-[#899CC9] text-[25px] cursor-pointer"
+        (click)="showPopupPrescription = false"></i>
+    </div>
+
+    <!-- Header -->
+    <div class="w-fit mx-auto my-[20px]">
+      <div class="flex items-center gap-2">
+        <img class="w-[15px] h-[19px]" src="../../../../../assets/images/Vector (3).svg" loading="lazy" alt="img">
+        @if(currentSection === 0){
+        <h2 class="text-[#1F1F1F] text-[20px] font-bold leading-[100%]">Lab Analyses</h2>
+        }
+        @if(currentSection === 1){
+        <h2 class="text-[#1F1F1F] text-[20px] font-bold leading-[100%]">Radiological</h2>
+        }
+        @if(currentSection === 2){
+        <h2 class="text-[#1F1F1F] text-[20px] font-bold leading-[100%]">Prescription</h2>
+        }
+      </div>
+      <p class="text-[#007BBDBD] text-[18px] font-semibold leading-[150%] mt-[10px]">
+        RX-{{ meetingReport?.prescription?.id || 'Not Found' }}
+      </p>
+    </div>
+
+    <div class="flex flex-col md:flex-row items-start gap-4">
+
+      <!-- QR -->
+      <div class="w-[115px] h-[115px]">
+        <img class="w-full h-full" src="../../../../../assets/images/2048px-QR_Code_Model_1_Example 1.png"
+          loading="lazy" alt="QR">
+      </div>
+
+      <!-- Details & Sections -->
+      <div class="w-full">
+
+        <!-- Doctor & Patient Info -->
+        <div class="text-center md:text-left">
+          <div class="w-full flex justify-center md:justify-start items-center gap-2 mb-[10px]">
+            <h3 class="text-[#1F1F1F] text-[16px] font-bold leading-[100%]">
+              {{ agoraDetailsPatient?.doctor?.name || 'Not Found' }}</h3>
+            <h5 class="text-[#6C757D] text-[16px] font-bold leading-[100%]">
+              {{ agoraDetailsPatient?.doctor?.rating || 0 }} <i class="fa-solid fa-star text-[#FFC107]"></i>
+            </h5>
+          </div>
+          <h4 class="text-[#555555] text-[14px] font-semibold leading-[150%] mb-[10px]">
+            {{ agoraDetailsPatient?.doctor?.speciality || 'Not Found' }}
+          </h4>
+          <p class="text-[#555555] text-[12px] font-normal leading-[150%]">
+            ( Number of Consultations: {{ agoraDetailsPatient?.doctor?.consultations || 0 }} )
+          </p>
+          <div class="text-left">
+            <h4 class="text-[#1F1F1F] text-[16px] font-bold mt-[10px]">
+              Medical Practice License Number: <span
+                class="text-[#007BBDCC]">{{ agoraDetailsPatient?.doctor?.licenseNumber || 'Not Found' }}</span>
+            </h4>
+          </div>
+        </div>
+
+        <!-- Sections (Lab, Radiology, Prescription) -->
+        <div class="text-start mt-[30px] w-full">
+          @if(currentSection === 0){
+          <!-- Lab Analyses -->
+          <div>
+            <h2 class="text-[#0068A1] text-[16px] font-bold mb-[10px]">Lab Analysis Requests</h2>
+            <div *ngIf="meetingReport?.labAnalysisRequest?.labAnalyses?.length; else labNotFound">
+              <div *ngFor="let lab of meetingReport.labAnalysisRequest.labAnalyses" class="mb-3">
+                <p class="text-[#555555] text-[14px] font-semibold">{{ lab.name }} - {{ lab.notes || 'No Notes' }}</p>
+              </div>
+            </div>
+            <ng-template #labNotFound>
+              <p class="text-red-500 font-bold">Not Found</p>
+            </ng-template>
+          </div>
+          }
+
+          <!-- Radiological Examinations -->
+          @if(currentSection === 1){
+          <div>
+            <h2 class="text-[#0068A1] text-[16px] font-bold mb-[10px]">Radiological Examinations</h2>
+            <div
+              *ngIf="meetingReport?.radiologicalExaminationRequest?.radiologicalExaminations?.length; else radiologyNotFound">
+              <div *ngFor="let rad of meetingReport.radiologicalExaminationRequest.radiologicalExaminations"
+                class="mb-3">
+                <p class="text-[#555555] text-[14px] font-semibold">{{ rad.name }} - {{ rad.notes || 'No Notes' }}</p>
+              </div>
+            </div>
+            <ng-template #radiologyNotFound>
+              <p class="text-red-500 font-bold">Not Found</p>
+            </ng-template>
+          </div>
+          }
+
+          @if(currentSection === 2){
+          <!-- Prescription -->
+          <div>
+            <h2 class="text-[#0068A1] text-[16px] font-bold mb-[10px]">Prescription</h2>
+            <div *ngIf="meetingReport?.prescription?.medicines?.length; else prescriptionNotFound">
+              <div *ngFor="let med of meetingReport.prescription.medicines" class="mb-3">
+                <p class="text-[#555555] text-[14px] font-semibold">{{ med.name }} - {{ med.instructions }}</p>
+              </div>
+            </div>
+            <ng-template #prescriptionNotFound>
+              <p class="text-red-500 font-bold">Not Found</p>
+            </ng-template>
+          </div>
+          }
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="mt-[30px] w-full lg:w-[80%] mx-auto flex flex-col md:flex-row items-center gap-3">
+      <button
+        class="w-full px-[30px] py-[15px] text-[#FFFFFF] bg-[#007BBD] rounded-full border border-[#007BBD] text-[18px] md:text-[20px] font-bold"
+        (click)="downloadPrescription()">
+        Download
+
+        @if (currentSection === 0)
+        {
+        Lab Analyses
+        }
+        @if (currentSection === 1)
+        {
+        Radiology
+        }
+        @if (currentSection === 2)
+        {
+        Prescription
+        }
+
+        <i class="fa-solid fa-download ml-[10px]"></i>
+      </button>
+
+      <button
+        class="w-full px-[30px] py-[15px] text-[#007BBD] bg-[#FFFFFF] border rounded-full shadow-md text-[18px] md:text-[20px] font-bold"
+        (click)="nextSection()">
+        Next
+      </button>
+    </div>
+
+  </div>
+</div>
+}

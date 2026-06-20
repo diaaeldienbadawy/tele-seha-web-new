@@ -1,0 +1,38 @@
+<section class="videocall relative h-screen overflow-hidden">
+
+  <div class="flex justify-between items-center h-full">
+    <div class="w-full md:w-[60%] h-[calc(100vh-100px)]">
+      <app-doctor-meeting-video-call (openWhatsapp)="showWhatsapp = true"></app-doctor-meeting-video-call>
+    </div>
+
+    <div class="hidden md:block w-full md:w-[40%] h-[calc(100vh-100px)] px-[20px]">
+      <div class="h-[70vh]">
+        <app-doctor-chat-video-call></app-doctor-chat-video-call>
+      </div>
+
+      <app-popup-doctor></app-popup-doctor>
+
+    </div>
+  </div>
+
+</section>
+
+
+
+@if(showWhatsapp){
+<div class="fixed inset-0 bg-[#000]/90 z-[999999999999999] flex flex-col p-[20px] ">
+
+  <button class="absolute top-4 right-4 text-white text-2xl" (click)="showWhatsapp = false">
+    ✕
+  </button>
+
+  <div class="w-full h-[80vh] ">
+    <app-doctor-chat-video-call></app-doctor-chat-video-call>
+
+  </div>
+  <div>
+    <app-popup-doctor></app-popup-doctor>
+  </div>
+
+</div>
+}

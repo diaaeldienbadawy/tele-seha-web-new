@@ -1,0 +1,90 @@
+<header #header class="fixed top-0 w-full z-[100] bg-white/85 backdrop-blur-xl
+         border-b border-gray-200/60 shadow-[0_4px_30px_rgba(0,0,0,0.03)]
+         h-[80px] lg:h-[90px]
+         flex items-center transition-all duration-300">
+  <div class="container mx-auto px-4 md:px-6 flex justify-between items-center w-full">
+
+    <!-- Logo -->
+    <div class="flex-shrink-0 transition-transform duration-300 hover:scale-[1.02]">
+      <app-header-logo></app-header-logo>
+    </div>
+
+    <!-- Desktop Navigation -->
+    <div class="hidden lg:flex items-center justify-center flex-1 mx-8">
+      <app-desktop-nav></app-desktop-nav>
+    </div>
+
+    <!-- Right Side Actions -->
+    <div class="hidden lg:flex items-center justify-end gap-5 lg:gap-7">
+      <app-header-notification class="hover:scale-110 transition-transform"></app-header-notification>
+      <app-header-language class="hover:scale-110 transition-transform"></app-header-language>
+      
+      <app-header-profile (openAccountModal)="openAccountModal()"></app-header-profile>
+    </div>
+
+    <!-- Mobile Menu Button -->
+    <button class="lg:hidden w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50 text-[--primary-color] border border-gray-100 shadow-sm hover:bg-gray-100 active:scale-95 transition-all duration-200" (click)="openMenu()">
+      <i class="fa-solid fa-bars text-lg"></i>
+    </button>
+
+  </div>
+</header>
+
+<app-header-mobile [menuOpen]="menuOpen" (close)="closeMenu()">
+</app-header-mobile>
+
+
+@if (showAccountModal) {
+<div class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[999999999] flex items-center justify-center p-4">
+
+  <!-- Card Container -->
+  <div class="bg-white rounded-[2rem] p-8 md:p-12 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] w-full max-w-2xl relative animate-fadeIn border border-white/20">
+
+    <button (click)="closeAccountModal()" class="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-500 hover:rotate-90 transition-all duration-300">
+      <i class="fa-solid fa-xmark text-xl"></i>
+    </button>
+
+    <h2 class="text-center text-[24px] md:text-[30px] font-bold text-gray-800 mb-2">
+      {{ 'header.joinPlatform' | translate }}
+    </h2>
+    <p class="text-center text-gray-500 mb-10 text-sm md:text-base">{{ 'header.selectAccountType' | translate }}</p>
+
+    <div class="flex flex-col sm:flex-row gap-6 justify-center">
+
+      <!-- Patient -->
+      <div routerLink="/patient/auth/login" class="group cursor-pointer flex-1 h-[180px] bg-white
+          flex flex-col items-center justify-center
+          border-2 border-gray-100 rounded-3xl
+          transition-all duration-300 ease-out
+          hover:border-[#007BBD] hover:bg-[#007BBD]/5
+          hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(0,123,189,0.2)]">
+
+        <i class="fa-solid fa-user text-[40px] text-[#4F46E5] mb-4
+            group-hover:scale-110 transition"></i>
+
+        <p class="text-[20px] font-semibold text-[#333]">
+          {{ 'header.patient' | translate }}
+        </p>
+      </div>
+
+      <!-- Doctor -->
+      <div routerLink="/doctor/auth/login" class="group cursor-pointer flex-1 h-[180px] bg-white
+          flex flex-col items-center justify-center
+          border-2 border-gray-100 rounded-3xl
+          transition-all duration-300 ease-out
+          hover:border-[#0D9488] hover:bg-[#0D9488]/5
+          hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(13,148,136,0.2)]">
+
+        <i class="fa-solid fa-user-doctor text-[40px] text-[#16A34A] mb-4
+            group-hover:scale-110 transition"></i>
+
+        <p class="text-[20px] font-semibold text-[#333]">
+          {{ 'header.doctor' | translate }}
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+}

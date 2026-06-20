@@ -1,0 +1,109 @@
+<div>
+
+  <!-- Close Icon -->
+  <i class="fa-solid fa-xmark text-[#899CC9] text-[22px] cursor-pointer " (click)="onClose()">
+  </i>
+
+  <div class="text-center">
+
+    <!-- Title -->
+    @if(sendForm){
+    <div>
+      <div class="title w-full mx-auto mb-[30px]">
+        <h2 class="text-[#1F1F1F] text-[24px] sm:text-[28px] md:text-[32px] font-bold leading-[150%] relative">
+          Write your symptoms
+        </h2>
+      </div>
+
+      <form>
+
+        <div class="mb-[25px] text-left">
+          <label class="block text-[#1F1F1F] text-[12px] font-semibold mb-[10px]">
+            Write Your Symptoms
+          </label>
+
+          <div class="border border-[#007BBD] rounded-full p-[14px] flex items-center gap-[10px]">
+            <input type="text" placeholder="Enter your symptoms" [(ngModel)]="text"
+              class="text-[#1F1F1F] text-[14px] bg-transparent w-full outline-none">
+          </div>
+        </div>
+
+        <button (click)="send()" type="button"
+          class="w-full md:w-[50%] bg-[#007BBD] text-white py-[14px] rounded-full font-bold">
+          Send
+        </button>
+
+      </form>
+
+    </div>
+    }
+
+    <!-- Reception Pay Now  -->
+    @if(payNow){
+    <div>
+      <div class="title w-full mx-auto mb-[30px]">
+        <h2 class="text-[#1F1F1F] text-[24px] sm:text-[28px] md:text-[32px] font-bold leading-[150%] relative">
+          Reception
+        </h2>
+      </div>
+
+      <div class="mt-[20px]">
+        <div class="image mx-auto w-[156px] h-[156px]  ">
+          <img class="w-full h-full" src="../../../../../../assets/images/Group 75918.png" loading="lazy" alt="img">
+        </div>
+
+        <div class="mt-[20px]">
+          <h2 class="text-[#007BBD] text-[24px] font-bold leading-[100%] ">
+            Specialty successfully identified!
+          </h2>
+          <p class="text-[#9795B5] text-[20px] font-bold leading-[100%] mt-[15px]">
+            Please proceed with payment to reveal your case's specialty.
+          </p>
+        </div>
+
+        <div class="mt-[20px]">
+          <button (click)="closePayNow()" type="button"
+            class="w-full md:w-[50%] bg-[#007BBD] text-white py-[14px] rounded-full font-bold">
+            Pay Now
+          </button>
+        </div>
+
+      </div>
+    </div>
+    }
+
+    @if(result){
+    <div>
+      <div class="title w-full mx-auto mb-[30px]">
+        <h2 class="text-[#1F1F1F] text-[24px] sm:text-[28px] md:text-[32px] font-bold leading-[150%] relative">
+          Reception
+        </h2>
+      </div>
+
+      <div class="mt-[20px]">
+        <div class=" mx-auto w-[80%] md:w-[60%] lg:w-[40%] bg-[#007BBDBF] rounded-[20px] p-[40px]  ">
+          <h4 class="text-[#FFFFFF] text-[20px] font-bold leading-[100%] ">
+            The specialty is Cardiology.
+          </h4>
+        </div>
+
+        <div class="mt-[20px]">
+          <h2 class="text-[#007BBD] text-[24px] font-bold leading-[100%] ">
+            Please book an appointment with a doctor for consultation and diagnosis.
+          </h2>
+        </div>
+
+        <div class="mt-[20px]">
+          <button type="button" class="w-full md:w-[50%] bg-[#007BBD] text-white py-[14px] rounded-full font-bold">
+            Choose a Doctor
+          </button>
+        </div>
+
+      </div>
+    </div>
+    }
+
+
+  </div>
+
+</div>

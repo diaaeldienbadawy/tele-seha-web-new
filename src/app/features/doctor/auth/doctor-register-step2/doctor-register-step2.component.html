@@ -1,0 +1,268 @@
+<div class="p-0 min-h-screen bg-slate-50">
+
+  <div class="flex justify-between items-stretch min-h-screen">
+
+    <!-- ================= Left Side ================= -->
+    <div class="w-[50%] hidden md:block min-h-screen">
+      <app-auth-left-side class="h-full w-full"></app-auth-left-side>
+    </div>
+
+    <!-- ================= Right Side ================= -->
+    <div class="w-full md:w-[50%] p-[16px] sm:p-[24px] min-h-screen flex flex-col justify-between bg-gradient-to-tr from-[#f8fafc] via-[#f1f5f9] to-[#eff6ff] overflow-y-auto">
+
+      <!-- Header -->
+      <div class="w-full h-fit flex items-center justify-between z-10">
+        <div class="w-[25px]"></div>
+        <app-auth-logo></app-auth-logo>
+        <i class="fa-solid fa-xmark text-[#899CC9] hover:text-red-500 text-[25px] cursor-pointer transition-colors duration-200" (click)="clearLocalStorage()"></i>
+      </div>
+
+      <!-- ================= Content ================= -->
+      <div class="flex-1 flex flex-col justify-center my-4 w-[95%] md:w-[92%] lg:w-[90%] max-w-[700px] mx-auto py-2 z-10">
+
+        <div class="w-full bg-white/95 backdrop-blur-md rounded-3xl border border-slate-100 shadow-2xl shadow-slate-200/50 p-6 sm:p-8 transition-all duration-300">
+
+          <h2 class="text-slate-800 text-[28px] sm:text-[32px] font-bold leading-tight tracking-tight">
+            Get Started Now
+          </h2>
+
+          <p class="text-slate-500 text-[14px] font-normal leading-normal mt-[8px]">
+            Complete your profile details to proceed
+          </p>
+
+          <form class="mt-[30px]" [formGroup]="basicInfoForm">
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-4">
+
+              <!-- Country -->
+              <div class="col-span-1">
+                <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+                  Country ( Optional )
+                </label>
+
+                <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out">
+                  <i class="fa-solid fa-globe text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
+                  <p-select class="custom-select w-full" [options]="countries" optionLabel="countryName"
+                    optionValue="countryName" formControlName="Country" placeholder="Select Country" appendTo="body">
+                  </p-select>
+                </div>
+                <div class="min-h-[22px] mt-[6px]">
+                  @if (basicInfoForm.get('Country')?.touched && basicInfoForm.get('Country')?.errors) {
+                  <div class="text-red-500 text-[12px] font-medium flex items-center gap-1">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    Country is required
+                  </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Governorate -->
+              <div class="col-span-1">
+                <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+                  Governorate ( Optional )
+                </label>
+
+                <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out">
+                  <i class="fa-solid fa-map text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
+                  <p-select class="custom-select w-full" [options]="states" optionLabel="stateName" optionValue="stateName"
+                    formControlName="State" placeholder="Select Governorate" appendTo="body">
+                  </p-select>
+                </div>
+                <div class="min-h-[22px] mt-[6px]">
+                  @if (basicInfoForm.get('State')?.touched && basicInfoForm.get('State')?.errors) {
+                  <div class="text-red-500 text-[12px] font-medium flex items-center gap-1">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    Governorate is required
+                  </div>
+                  }
+                </div>
+              </div>
+
+              <!-- City -->
+              <div class="col-span-1">
+                <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+                  City ( Optional )
+                </label>
+
+                <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out">
+                  <i class="fa-solid fa-city text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
+                  <p-select class="custom-select w-full" [options]="cities" formControlName="City"
+                    placeholder="Select City" appendTo="body">
+                  </p-select>
+                </div>
+                <div class="min-h-[22px] mt-[6px]">
+                  @if (basicInfoForm.get('City')?.touched && basicInfoForm.get('City')?.errors) {
+                  <div class="text-red-500 text-[12px] font-medium flex items-center gap-1">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    City is required
+                  </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Profile Image -->
+              <div class="col-span-1">
+                <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+                  Profile Image ( Optional )
+                </label>
+
+                <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out cursor-pointer" (click)="fileInput.click()">
+                  @if (previewUrl) {
+                    <img [src]="previewUrl" alt="Profile Image" class="w-8 h-8 rounded-full object-cover shrink-0 mr-2 border border-slate-200">
+                  } @else {
+                    <i class="fa-solid fa-image text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
+                  }
+                  <input type="text" readonly [value]="fileName" placeholder="Upload the profile image"
+                    class="bg-transparent w-full text-slate-800 text-[14px] outline-none h-[44px] cursor-pointer">
+                  <i class="fa-solid fa-cloud-arrow-up text-[#899CC9] hover:text-(--primary-color) text-[18px] transition-colors duration-200"></i>
+                </div>
+
+                <input #fileInput type="file" accept="image/*" class="hidden" (change)="onFileSelected($event)">
+                <div class="min-h-[22px] mt-[6px]">
+                  @if (basicInfoForm.get('Image')?.touched && basicInfoForm.get('Image')?.errors) {
+                  <div class="text-red-500 text-[12px] font-medium flex items-center gap-1">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    Profile Image is required
+                  </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Date of Birth -->
+              <div class="col-span-1">
+                <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+                  Date of Birth
+                  <span class="text-red-500 font-bold">*</span>
+                </label>
+
+                <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out">
+                  <i class="fa-solid fa-calendar-days text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
+                  <p-datepicker class="custom-datepicker w-full" formControlName="BirthDate" [showButtonBar]="true"
+                    placeholder="Select birth date" dateFormat="dd/mm/yy" [maxDate]="maxBirthDate" [defaultDate]="maxBirthDate" appendTo="body">
+                  </p-datepicker>
+                </div>
+                <div class="min-h-[22px] mt-[6px]">
+                  @if (basicInfoForm.get('BirthDate')?.touched && basicInfoForm.get('BirthDate')?.errors) {
+                  <div class="text-red-500 text-[12px] font-medium flex items-center gap-1">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    @if (basicInfoForm.get('BirthDate')?.errors?.['required']) {
+                    Date of Birth is required
+                    }
+                  </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Gender -->
+              <div class="col-span-1">
+                <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+                  Gender
+                  <span class="text-red-500 font-bold">*</span>
+                </label>
+
+                <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out">
+                  <i class="fa-solid fa-venus-mars text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
+                  <p-select [options]="genders" optionLabel="name" optionValue="code" placeholder="Select Gender"
+                    formControlName="IsMale" class="custom-select w-full" appendTo="body">
+                  </p-select>
+                </div>
+                <div class="min-h-[22px] mt-[6px]">
+                  @if (basicInfoForm.get('IsMale')?.touched && basicInfoForm.get('IsMale')?.errors) {
+                  <div class="text-red-500 text-[12px] font-medium flex items-center gap-1">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    @if (basicInfoForm.get('IsMale')?.errors?.['required']) {
+                    Gender is required
+                    }
+                  </div>
+                  }
+                </div>
+              </div>
+
+              <!-- University -->
+              <div class="col-span-1">
+                <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+                  University
+                  <span class="text-red-500 font-bold">*</span>
+                </label>
+
+                <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out">
+                  <i class="fa-solid fa-graduation-cap text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
+                  <p-select class="custom-select w-full" formControlName="University" [options]="University"
+                    optionLabel="universityName" placeholder="Select University" appendTo="body">
+                  </p-select>
+                </div>
+                <div class="min-h-[22px] mt-[6px]">
+                  @if (basicInfoForm.get('University')?.touched && basicInfoForm.get('University')?.errors) {
+                  <div class="text-red-500 text-[12px] font-medium flex items-center gap-1">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    @if (basicInfoForm.get('University')?.errors?.['required']) {
+                    University is required
+                    }
+                  </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Spacer column to keep grid symmetric -->
+              <div class="col-span-1 hidden sm:block"></div>
+
+              <!-- Description -->
+              <div class="col-span-1 sm:col-span-2">
+                <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+                  Description ( Optional )
+                </label>
+
+                <div class="border border-slate-200 bg-slate-50/40 rounded-[20px] px-[18px] py-[12px] flex items-start w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out">
+                  <i class="fa-solid fa-file-lines text-[#899CC9]/80 text-[18px] shrink-0 mr-2 mt-1"></i>
+                  <textarea formControlName="Description" placeholder="Enter your description..."
+                    class="text-slate-800 text-[14px] font-normal bg-transparent w-full outline-none resize-none h-[100px]"></textarea>
+                </div>
+                <div class="min-h-[22px] mt-[6px]">
+                  @if (basicInfoForm.get('Description')?.touched && basicInfoForm.get('Description')?.errors) {
+                  <div class="text-red-500 text-[12px] font-medium flex items-center gap-1">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    Description is required
+                  </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Stepper Progress Dots -->
+              <div class="col-span-1 sm:col-span-2 flex justify-center items-center gap-1.5 my-6">
+                <div class="w-[8px] h-[6px] bg-slate-200 rounded-full"></div>
+                <div class="w-[24px] h-[6px] bg-(--primary-color) rounded-full shadow-sm shadow-(--primary-color)/25"></div>
+                <div class="w-[8px] h-[6px] bg-slate-200 rounded-full"></div>
+                <div class="w-[8px] h-[6px] bg-slate-200 rounded-full"></div>
+                <div class="w-[8px] h-[6px] bg-slate-200 rounded-full"></div>
+              </div>
+
+              <!-- Actions -->
+              <div class="col-span-1 sm:col-span-2 mt-[10px] flex gap-4">
+                <button type="button" routerLink="/doctor/auth/register/basicInfo" [disabled]="isLoading" class="w-[30%] bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 px-[20px] h-[54px] rounded-full text-[16px] font-bold leading-none flex items-center justify-center gap-2 shadow-sm transition-all duration-300 ease-in-out cursor-pointer">
+                  <i class="fa-solid fa-arrow-left text-[15px] mr-1"></i>
+                  <span>Previous</span>
+                </button>
+
+                <button type="button" (click)="save()" [disabled]="isLoading" class="flex-1 bg-gradient-to-r from-(--primary-color) to-[#006ba5] text-white hover:from-[#006ba5] hover:to-[#005a8c] px-[20px] h-[54px] rounded-full text-[16px] font-bold leading-none flex items-center justify-center gap-2 shadow-lg shadow-(--primary-color)/15 hover:shadow-xl hover:shadow-(--primary-color)/25 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 ease-in-out cursor-pointer">
+                  @if (isLoading) {
+                    <i class="fa-solid fa-spinner fa-spin mr-2"></i>
+                  }
+                  <span>Next Step</span>
+                  <i class="fa-solid fa-arrow-right text-[15px] ml-1"></i>
+                </button>
+              </div>
+
+            </div>
+
+          </form>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="w-full text-center text-xs text-slate-400 z-10 mt-4">
+        &copy; 2026 teleSEHA. All rights reserved.
+      </div>
+
+    </div>
+  </div>
+</div>

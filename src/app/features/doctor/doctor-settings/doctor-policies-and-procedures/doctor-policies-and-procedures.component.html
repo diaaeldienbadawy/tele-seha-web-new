@@ -1,0 +1,219 @@
+<div>
+
+  <div class="title w-full md:w-[90%] mx-auto  text-center">
+    <h2
+      class="text-[#1F1F1F] text-[22px] sm:text-[28px] md:text-[30px] lg:text-[40px] py-10 font-bold leading-[150%] tracking-[-0.02em] relative">
+      {{ data?.title }}
+    </h2>
+
+    <p class="text-[#555555] text-[16px] md:text-[18px] font-normal leading-[30px] mt-[20px] ">
+      {{ data?.prief }}
+    </p>
+
+  </div>
+
+  @for (item of data?.infos; track $index) {
+  <div class="title w-full md:w-[90%] mx-auto  mt-[30px]">
+    <h2
+      class="text-[#1F1F1F] text-[22px] sm:text-[28px] md:text-[30px] lg:text-[40px] font-bold leading-[150%] tracking-[-0.02em] relative text-center ">
+      {{ item?.title }}
+
+    </h2>
+    <p class="text-[#555555] text-[16px] md:text-[18px] font-medium leading-[30px]">
+      {{ item?.content }}
+    </p>
+
+  </div>
+  }
+
+
+
+  <!-- <div class="title w-full md:w-[90%] mx-auto mt-[50px] ">
+    <h2
+      class="text-[#1F1F1F] text-[22px] sm:text-[28px] md:text-[30px] lg:text-[40px] font-bold leading-[150%] tracking-[-0.02em] relative text-center ">
+      1. Privacy and Data Protection Policy
+      <img class="absolute w-[60%] left-[50%] md:w-[15%] translate-x-[-50%] md:bottom-[-10%] md:left-[50%] "
+        src="../../../../../assets/images/Shape.png" loading="lazy" alt="img">
+    </h2>
+
+    <p class="text-[#555555] text-[16px] md:text-[18px] font-normal leading-[30px] mt-[20px] ">
+      TeleSeha places the privacy of its users — including doctors (service providers), patients (users), and website
+      visitors — at the forefront of its priorities. This policy aims to clarify how personal and medical data is
+      collected, used, processed, and protected, as well as the rights guaranteed to users under the applicable laws and
+      regulations.
+    </p>
+
+  </div>
+  <div class="title w-full md:w-[90%] mx-auto mt-[50px] ">
+    <h2
+      class="text-[#1F1F1F] text-[22px] sm:text-[28px] md:text-[30px] lg:text-[40px] font-bold leading-[150%] tracking-[-0.02em] relative text-center ">
+      Data We Collect
+      <img class="absolute w-[60%] left-[50%] md:w-[15%] translate-x-[-50%] md:bottom-[-10%] md:left-[50%] "
+        src="../../../../../assets/images/Shape.png" loading="lazy" alt="img">
+    </h2>
+
+    <p class="text-[#555555] text-[16px] md:text-[18px] font-normal leading-[30px] mt-[20px] ">
+      Personal Data:
+    </p>
+    <ul class="space-y-2 pl-6" style="list-style-type: disc;">
+
+      <li class="text-[#555555] text-[16px] md:text-[18px] font-medium leading-[30px]">
+        Full name, date of birth, gender
+      </li>
+      <li class="text-[#555555] text-[16px] md:text-[18px] font-medium leading-[30px]">
+        Contact information (phone number, address, email)
+      </li>
+      <li class="text-[#555555] text-[16px] md:text-[18px] font-medium leading-[30px]">
+        Payment information (stored securely in encrypted form)
+      </li>
+    </ul>
+    <p class="text-[#555555] text-[16px] md:text-[18px] font-normal leading-[30px] mt-[20px] ">
+      Medical Data:
+    </p>
+    <ul class="space-y-2 pl-6" style="list-style-type: disc;">
+
+      <li class="text-[#555555] text-[16px] md:text-[18px] font-medium leading-[30px]">
+        Medical history and current medications
+      </li>
+      <li class="text-[#555555] text-[16px] md:text-[18px] font-medium leading-[30px]">
+        Symptoms and health complaints
+      </li>
+      <li class="text-[#555555] text-[16px] md:text-[18px] font-medium leading-[30px]">
+        Test results and radiology reports
+      </li>
+      <li class="text-[#555555] text-[16px] md:text-[18px] font-medium leading-[30px]">
+        Prescriptions and diagnoses
+      </li>
+    </ul>
+    <p class="text-[#555555] text-[16px] md:text-[18px] font-normal leading-[30px] mt-[20px] ">
+      How We Use Your Data:
+    </p>
+    <ul class="space-y-2 pl-6" style="list-style-type: disc;">
+
+      <li class="text-[#555555] text-[16px] md:text-[18px] font-medium leading-[30px]">
+        To provide medical services and consultations
+      </li>
+      <li class="text-[#555555] text-[16px] md:text-[18px] font-medium leading-[30px]">
+        To communicate with you about your health status
+      </li>
+      <li class="text-[#555555] text-[16px] md:text-[18px] font-medium leading-[30px]">
+        To issue invoices and process payments
+      </li>
+      <li class="text-[#555555] text-[16px] md:text-[18px] font-medium leading-[30px]">
+        To improve the quality of our services
+      </li>
+      <li class="text-[#555555] text-[16px] md:text-[18px] font-medium leading-[30px]">
+        To comply with medical laws and regulations
+      </li>
+    </ul>
+    <p class="text-[#555555] text-[16px] md:text-[18px] font-normal leading-[30px] mt-[20px] ">
+      Data Sharing:
+    </p>
+    <ul class="space-y-2 pl-6" style="list-style-type: disc;">
+
+      <li class="text-[#555555] text-[16px] md:text-[18px] font-medium leading-[30px]">
+        We only share your data in the following cases:
+      </li>
+      <li class="text-[#555555] text-[16px] md:text-[18px] font-medium leading-[30px]">
+        With the treating doctor to provide the service
+      </li>
+      <li class="text-[#555555] text-[16px] md:text-[18px] font-medium leading-[30px]">
+        With insurance companies (with your prior consent)
+      </li>
+      <li class="text-[#555555] text-[16px] md:text-[18px] font-medium leading-[30px]">
+        With legal authorities (if required by law)
+      </li>
+      <li class="text-[#555555] text-[16px] md:text-[18px] font-medium leading-[30px]">
+        With technical service providers (under strict confidentiality agreements)
+      </li>
+    </ul>
+
+  </div>
+  <div class="title w-full md:w-[90%] mx-auto mt-[50px] ">
+    <h2
+      class="text-[#1F1F1F] text-[22px] sm:text-[28px] md:text-[30px] lg:text-[40px] font-bold leading-[150%] tracking-[-0.02em] relative text-center ">
+      2. Terms of Use
+      <img class="absolute w-[60%] left-[50%] md:w-[15%] translate-x-[-50%] md:bottom-[-10%] md:left-[50%] "
+        src="../../../../../assets/images/Shape.png" loading="lazy" alt="img">
+    </h2>
+
+    <p class="text-[#555555] text-[16px] md:text-[18px] font-normal leading-[30px] mt-[20px] ">
+      By using the TeleSeha app, you agree to abide by these terms and conditions. If you do not agree to any of these
+      terms, please do not use the app.
+    </p>
+    <p class="text-[#555555] text-[16px] md:text-[18px] font-normal leading-[30px] mt-[20px] ">
+      Use of Service:
+    </p>
+    <p class="text-[#555555] text-[16px] md:text-[18px] font-bold leading-[30px] mt-[20px] ">
+      You are allowed to:
+    </p>
+    <ul class="space-y-2 pl-6" style="list-style-type: disc;">
+
+      <li class="text-[#555555] text-[16px] md:text-[18px] font-medium leading-[30px]">
+        Conduct medical consultations with licensed doctors
+      </li>
+      <li class="text-[#555555] text-[16px] md:text-[18px] font-medium leading-[30px]">
+        Save and print prescriptions and medical reports
+      </li>
+      <li class="text-[#555555] text-[16px] md:text-[18px] font-medium leading-[30px]">
+        Rate the service and provide feedback
+      </li>
+    </ul>
+    <p class="text-[#555555] text-[16px] md:text-[18px] font-bold leading-[30px] mt-[20px] ">
+      You are prohibited from:
+    </p>
+    <ul class="space-y-2 pl-6" style="list-style-type: disc;">
+
+      <li class="text-[#555555] text-[16px] md:text-[18px] font-medium leading-[30px]">
+        Providing false or misleading medical information
+      </li>
+      <li class="text-[#555555] text-[16px] md:text-[18px] font-medium leading-[30px]">
+        Sharing your account with others
+      </li>
+      <li class="text-[#555555] text-[16px] md:text-[18px] font-medium leading-[30px]">
+        Using the service for non-medical purposes
+      </li>
+      <li class="text-[#555555] text-[16px] md:text-[18px] font-medium leading-[30px]">
+        Violating the privacy of doctors or other patients
+      </li>
+    </ul>
+    <p class="text-[#555555] text-[16px] md:text-[18px] font-bold leading-[30px] mt-[20px] ">
+      Responsibilities and Limitations:
+    </p>
+    <ul class="space-y-2 pl-6" style="list-style-type: disc;">
+
+      <li class="text-[#555555] text-[16px] md:text-[18px] font-medium leading-[30px]">
+        The service is intended for general medical consultations, not emergency cases
+      </li>
+      <li class="text-[#555555] text-[16px] md:text-[18px] font-medium leading-[30px]">
+        Medical advice does not replace in-person doctor visits when necessary
+      </li>
+      <li class="text-[#555555] text-[16px] md:text-[18px] font-medium leading-[30px]">
+        The platform is not responsible for doctors' medical decisions, similar to private clinics
+      </li>
+    </ul>
+
+
+  </div>
+
+  <div class="title w-full md:w-[90%] mx-auto mt-[50px] ">
+    <h2
+      class="text-[#1F1F1F] text-[22px] sm:text-[28px] md:text-[30px] lg:text-[40px] font-bold leading-[150%] tracking-[-0.02em] relative text-center ">
+      3. Cancellation and Refund Policy
+      <img class="absolute w-[60%] left-[50%] md:w-[15%] translate-x-[-50%] md:bottom-[-10%] md:left-[50%] "
+        src="../../../../../assets/images/Shape.png" loading="lazy" alt="img">
+    </h2>
+
+    <p class="text-[#555555] text-[16px] md:text-[18px] font-normal leading-[30px] mt-[20px] ">
+      In case the doctor is unavailable due to technical reasons or the service is interrupted for more than 30 minutes,
+      the patient has the right to a refund of the consultation fee (5% deducted for payment gateway fees) or to request
+      a new appointment.
+    </p>
+    <p class="text-[#555555] text-[16px] md:text-[18px] font-normal leading-[30px] mt-[20px] ">
+      If the patient cancels appointments twice consecutively, their account will be suspended for two weeks.
+    </p>
+
+  </div> -->
+
+
+</div>

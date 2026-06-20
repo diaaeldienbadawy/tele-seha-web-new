@@ -1,0 +1,38 @@
+:host {
+  display: block;
+}
+
+.forDocotrs {
+  background-image: url('/assets/images/Group 1000006135.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+}
+
+.forDocotrs::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(247, 249, 254, 0.85) 0%, rgba(247, 249, 254, 0.4) 60%, transparent 100%);
+  pointer-events: none;
+}
+
+.forDocotrs .container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Button hover */
+:host ::ng-deep button {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+:host ::ng-deep button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 123, 189, 0.35);
+}
+
+:host ::ng-deep button:active {
+  transform: translateY(0);
+}

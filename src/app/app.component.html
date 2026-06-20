@@ -1,0 +1,13 @@
+<router-outlet></router-outlet>
+<ngx-spinner bdColor="rgba(0, 0, 0, 0.8)" size="medium" color="#fff" type="square-jelly-box" [fullScreen]="true">
+  <p style="color: white"> Loading... </p>
+</ngx-spinner>
+
+
+@if(showScrollButton){
+  <button id="scrollToTopButton"
+    class="ts-scroll-to-top"
+    (click)="scrollToTop()">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+}

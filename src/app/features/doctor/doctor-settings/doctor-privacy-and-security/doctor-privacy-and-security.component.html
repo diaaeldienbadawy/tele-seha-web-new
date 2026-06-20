@@ -1,0 +1,97 @@
+<div>
+  <div class="title w-full md:w-[90%] mx-auto  text-center">
+    <h2
+      class="text-[#1F1F1F] text-[22px] sm:text-[28px] md:text-[30px] lg:text-[40px] py-10 font-bold leading-[150%] tracking-[-0.02em] relative">
+      Privacy & Security
+    </h2>
+
+    @if(!showOtpForm){
+    <!-- mobile -->
+    @if(!showDisableBtn){
+    <div class="mb-[20px] text-end   ">
+      <button (click)="closeMobileEdit()"
+        class="border border-[#007BBD] bg-transparent px-[40px] py-[10px] rounded-full  text-[#007BBD] text-[14px] font-bold">
+        Cancel
+      </button>
+    </div>
+    }
+    <form action="" [formGroup]="mobileForm">
+      <div class="mt-[20px]">
+        <div class="border border-(--primary-color) rounded-full px-[16px] py-[8px] flex items-center gap-[10px]">
+          <i class="fa-solid fa-phone text-(--primary-color) text-[20px]"></i>
+          <input type="text" formControlName="mobile" [disabled]="showDisableBtn"
+            class="text-(--text-color) text-[14px] font-normal bg-transparent w-full" />
+
+          <button type="button" (click)="toggleMobileEdit()" class="btn-header border border-(--primary-color)
+           bg-(--primary-color) text-[#F7F9FE]
+           px-[40px] py-[10px] rounded-full
+           text-[16px] font-bold">
+            {{ showDisableBtn ? 'Edit' : 'Save' }}
+          </button>
+
+        </div>
+        <!-- @if (mobileForm.get('mobile')?.touched && mobileForm.get('mobile')?.errors) {
+          <p class="text-red-500 text-[12px] mt-2">
+            @if (mobileForm.get('mobile')?.errors?.['required']) {
+            Phone is required
+            }
+            @if (mobileForm.get('mobile')?.errors?.['invalidEgyptPhone']) {
+            Phone must be 10 digits befor the country code And
+            Phone must be in the format +20-1012344792
+            }
+          </p>
+          } -->
+      </div>
+    </form>
+    }
+
+    <!-- OTP -->
+    @if(showOtpForm){
+    <div class="w-full md:w-[50%] lg:w-[40%] mx-auto">
+
+      <form [formGroup]="otpForm" class="mt-[30px]">
+
+        <!-- OTP Inputs -->
+        <div class="flex justify-between items-center gap-3 lg:gap-[10px]">
+          <div *ngFor="let c of controls; let i = index">
+            <div
+              class="rounded-full w-[30px] h-[30px] md:w-[45px] md:h-[45px] lg:w-[60px] md:w-[45px] md:h-[45px] lg:h-[60px] flex items-center justify-center border"
+              [ngClass]="{
+             'border-blue-500': otpArray[i],
+             'border-red-500': showError,
+             'border-[#D3E0FE]': !otpArray[i] && !showError
+           }">
+              <input type="text" maxlength="1" class="text-(--text-color) text-[14px] sm:text-[18px] font-bold
+                         bg-transparent w-full text-center outline-none" (input)="onInput($event, i)"
+                (keydown)="onKeyDown($event, i)" #otpInput>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- Error Message -->
+        <p *ngIf="showError" class="text-red-500 mt-2 text-[14px]">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          Invalid OTP. Please enter a valid OTP.
+        </p>
+
+        <!-- Verify Button -->
+        <div class="w-full mt-[30px]">
+          <button type="button" (click)="submitOtp()" class="w-full btn-header border border-(--primary-color) bg-(--primary-color)
+                                text-[#F7F9FE] px-[20px] py-[15px] rounded-full
+                                text-[16px] font-bold leading-[18px]">
+            verify
+          </button>
+        </div>
+
+        <p class="text-[#555555] text-[16px] md:text-[14px] font-normal leading-[30px] mt-[20px] ">
+          Resend code in : <span class="text-[#007BBD]">00:30</span>
+        </p>
+
+      </form>
+    </div>
+
+    }
+
+  </div>
+</div>

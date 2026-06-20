@@ -1,0 +1,72 @@
+<nav class="hidden lg:block">
+  @if(userRole() == 'Patient'){
+  <ul class="flex items-center gap-8 lg:gap-10 text-[19px] font-semibold whitespace-nowrap">
+    <li><a routerLink="/patient/home" (click)="scrollTop()" routerLinkActive="active"
+        [routerLinkActiveOptions]="{exact:true}">{{ 'nav.home' | translate }}</a></li>
+    <li><a routerLink="/patient/allDoctors" (click)="removeSpecialty()" routerLinkActive="active"
+        [routerLinkActiveOptions]="{exact:true}">{{ 'nav.doctors' | translate }}</a></li>
+    <li><a routerLink="/patient/specialties" (click)="scrollTop()" routerLinkActive="active"
+        [routerLinkActiveOptions]="{exact:true}">{{ 'nav.specialties' | translate }}</a></li>
+    <li><a routerLink="/patient/allResent" (click)="scrollTop()" routerLinkActive="active"
+        [routerLinkActiveOptions]="{exact:true}">{{ 'nav.recentAppointments' | translate }}</a></li>
+    <li><a routerLink="/patient/reports" (click)="scrollTop()" routerLinkActive="active"
+        [routerLinkActiveOptions]="{exact:true}">{{ 'nav.reports' | translate }}</a>
+    </li>
+  </ul>
+  } @else if(userRole() == 'Doctor'){
+  <ul class="flex items-center gap-8 lg:gap-10 text-[19px] font-semibold whitespace-nowrap">
+    <li><a routerLink="/doctor/home" routerLinkActive="active" (click)="scrollTop()"
+        [routerLinkActiveOptions]="{exact:true}">{{ 'nav.home' | translate }}</a></li>
+    <li><a routerLink="/doctor/allDoctors" routerLinkActive="active" (click)="scrollTop()"
+        [routerLinkActiveOptions]="{exact:true}">{{ 'nav.doctors' | translate }}</a></li>
+    <li><a routerLink="/doctor/myAppointments" routerLinkActive="active" (click)="scrollTop()"
+        [routerLinkActiveOptions]="{exact:true}">{{ 'nav.mySessions' | translate }}</a></li>
+  </ul>
+  } @else {
+    <ul class="flex items-center gap-7 lg:gap-9 text-[19px] font-semibold whitespace-nowrap">
+      <li><a routerLink="/home" (click)="scrollTop()" routerLinkActive="active"
+          [routerLinkActiveOptions]="{exact:true}">{{ 'nav.home' | translate }}</a></li>
+      <li>
+        <a routerLink="/search-for-doctor" (click)="scrollTop()" routerLinkActive="active"
+          [routerLinkActiveOptions]="{exact:true}">
+          {{ 'nav.searchForDoctor' | translate }}
+        </a>
+      </li>
+
+      <li><a routerLink="/specialities" (click)="scrollTop()" routerLinkActive="active"
+          [routerLinkActiveOptions]="{exact:true}">
+          {{ 'nav.specialties' | translate }}
+        </a>
+      </li>
+      <li><a routerLink="/for-doctor" (click)="scrollTop()" routerLinkActive="active"
+          [routerLinkActiveOptions]="{exact:true}">
+          {{ 'nav.forDoctors' | translate }}
+        </a></li>
+
+      <!-- <li><a routerLink="/about-us" (click)="scrollTop()" routerLinkActive="active"
+          [routerLinkActiveOptions]="{exact:true}">
+          About Us
+        </a></li> -->
+    </ul>
+  }
+
+
+</nav>
+
+
+
+<!-- <li class="relative group cursor-pointer">
+    <span class="flex items-center gap-1">
+      About Us <i class="fa-solid fa-chevron-down text-[12px]"></i>
+    </span>
+    <ul class="absolute top-full left-0 bg-white rounded-xl shadow-lg
+               min-w-[200px] opacity-0 invisible p-2.5
+               group-hover:opacity-100 group-hover:visible transition-all">
+      <li><a routerLink="/about-us" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Feature
+          About Us</a></li>
+      <li><a routerLink="/features/two" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Feature
+          Two</a></li>
+      <li><a routerLink="/features/three" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Feature
+          Three</a></li>
+    </ul>
+  </li> -->

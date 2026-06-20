@@ -1,0 +1,12 @@
+.image-container {
+  background-image: url('/assets/images/Sign Up doctor.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.image-container:hover {
+  transform: scale(1.006);
+  box-shadow: 0 30px 60px -15px rgba(15, 23, 42, 0.15), 0 20px 40px -20px rgba(15, 23, 42, 0.15);
+}

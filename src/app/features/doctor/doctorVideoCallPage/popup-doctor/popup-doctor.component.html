@@ -1,0 +1,142 @@
+<div class="flex justify-between gap-5 items-center">
+
+  <button (click)="openPopupPrescription()" class="w-full bg-[#007BBD] text-white px-3 font-bold py-4 rounded-[20px]">
+    كتابة الروشتة
+  </button>
+  <button (click)="openPopupLabTests()" class="w-full bg-[#FFFFFF] text-[#007BBD] px-3 font-bold py-4 rounded-[20px]">
+    طلب تحاليل
+  </button>
+  <button (click)="openPopupRadiology()" class="w-full bg-[#FFFFFF] text-[#007BBD] px-3 font-bold py-4 rounded-[20px]">
+    طلب آشعة
+  </button>
+  <button (click)="openPopupBookFollowUp()" class="w-full bg-[#FFFFFF] text-[#007BBD] px-3 font-bold py-4 rounded-[20px]">
+    حجز متابعة
+  </button>
+</div>
+
+
+<!-- Prescription -->
+@if (showPopupPrescription) {
+<div class="fixed inset-0 bg-black/50 flex items-center justify-center z-[999999]">
+
+  <!-- Popup Card -->
+  <div class="bg-white rounded-xl shadow-lg p-[20px] md:p-[40px] w-[95%] md:w-[60%] max-h-[90vh] overflow-auto no-scrollbar
+           relative flex flex-col">
+
+    <!-- Close Icon -->
+    <div class="w-full flex justify-end items-center">
+      <i class="fa-solid fa-xmark text-[#899CC9] text-[25px] cursor-pointer" (click)="closePrescription()"></i>
+    </div>
+
+    <!-- Scrollable Content -->
+    <div class="mt-[30px] w-full md:w-[70%] mx-auto flex-1 ">
+
+      <div class="text-center">
+        <h3 class="text-[#1F1F1F] text-[20px] font-bold mb-[8px]">
+          The Prescription
+        </h3>
+        <!-- <p class="text-[#007BBDBD] text-[18px] font-bold mb-[20px]">
+          RX-20250824-00021
+        </p> -->
+      </div>
+      <div>
+        <app-add-edit-prescription (closePrescription)="closePrescription()"></app-add-edit-prescription>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+}
+
+
+<!-- Radiology -->
+@if (showPopupRadiology) {
+<div class="fixed inset-0 bg-black/50 flex items-center justify-center z-[999999]">
+
+  <!-- Popup Card -->
+  <div class="bg-white rounded-xl shadow-lg p-[20px] md:p-[40px] w-[95%] md:w-[60%] max-h-[90vh] overflow-auto no-scrollbar
+           relative flex flex-col">
+
+    <!-- Close Icon -->
+    <div class="w-full flex justify-end items-center">
+      <i class="fa-solid fa-xmark text-[#899CC9] text-[25px] cursor-pointer" (click)="closeRadiology()"></i>
+    </div>
+
+    <!-- Scrollable Content -->
+    <div class="mt-[30px] w-full md:w-[70%] mx-auto flex-1 ">
+
+      <div class="text-center">
+        <h3 class="text-[#1F1F1F] text-[20px] font-bold mb-[8px]">
+          The Radiology
+        </h3>
+        <!-- <p class="text-[#007BBDBD] text-[18px] font-bold mb-[20px]">
+          RX-20250824-00021
+        </p> -->
+      </div>
+      <div>
+        <app-add-edit-radiology (closeRadiology)="closeRadiology()"></app-add-edit-radiology>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+}
+
+
+<!-- Lab Tests -->
+@if (showPopupLabTests) {
+<div class="fixed inset-0 bg-black/50 flex items-center justify-center z-[999999]">
+
+  <!-- Popup Card -->
+  <div class="bg-white rounded-xl shadow-lg p-[20px] md:p-[40px] w-[95%] md:w-[60%] max-h-[90vh] overflow-auto no-scrollbar
+           relative flex flex-col">
+
+    <!-- Close Icon -->
+    <div class="w-full flex justify-end items-center">
+      <i class="fa-solid fa-xmark text-[#899CC9] text-[25px] cursor-pointer" (click)="closeLabTest()"></i>
+    </div>
+
+    <!-- Scrollable Content -->
+    <div class="mt-[30px] w-full md:w-[70%] mx-auto flex-1 ">
+
+      <div class="text-center">
+        <h3 class="text-[#1F1F1F] text-[20px] font-bold mb-[8px]">
+          Lab Tests
+        </h3>
+        <!-- <p class="text-[#007BBDBD] text-[18px] font-bold mb-[20px]">
+          RX-20250824-00021
+        </p> -->
+      </div>
+      <div>
+        <app-add-edit-labtest (closeLab)="closeLabTest()"></app-add-edit-labtest>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>
+}
+@if (bookFollowUp) {
+<div class="fixed inset-0 bg-black/50 flex items-center justify-center z-[999999]">
+
+  <div class="bg-white rounded-xl shadow-lg p-[20px] md:p-[40px] w-[95%] md:w-[80%] max-h-[90vh] overflow-auto no-scrollbar
+           relative flex flex-col">
+
+    <div class="w-full flex justify-end items-center">
+      <i class="fa-solid fa-xmark text-[#899CC9] text-[25px] cursor-pointer"
+      (click)="closeBookFollowUp()"></i>
+    </div>
+
+    <div class="mt-[30px] w-full md:w-[70%] mx-auto flex-1 ">
+      <div>
+        <app-book-follow-up (closeBookFollowUp)="closeBookFollowUp()"></app-book-follow-up>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+}

@@ -1,0 +1,136 @@
+<section class="py-12 bg-slate-50/50">
+  <div class="container mx-auto px-4">
+    <div class="ts-card max-w-4xl mx-auto border border-slate-100/80 shadow-[0_10px_30px_rgba(0,0,0,0.02)] p-6 sm:p-10 bg-white">
+
+      <div class="title flex justify-between items-center pb-4 border-b border-slate-100 mb-8">
+        <h2 class="text-slate-800 text-2xl sm:text-3xl font-bold tracking-tight">
+          {{ 'auth.infoAboutYou' | translate }}
+        </h2>
+        <i class="fa-solid fa-xmark text-[#899CC9] hover:text-slate-600 transition-colors duration-200 text-[25px] cursor-pointer" (click)="clearLocalStorage()">
+        </i>
+      </div>
+
+      <div class="mt-6">
+
+        <form [formGroup]="basicInfoForm">
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <!-- Country -->
+            <div class="mb-4">
+              <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+                {{ 'auth.country' | translate }}
+              </label>
+
+              <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out">
+                <i class="fa-solid fa-location-dot text-[#899CC9]/80 text-[18px] mr-2 shrink-0"></i>
+
+                <p-select class="custom-select w-full" [options]="countries" optionLabel="countryName"
+                  optionValue="countryId" formControlName="Country" [placeholder]="'auth.selectCountry' | translate">
+                </p-select>
+              </div>
+            </div>
+
+            <!-- Governorate -->
+            <div class="mb-4">
+              <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+                {{ 'auth.governorate' | translate }}
+              </label>
+
+              <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out">
+                <i class="fa-solid fa-location-dot text-[#899CC9]/80 text-[18px] mr-2 shrink-0"></i>
+
+                <p-select class="custom-select w-full" [options]="states" optionLabel="stateName" optionValue="stateId"
+                  formControlName="State" [placeholder]="'auth.selectGovernorate' | translate">
+                </p-select>
+              </div>
+            </div>
+
+            <!-- City -->
+            <div class="mb-4">
+              <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+                {{ 'auth.city' | translate }}
+              </label>
+
+              <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out">
+                <i class="fa-solid fa-location-dot text-[#899CC9]/80 text-[18px] mr-2 shrink-0"></i>
+
+                <p-select class="custom-select w-full" [options]="cities" formControlName="City"
+                  [placeholder]="'auth.selectCity' | translate">
+                </p-select>
+              </div>
+            </div>
+
+            <!-- Marital Status -->
+            <div class="mb-4">
+              <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+                {{ 'auth.maritalStatus' | translate }}
+              </label>
+
+              <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out">
+                <i class="fa-solid fa-heart text-[#899CC9]/80 text-[18px] mr-2 shrink-0"></i>
+
+                <p-select class="custom-select w-full" [options]="maritalStatus" formControlName="MaritalStatus"
+                  [placeholder]="'auth.selectMaritalStatus' | translate">
+                </p-select>
+              </div>
+            </div>
+
+            <!-- Job Title -->
+            <div class="mb-4">
+              <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+                {{ 'auth.jobTitle' | translate }}
+              </label>
+
+              <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out">
+                <i class="fa-solid fa-briefcase text-[#899CC9]/80 text-[18px] mr-2 shrink-0"></i>
+
+                <p-select class="custom-select w-full" [options]="jobTitles" formControlName="JobTitle"
+                  [placeholder]="'auth.selectJobTitle' | translate">
+                </p-select>
+              </div>
+            </div>
+
+            <!-- Height & Weight -->
+            <div class="w-full flex justify-between items-start gap-4 mb-4">
+              <div class="w-full">
+                <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+                  {{ 'auth.height' | translate }}
+                </label>
+                <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out">
+                  <input type="number" formControlName="Height" class="text-slate-800 text-[14px] font-normal bg-transparent w-full outline-none h-[48px]"
+                    [placeholder]="'auth.heightPlaceholder' | translate">
+                </div>
+              </div>
+
+              <div class="w-full">
+                <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
+                  {{ 'auth.weight' | translate }}
+                </label>
+                <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out">
+                  <input type="number" formControlName="Weight" class="text-slate-800 text-[14px] font-normal bg-transparent w-full outline-none h-[48px]"
+                    [placeholder]="'auth.weightPlaceholder' | translate">
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </form>
+
+
+      </div>
+
+      <!-- BUTTONS: BACK & SUBMIT -->
+      <div class="flex flex-col sm:flex-row gap-4 w-full md:w-[60%] lg:w-[50%] mx-auto mt-8 justify-center">
+        <button type="button" (click)="goBack()" class="ts-btn-secondary w-full py-4 text-base font-bold">
+          {{ 'auth.back' | translate }}
+        </button>
+        <button (click)="save()" class="ts-btn-primary w-full py-4 text-base font-bold shadow-lg shadow-(--primary-color)/15 hover:shadow-xl hover:shadow-(--primary-color)/25">
+          {{ 'auth.submit' | translate }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+</section>

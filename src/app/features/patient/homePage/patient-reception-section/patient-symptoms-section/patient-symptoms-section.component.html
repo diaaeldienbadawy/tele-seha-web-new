@@ -1,0 +1,98 @@
+<div class="relative">
+  <!-- Close Icon -->
+  <button (click)="onClose()" class="absolute top-0 right-0 text-slate-400 hover:text-slate-600 transition-colors shrink-0 cursor-pointer">
+    <i class="fa-solid fa-xmark text-xl"></i>
+  </button>
+
+  <div class="mt-4">
+    <!-- Step 1: Write Symptoms Form -->
+    @if(sendForm){
+    <div>
+      <div class="text-center mb-6">
+        <h2 class="text-slate-800 text-xl sm:text-2xl font-extrabold tracking-tight">
+          {{ 'reception.writeSymptoms' | translate }}
+        </h2>
+        <div class="w-12 h-1 bg-gradient-to-r from-(--primary-color) to-teal-500 mx-auto rounded-full mt-3"></div>
+      </div>
+
+      <div class="mb-5">
+        <label class="block text-slate-700 text-xs sm:text-sm font-semibold mb-2">
+          {{ 'reception.writeSymptoms' | translate }}
+        </label>
+        <div class="border border-slate-200 bg-slate-50/40 rounded-2xl px-5 py-3 flex items-start w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300">
+          <textarea [placeholder]="'reception.enterSymptoms' | translate" [(ngModel)]="text"
+            rows="4"
+            class="text-slate-800 text-[14px] bg-transparent w-full outline-none resize-none min-h-[80px]"></textarea>
+        </div>
+      </div>
+
+      <button (click)="send()" type="button" 
+        class="ts-btn-primary w-full shadow-lg shadow-(--primary-color)/20 hover:shadow-xl hover:shadow-(--primary-color)/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 cursor-pointer">
+        {{ 'reception.send' | translate }}
+      </button>
+    </div>
+    }
+
+    <!-- Step 2: Reception Pay Now -->
+    @if(payNow){
+    <div class="text-center">
+      <div class="mb-6">
+        <h2 class="text-slate-800 text-xl sm:text-2xl font-extrabold tracking-tight">
+          {{ 'reception.title' | translate }}
+        </h2>
+        <div class="w-12 h-1 bg-gradient-to-r from-(--primary-color) to-teal-500 mx-auto rounded-full mt-3"></div>
+      </div>
+
+      <div class="mt-6 flex flex-col items-center">
+        <div class="w-24 h-24 md:w-32 md:h-32 mb-6">
+          <img class="w-full h-full object-contain" src="../assets/images/Group 75918.png" loading="lazy" alt="img">
+        </div>
+
+        <div class="space-y-2 mb-6 max-w-sm">
+          <h3 class="text-(--primary-color) text-lg md:text-xl font-bold">
+            {{ 'reception.successIdentified' | translate }}
+          </h3>
+          <p class="text-slate-500 text-sm md:text-base font-normal leading-relaxed">
+            {{ 'reception.payPrompt' | translate }}
+          </p>
+        </div>
+
+        <button (click)="closePayNow()" type="button"
+          class="ts-btn-primary w-full shadow-lg shadow-(--primary-color)/20 hover:shadow-xl hover:shadow-(--primary-color)/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 cursor-pointer">
+          {{ 'reception.payNow' | translate }}
+        </button>
+      </div>
+    </div>
+    }
+
+    <!-- Step 3: Specialty Result -->
+    @if(result){
+    <div class="text-center">
+      <div class="mb-6">
+        <h2 class="text-slate-800 text-xl sm:text-2xl font-extrabold tracking-tight">
+          {{ 'reception.title' | translate }}
+        </h2>
+        <div class="w-12 h-1 bg-gradient-to-r from-(--primary-color) to-teal-500 mx-auto rounded-full mt-3"></div>
+      </div>
+
+      <div class="mt-6 flex flex-col items-center">
+        <div class="w-full bg-gradient-to-br from-(--primary-color)/10 to-teal-500/5 border border-(--primary-color)/15 rounded-2xl p-6 mb-6">
+          <h4 class="text-slate-800 text-lg md:text-xl font-bold leading-normal">
+            {{ 'reception.specialtyIs' | translate: { speciality: speciality } }}
+          </h4>
+        </div>
+
+        <p class="text-slate-500 text-sm md:text-base font-normal max-w-sm leading-relaxed mb-6">
+          {{ 'reception.bookDoctorPrompt' | translate }}
+        </p>
+
+        <button routerLink="/patient/allDoctors" (click)="onClose()" type="button"
+          class="ts-btn-primary w-full shadow-lg shadow-(--primary-color)/20 hover:shadow-xl hover:shadow-(--primary-color)/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 cursor-pointer">
+          {{ 'reception.chooseDoctor' | translate }}
+        </button>
+      </div>
+    </div>
+    }
+  </div>
+</div>
+
