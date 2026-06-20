@@ -1,8 +1,8 @@
 export class Environment {
   public static readonly production = false;
 
-  // public static readonly apiUrl = 'https://teleseha4-001-site1.stempurl.com/v1';
-  public static readonly apiUrl = 'http://localhost:5159';
+  public static readonly apiUrl = 'https://teleseha5-001-site1.ftempurl.com/v1';
+  // public static readonly apiUrl = 'http://localhost:5159';
 
   // public static readonly agoraApiGenerateUrl = 'https://agora-generate-token.vercel.app';
 
@@ -11,14 +11,14 @@ export class Environment {
   public static readonly agoraCertificateId = '4a3bba9e01f345828796240237b03a37';
 
   public static readonly patientnotificationHubUrl =
-    // 'https://teleseha4-001-site1.stempurl.com//hubs/patient_notification';
-    'http://localhost:5159/hubs/patient_notification';
+    'https://teleseha5-001-site1.ftempurl.com/hubs/patient_notification';
+  // 'http://localhost:5159/hubs/patient_notification';
 
   public static readonly doctornotificationHubUrl =
-    // 'https://teleseha4-001-site1.stempurl.com//hubs/doctor_notification';
-    'http://localhost:5159/hubs/doctor_notification';
+    'https://teleseha5-001-site1.ftempurl.com/hubs/doctor_notification';
+  // 'http://localhost:5159/hubs/doctor_notification';
 
   public static readonly chatHubUrl =
-    // 'https://teleseha4-001-site1.stempurl.com//hubs/chat';
-    'http://localhost:5159/hubs/chat';
+    'https://teleseha5-001-site1.ftempurl.com/hubs/chat';
+  // 'http://localhost:5159/hubs/chat';
 }
