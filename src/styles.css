@@ -473,4 +473,474 @@ section {
 }
 
 
+/* =========================================
+   Modal Design System
+   ========================================= */
+
+@keyframes ts-modal-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ts-modal-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes ts-item-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ts-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999999;
+  animation: ts-modal-fade-in 0.25s ease-out;
+}
+
+.ts-modal-card {
+  background: #ffffff;
+  border-radius: 1.5rem;
+  box-shadow:
+    0 25px 60px -12px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(226, 232, 240, 0.5);
+  width: 95%;
+  max-width: 580px;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: ts-modal-slide-up 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ts-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #f1f5f9;
+  position: relative;
+}
+
+.ts-modal-header-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.ts-modal-header-icon.prescription {
+  background: linear-gradient(135deg, rgba(0, 123, 189, 0.12) 0%, rgba(0, 123, 189, 0.06) 100%);
+  color: #007BBD;
+}
+
+.ts-modal-header-icon.labtest {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(16, 185, 129, 0.06) 100%);
+  color: #10b981;
+}
+
+.ts-modal-header-icon.radiology {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.12) 0%, rgba(139, 92, 246, 0.06) 100%);
+  color: #8b5cf6;
+}
+
+.ts-modal-header-text h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.ts-modal-header-text p {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin: 0.15rem 0 0;
+  font-weight: 400;
+}
+
+.ts-modal-close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.5rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: none;
+  background: #f8fafc;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1rem;
+}
+
+.ts-modal-close:hover {
+  background: #fee2e2;
+  color: #ef4444;
+  transform: rotate(90deg);
+}
+
+.ts-modal-body {
+  padding: 1.5rem 2rem 2rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.ts-modal-body::-webkit-scrollbar {
+  width: 4px;
+}
+
+.ts-modal-body::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+/* Item Cards inside modals */
+.ts-item-card {
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  position: relative;
+  transition: all 0.25s ease;
+  animation: ts-item-fade-in 0.3s ease-out;
+}
+
+.ts-item-card:hover {
+  border-color: rgba(0, 123, 189, 0.3);
+  background: #ffffff;
+}
+
+.ts-item-card .ts-item-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.625rem;
+}
+
+.ts-item-card .ts-item-number {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #007BBD 0%, #005e91 100%);
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ts-item-card .ts-item-number.labtest {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.ts-item-card .ts-item-number.radiology {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+}
+
+.ts-item-card .ts-item-label-text {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+/* Select wrapper inside item card */
+.ts-item-card .ts-select-wrapper {
+  border: 1.5px solid #e2e8f0;
+  border-radius: 0.75rem;
+  background: #ffffff;
+  padding: 0.5rem 0.75rem;
+  transition: all 0.25s ease;
+}
+
+.ts-item-card .ts-select-wrapper:focus-within {
+  border-color: #007BBD;
+  box-shadow: 0 0 0 4px rgba(0, 123, 189, 0.1);
+}
+
+/* Remove button */
+.ts-item-remove {
+  position: absolute;
+  top: 0.625rem;
+  right: 0.625rem;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.85rem;
+}
+
+.ts-item-remove:hover {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+/* Add button */
+.ts-add-btn {
+  width: 100%;
+  padding: 0.875rem;
+  border: 2px dashed #cbd5e1;
+  border-radius: 1rem;
+  background: transparent;
+  color: #64748b;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.ts-add-btn:hover {
+  border-color: #007BBD;
+  color: #007BBD;
+  background: rgba(0, 123, 189, 0.03);
+}
+
+.ts-add-btn .ts-add-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: rgba(0, 123, 189, 0.1);
+  color: #007BBD;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.ts-add-btn:hover .ts-add-icon {
+  background: #007BBD;
+  color: #ffffff;
+}
+
+/* Notes section */
+.ts-notes-section {
+  margin-bottom: 1.5rem;
+}
+
+.ts-notes-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.ts-notes-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+/* Submit section */
+.ts-submit-section {
+  padding-top: 0.5rem;
+}
+
+/* =========================================
+   Video Call & Chat Premium Overrides
+   ========================================= */
+
+.ts-video-header-badge {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.ts-video-btn-control {
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1.5px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+.ts-video-btn-control:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.ts-video-btn-control.active {
+  background-color: #ffffff;
+  color: #475569;
+}
+
+.ts-video-btn-control.active:hover {
+  background-color: #f1f5f9;
+}
+
+.ts-video-btn-control.muted {
+  background-color: #fee2e2;
+  color: #ef4444;
+  border-color: #fca5a5;
+}
+
+.ts-video-btn-control.muted:hover {
+  background-color: #fecaca;
+}
+
+.ts-video-btn-control.end-call {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: #ffffff;
+  border: none;
+  width: 3.75rem;
+  height: 3.75rem;
+  box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.3);
+}
+
+.ts-video-btn-control.end-call:hover {
+  background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+  box-shadow: 0 15px 20px -3px rgba(239, 68, 68, 0.4);
+}
+
+/* Floating reports drawer tab */
+.ts-reports-pull-tab {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  z-index: 99;
+  background: linear-gradient(135deg, #007BBD 0%, #005e91 100%);
+  color: #ffffff;
+  padding: 1.25rem 0.625rem;
+  border-radius: 0 1.25rem 1.25rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  box-shadow: 4px 0 15px rgba(0, 123, 189, 0.25);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ts-reports-pull-tab:hover {
+  padding-left: 0.875rem;
+  box-shadow: 6px 0 20px rgba(0, 123, 189, 0.35);
+}
+
+.ts-reports-pull-tab i {
+  font-size: 1.25rem;
+}
+
+.ts-reports-pull-tab span {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Chat bubble styling overrides */
+.ts-chat-bubble-patient {
+  background: linear-gradient(135deg, #007BBD 0%, #005e91 100%);
+  color: #ffffff;
+  border-radius: 1rem;
+  border-top-left-radius: 0.25rem;
+  padding: 0.75rem 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 123, 189, 0.1);
+  max-width: 85%;
+}
+
+.ts-chat-bubble-doctor {
+  background: #ffffff;
+  color: #1e293b;
+  border-radius: 1rem;
+  border-top-right-radius: 0.25rem;
+  padding: 0.75rem 1rem;
+  border: 1.5px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+  max-width: 85%;
+}
+
+.ts-chat-input-container {
+  background: #ffffff;
+  border-radius: 1rem;
+  border: 1.5px solid #e2e8f0;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+  padding: 0.625rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.ts-chat-input-container:focus-within {
+  border-color: #007BBD;
+  box-shadow: 0 10px 20px -3px rgba(0, 123, 189, 0.08), 0 0 0 3px rgba(0, 123, 189, 0.08);
+}
+
+/* Ensure global spinner overlay is on top of everything */
+.ngx-spinner-overlay {
+  z-index: 2147483647 !important;
+}
+
+/* Hide Today button in DatePicker */
+.hide-today-btn {
+  display: none !important;
+}
 

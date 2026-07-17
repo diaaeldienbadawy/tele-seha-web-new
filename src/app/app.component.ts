@@ -5,6 +5,7 @@ import { NgxSpinnerModule } from 'ngx-spinner';
 import { NotificationService } from './features/patient/service/notification.service';
 import { LocalstorageService } from './core/services/localstorage.service';
 import { RefreshTokenService } from './shared/services/refresh-token.service';
+import { TranslateServiceService } from './core/services/translate-service.service';
 
 @Component({
   selector: 'app-root',
@@ -16,6 +17,7 @@ export class AppComponent implements OnInit {
   constructor(
     private notificationService: NotificationService,
     private localStorageService: LocalstorageService,
+    private translateServiceService: TranslateServiceService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 

@@ -64,7 +64,7 @@
                 </button>
 
                 <!-- Secondary Controls -->
-                <div class="flex gap-2">
+                <div class="flex gap-2" *ngIf="!isTerminalOrStarted(appointment.status)">
                   <!-- Reschedule -->
                   <button (click)="showModal(appointment)" 
                           class="flex-1 sm:flex-initial py-3 px-4 rounded-xl border border-slate-200 text-slate-600 bg-white font-semibold text-xs md:text-sm hover:bg-slate-50 hover:border-slate-300 transition-colors flex items-center justify-center gap-1.5 cursor-pointer">

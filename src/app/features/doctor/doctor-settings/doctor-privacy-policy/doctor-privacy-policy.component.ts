@@ -26,7 +26,6 @@ export class DoctorPrivacyPolicyComponent implements OnInit {
       },
       error: (err) => {
         this.data = '';
-        console.log("ersssssssssssssssssssr");
         console.log(err);
 
       },

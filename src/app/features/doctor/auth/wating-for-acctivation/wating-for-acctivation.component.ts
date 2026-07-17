@@ -5,9 +5,11 @@ import { Router, RouterLink } from '@angular/router';
 import { GlobalUserStateService } from '../../../../core/services/state/global-user-state.service';
 import { DoctorRegistrationStateService } from '../../../../core/services/state/doctor-registration-state.service';
 
+import { TranslateModule } from '@ngx-translate/core';
+
 @Component({
   selector: 'app-wating-for-acctivation',
-  imports: [AuthLeftSideComponent, AuthLogoComponent, RouterLink],
+  imports: [AuthLeftSideComponent, AuthLogoComponent, RouterLink, TranslateModule],
   templateUrl: './wating-for-acctivation.component.html',
   styleUrl: './wating-for-acctivation.component.css',
   providers: [DoctorRegistrationStateService]

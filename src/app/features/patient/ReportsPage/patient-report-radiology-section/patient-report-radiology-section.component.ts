@@ -1,8 +1,10 @@
 import { PopupUploadComponent } from './../popup-upload/popup-upload.component';
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { LocalstorageService } from '../../../../core/services/localstorage.service';
 import { PatientReportsService } from '../../service/patient-reports.service';
+import { NotificationService } from '../../service/notification.service';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { TranslateModule } from '@ngx-translate/core';
@@ -22,6 +24,8 @@ export class PatientReportRadiologySectionComponent implements OnInit {
   );
   readonly localStorageServices: LocalstorageService =
     inject(LocalstorageService);
+  private readonly notificationService = inject(NotificationService);
+  private readonly destroyRef = inject(DestroyRef);
 
   selectedId: number | null = null;
 
@@ -30,10 +34,23 @@ export class PatientReportRadiologySectionComponent implements OnInit {
   patients: any;
 
   ngOnInit(): void {
-    const patients =
-      JSON.parse(this.localStorageServices.get('patients')) || null;
-    this.patients = patients[0];
+    // Guard against a missing/malformed 'patients' entry (see lab-tests section).
+    const raw = this.localStorageServices.get('patients');
+    let parsed: any = null;
+    try {
+      parsed = raw ? JSON.parse(raw) : null;
+    } catch {
+      parsed = null;
+    }
+    this.patients = Array.isArray(parsed) ? parsed[0] : null;
     this.getAllRadiology();
+
+    // Refresh live when the doctor requests a new radiological examination (or any report event).
+    const patientId = this.localStorageServices.loggedInPatientId();
+    if (patientId) this.notificationService.startPatientConnection(patientId);
+    this.notificationService.reportEvents$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.getAllRadiology());
   }
 
   getAllRadiology() {
@@ -73,8 +90,15 @@ export class PatientReportRadiologySectionComponent implements OnInit {
       return;
     }
 
+    if (this.selectedId == null) {
+      alert('No radiology request selected.');
+      return;
+    }
+
     const formData = new FormData();
-    formData.append('RadiologicalExaminationRequestId', '1');
+    // Attach to the selected RadiologicalExaminationRequest (not a hardcoded id). The primary
+    // upload path is <app-popup-upload>; this stays correct in case it is ever re-wired.
+    formData.append('RadiologicalExaminationRequestId', String(this.selectedId));
 
     files.forEach((file) => {
       formData.append('Files', file);

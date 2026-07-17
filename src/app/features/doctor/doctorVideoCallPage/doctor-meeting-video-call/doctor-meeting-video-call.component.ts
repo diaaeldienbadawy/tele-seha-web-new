@@ -52,12 +52,12 @@ export class DoctorMeetingVideoCallComponent implements OnDestroy {
   medicalHistory: any[] = [];
 
   ngOnInit() {
-    this.medicalHistory = JSON.parse(
-      this.localStorageService.get('medicalHistory') || '[]',
-    );
+    this.medicalHistory = this.parseStored(
+      this.localStorageService.get('medicalHistory'),
+    ) ?? [];
 
     console.log(this.medicalHistory);
-    const stored: any = JSON.parse(
+    const stored: any = this.parseStored(
       this.localStorageService.get('agoraDetails'),
     );
 
@@ -86,6 +86,16 @@ export class DoctorMeetingVideoCallComponent implements OnDestroy {
     }
   }
 
+  /** بيقرأ JSON بأمان من غير ما يرمي exception لو القيمة فاضية/غلط. */
+  private parseStored(raw: string | null): any {
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  }
+
   openWhatsApp() {
     this.openWhatsapp.emit();
   }
@@ -109,33 +119,39 @@ export class DoctorMeetingVideoCallComponent implements OnDestroy {
     const AgoraRTC = (await import('agora-rtc-sdk-ng')).default;
     console.log(this.details);
 
-    let channel = this.agoraDetails().channel;
-    let token = this.agoraDetails().token;
-    let uid = this.agoraDetails().uid;
+    const channel = this.agoraDetails().channel;
+    const token = this.agoraDetails().token;
+    const uid = this.agoraDetails().uid;
 
-    // channel = this.details.channelName;
-    // token = this.details.providerToken;
-    // uid = this.userId;
+    // لازم نسجّل الـ listeners قبل الـ join عشان منفوتش الطرف
+    // اللي يكون ناشر الفيديو/الصوت قبل ما ندخل القناة.
+    const client = await this.agoraService.ensureClient();
+    client.removeAllListeners('user-published');
+    client.removeAllListeners('user-unpublished');
+    client.removeAllListeners('user-left');
 
-    // channel = 'test';
-    // token = '007eJxTYNANawiZdqLg7DONhj1rfaw/Cpb0Hs6aLu74+UPqmmtKc3YoMBgZWRgaGBubGKaZWJqkJJonJZqnJScbG5tZmhknGhiY7FPfk9kQyMiw+/wcRkYGRgYWBkYGEJ8JTDKDSRYoWZJaXMLIYAoAE90jiQ==';
-    // uid = 5;
+    client.on('user-published', async (user: any, mediaType: any) => {
+      await client.subscribe(user, mediaType);
+      if (mediaType === 'video') {
+        user.videoTrack?.play('remote-video');
+        this.showWaitingForOtherParticipant.set(false);
+      }
+      if (mediaType === 'audio') {
+        user.audioTrack?.play();
+      }
+    });
+
+    client.on('user-unpublished', (_user: any, mediaType: any) => {
+      if (mediaType === 'video') {
+        this.showWaitingForOtherParticipant.set(true);
+      }
+    });
+
+    client.on('user-left', () => {
+      this.showWaitingForOtherParticipant.set(true);
+    });
 
     await this.agoraService.joinChannel(channel, token, uid);
-
-    this.agoraService.client.on(
-      'user-published',
-      async (user: any, mediaType: any) => {
-        await this.agoraService.client.subscribe(user, mediaType);
-        if (mediaType === 'video') {
-          user.videoTrack?.play('remote-video');
-          this.showWaitingForOtherParticipant.set(false);
-        }
-        if (mediaType === 'audio') {
-          user.audioTrack?.play();
-        }
-      },
-    );
 
     try {
       this.localTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
@@ -157,25 +173,38 @@ export class DoctorMeetingVideoCallComponent implements OnDestroy {
       }
     }
 
-    this.startCallTimer();
+    this.startCallTimer(this.details?.start || this.details?.Start);
+  }
+  /** Call length in seconds: the session's configured duration (minutes), or 15-min fallback. */
+  private callDurationSec(): number {
+    const minutes = Number(this.details?.duration);
+    return Number.isFinite(minutes) && minutes > 0 ? minutes * 60 : CALL_DURATION_SEC;
   }
 
-  private startCallTimer(): void {
+  private startCallTimer(startDateString?: string): void {
     this.resetCallTimer();
-    this.callRemainingSeconds.set(CALL_DURATION_SEC);
-    this.callTimerId = setInterval(() => {
-      this.callRemainingSeconds.update((prev) => {
-        if (prev === null || prev <= 0) {
-          return 0;
-        }
-        return prev - 1;
-      });
-      const left = this.callRemainingSeconds();
-      if (left === 0) {
+    const durationSec = this.callDurationSec();
+
+    const updateTimer = () => {
+      let remaining = durationSec;
+      if (startDateString) {
+        const startTime = new Date(startDateString).getTime();
+        const now = new Date().getTime();
+        const elapsed = Math.floor((now - startTime) / 1000);
+        remaining = durationSec - elapsed;
+      }
+      
+      if (remaining <= 0) {
+        this.callRemainingSeconds.set(0);
         this.clearCallTimerInterval();
         this.endCall();
+      } else {
+        this.callRemainingSeconds.set(remaining);
       }
-    }, 1000);
+    };
+
+    updateTimer();
+    this.callTimerId = setInterval(updateTimer, 1000);
   }
 
   private clearCallTimerInterval(): void {
@@ -191,7 +220,8 @@ export class DoctorMeetingVideoCallComponent implements OnDestroy {
     this.callRemainingSeconds.set(null);
   }
 
-  async endCall() {
+  /** Release local tracks + leave the Agora channel WITHOUT finalizing the meeting. */
+  private async leaveCall() {
     this.resetCallTimer();
     if (this.localTracks) {
       this.localTracks.forEach((track: any) => {
@@ -203,7 +233,11 @@ export class DoctorMeetingVideoCallComponent implements OnDestroy {
     await this.agoraService.leaveChannel();
     this.micMuted = false;
     this.cameraOff = false;
+  }
 
+  /** Explicit end (End-call button / auto-timeout): leave the channel AND close the meeting. */
+  async endCall() {
+    await this.leaveCall();
     this.closeMeeting();
   }
 
@@ -234,7 +268,10 @@ export class DoctorMeetingVideoCallComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    // Only release local call resources on teardown. Closing the meeting must stay an explicit
+    // doctor action (End-call button or the auto-timeout) — otherwise an accidental navigation
+    // or a page refresh would finalize the consultation and its check-up unintentionally.
     this.resetCallTimer();
-    void this.endCall();
+    void this.leaveCall();
   }
 }

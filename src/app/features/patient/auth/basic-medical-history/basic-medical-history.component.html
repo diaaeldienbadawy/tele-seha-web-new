@@ -9,8 +9,10 @@
         <h2 class="text-slate-800 text-2xl sm:text-3xl font-bold tracking-tight">
           {{ 'auth.medicalHistory' | translate }}
         </h2>
-        <i class="fa-solid fa-xmark text-[#899CC9] hover:text-slate-600 transition-colors duration-200 text-[25px] cursor-pointer" (click)="clearLocalStorage()">
-        </i>
+        <button (click)="clearLocalStorage()" class="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-slate-600 hover:text-red-600 bg-slate-100/60 hover:bg-red-50 rounded-full border border-slate-200/60 hover:border-red-100 transition-all duration-200 cursor-pointer">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>{{ 'auth.logout' | translate }}</span>
+        </button>
       </div>
 
       <!-- QUESTION -->

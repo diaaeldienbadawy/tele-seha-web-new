@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DoctorsService } from '../../../../shared/services/doctors.service';
 import { LocalstorageService } from '../../../../core/services/localstorage.service';
 import { CommonModule } from '@angular/common';
@@ -7,6 +8,7 @@ import { PatientAppointmentStatus } from '../../../../core/enum/patientAppointme
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { TranslateModule } from '@ngx-translate/core';
+import { NotificationService } from '../../../patient/service/notification.service';
 
 @Component({
   selector: 'app-doctor-todays-appointments-section',
@@ -22,17 +24,28 @@ export class DoctorTodaysAppointmentsSectionComponent implements OnInit {
   selectedDate: string | null = null;
   patientId: number | null = null;
   doctorId: number | null = null;
+
+  private destroyRef = inject(DestroyRef);
+
   constructor(
     readonly doctorService: DoctorsService,
     readonly localStorageService: LocalstorageService,
     readonly route: ActivatedRoute,
     readonly router: Router,
     readonly toaster: ToastrService,
+    readonly notificationService: NotificationService,
   ) {}
 
   ngOnInit() {
     this.doctorId = Number(this.localStorageService.get('doctorId')) || null;
     this.loadTodaysAppointments();
+
+    // Real-time appointment updates (unsubscribed automatically on destroy)
+    this.notificationService.appointmentEvents$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.loadTodaysAppointments();
+      });
   }
 
   data: any;
@@ -105,11 +118,6 @@ export class DoctorTodaysAppointmentsSectionComponent implements OnInit {
   selectedMeetingId: number | null = null;
   openMeeting(appointmentId: number) {
     this.doctorService.openAppointment(appointmentId).subscribe((res: any) => {
-      console.log(
-        'ssssssssssssssssssssssssss sssssssssssssssssssssss ssssssssssssssssssss',
-      );
-      console.log(res);
-      console.log(res);
       this.selectedMeetingId = res.id;
       this.loadTodaysAppointments();
       this.localStorageService.set('meetingId', res.id);
@@ -118,10 +126,11 @@ export class DoctorTodaysAppointmentsSectionComponent implements OnInit {
       this.localStorageService.set('patientId', res.checkUp.patientId);
       this.localStorageService.set(
         'medicalHistory',
-        JSON.stringify(res.patient.sections),
+        JSON.stringify(res.patient?.sections || []),
       );
       this.localStorageService.set('meetingToken', res.providerToken);
       this.localStorageService.set('agoraDetails', JSON.stringify(res));
+      this.router.navigate([`/doctor/videoCall/${res.id}`]);
     });
   }
 
@@ -258,6 +267,14 @@ export class DoctorTodaysAppointmentsSectionComponent implements OnInit {
     ].includes(status);
   }
 
+  isTerminalOrStarted(status: PatientAppointmentStatus): boolean {
+    return [
+      PatientAppointmentStatus.Started,
+      PatientAppointmentStatus.Completed,
+      PatientAppointmentStatus.Canceled,
+    ].includes(status);
+  }
+
   getButtonClass(status: PatientAppointmentStatus): string {
     switch (status) {
       case PatientAppointmentStatus.Created:
@@ -273,7 +290,6 @@ export class DoctorTodaysAppointmentsSectionComponent implements OnInit {
   }
 
   handleAction(item: any) {
-    console.log('ssssssssssssssssssssssssssssss');
     console.log(item.id);
     console.log(item);
 
@@ -294,34 +310,28 @@ export class DoctorTodaysAppointmentsSectionComponent implements OnInit {
 
         break;
 
-      case PatientAppointmentStatus.Started:
-        // this.joinMeeting(item);
-        console.log(item);
+      case PatientAppointmentStatus.Started: {
+        // Join the CURRENT (ongoing) meeting, not meetings[0]: with follow-ups the
+        // first meeting is the oldest/closed one and its channel/token would be wrong.
+        const meetings: any[] = item?.checkUp?.meetings ?? [];
+        const meeting =
+          meetings.find((m) => m?.status === 'Ongoing') ??
+          meetings[meetings.length - 1];
+        if (!meeting) return;
 
-        this.localStorageService.set('meetingId', item.checkUp.meetings[0].id);
-        this.localStorageService.set(
-          'channelName',
-          item.checkUp.meetings[0].channelName,
-        );
-        this.localStorageService.set('checkUpId', item.checkUp.meetings[0].id);
+        this.localStorageService.set('meetingId', meeting.id);
+        this.localStorageService.set('channelName', meeting.channelName);
+        this.localStorageService.set('checkUpId', item.checkUp.id);
         this.localStorageService.set('patientId', item.patient.patientId);
         this.localStorageService.set(
           'medicalHistory',
           JSON.stringify(item.patient.sections),
         );
-
-        this.localStorageService.set(
-          'meetingToken',
-          item.checkUp.meetings[0].providerToken,
-        );
-        this.localStorageService.set(
-          'agoraDetails',
-          JSON.stringify(item.checkUp.meetings[0]),
-        );
-        this.router.navigate([
-          `/doctor/videoCall/${item.checkUp.meetings[0].id}`,
-        ]);
+        this.localStorageService.set('meetingToken', meeting.providerToken);
+        this.localStorageService.set('agoraDetails', JSON.stringify(meeting));
+        this.router.navigate([`/doctor/videoCall/${meeting.id}`]);
         break;
+      }
     }
   }
 }

@@ -77,10 +77,35 @@ export class PopupUploadComponent {
     this.uploadedFiles = this.uploadedFiles.filter((f) => f !== file);
   }
 
+  private static readonly MAX_FILE_BYTES = 10 * 1024 * 1024; // 10 MB
+  private static readonly ALLOWED_TYPES = [
+    'application/pdf',
+    'image/png',
+    'image/jpeg',
+    'image/jpg',
+    'image/webp',
+  ];
+
   onSend() {
-    console.log('testEmit called');
-    console.log(this.selectedId);
-    console.log(this.uploadedFiles);
+    // Validate before hitting the server: a request id must exist, at least one file must be
+    // chosen, and each file must be an allowed type within the size limit.
+    if (!this.selectedId) {
+      this.toastr.error('لا يوجد طلب مرتبط بهذا الرفع.');
+      return;
+    }
+    if (!this.uploadedFiles.length) {
+      this.toastr.error('اختر ملفًا واحدًا على الأقل.');
+      return;
+    }
+    const invalid = this.uploadedFiles.find(
+      (f) =>
+        f.size > PopupUploadComponent.MAX_FILE_BYTES ||
+        !PopupUploadComponent.ALLOWED_TYPES.includes(f.type),
+    );
+    if (invalid) {
+      this.toastr.error('الملفات المسموحة: PDF أو صور، وبحد أقصى 10 ميجابايت للملف.');
+      return;
+    }
 
     const formData = new FormData();
 

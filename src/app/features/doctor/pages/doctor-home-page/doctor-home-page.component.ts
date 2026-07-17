@@ -38,6 +38,29 @@ export class DoctorHomePageComponent implements OnInit {
 
   // Active appointments list
   allAppointments: any[] = [];
+
+  get activeAppointments(): any[] {
+    return this.allAppointments
+      .map((session: any) => ({
+        ...session,
+        appointments: session.appointments?.filter(
+          (a: any) => a.status !== PatientAppointmentStatus.Completed && a.status !== PatientAppointmentStatus.Canceled
+        ) || [],
+      }))
+      .filter((session: any) => session.appointments.length > 0);
+  }
+
+  get completedAppointments(): any[] {
+    return this.allAppointments
+      .map((session: any) => ({
+        ...session,
+        appointments: session.appointments?.filter(
+          (a: any) => a.status === PatientAppointmentStatus.Completed || a.status === PatientAppointmentStatus.Canceled
+        ) || [],
+      }))
+      .filter((session: any) => session.appointments.length > 0);
+  }
+
   isLoadingSchedule = false;
 
   // Reschedule schedule modal
@@ -59,10 +82,16 @@ export class DoctorHomePageComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    const userId = this.globalUserStateService.userId();
-    if (userId) {
-      this.notificationService.startDoctorConnection(userId);
+    const doctorId = this.localStorageService.get('doctorId');
+    if (doctorId) {
+      this.notificationService.startDoctorConnection(doctorId);
     }
+
+    // Subscribe to real-time appointment status changes
+    this.notificationService.appointmentEvents$.subscribe(() => {
+      this.loadDashboardStats();
+      this.loadTodaysAppointments();
+    });
 
     // Retrieve Doctor Info
     this.doctorName = this.localStorageService.get('doctorName') || 'Doctor';
@@ -92,7 +121,10 @@ export class DoctorHomePageComponent implements OnInit {
   loadTodaysAppointments() {
     if (!this.doctorId) return;
     this.isLoadingSchedule = true;
-    this.doctorService.getAppointmentsToday(this.doctorId).subscribe({
+    // includeCompleted: the page splits the response into the active queue and the
+    // "completed today" section below it. The backend strips finished appointments by
+    // default, which left that section permanently empty.
+    this.doctorService.getAppointmentsToday(this.doctorId, true).subscribe({
       next: (res: any[]) => {
         this.allAppointments = res.map((session) => ({
           sessionId: session.sessionId,
@@ -108,9 +140,16 @@ export class DoctorHomePageComponent implements OnInit {
     });
   }
 
+  /** فيه شغل لسه في الطابور؟ ده اللي بيتحكم في عرض جدول اليوم. */
   hasAppointments(): boolean {
-    return this.allAppointments?.some(
-      (session: any) => session.appointments?.length > 0
+    return this.activeAppointments.length > 0;
+  }
+
+  /** مفيش خالص النهاردة — لا طابور ولا حاجة خلصت. */
+  hasNothingToday(): boolean {
+    return (
+      this.activeAppointments.length === 0 &&
+      this.completedAppointments.length === 0
     );
   }
 
@@ -151,7 +190,7 @@ export class DoctorHomePageComponent implements OnInit {
         this.localStorageService.set('patientId', res.checkUp.patientId);
         this.localStorageService.set(
           'medicalHistory',
-          JSON.stringify(res.patient.sections)
+          JSON.stringify(res.patient?.sections || [])
         );
         this.localStorageService.set('meetingToken', res.providerToken);
         this.localStorageService.set('agoraDetails', JSON.stringify(res));
@@ -180,7 +219,7 @@ export class DoctorHomePageComponent implements OnInit {
         if (meeting) {
           this.localStorageService.set('meetingId', meeting.id);
           this.localStorageService.set('channelName', meeting.channelName);
-          this.localStorageService.set('checkUpId', meeting.id);
+          this.localStorageService.set('checkUpId', meeting.checkUpId ?? item.checkUp?.id);
           this.localStorageService.set('patientId', item.patient?.patientId);
           this.localStorageService.set(
             'medicalHistory',
@@ -315,6 +354,14 @@ export class DoctorHomePageComponent implements OnInit {
     return [
       PatientAppointmentStatus.Confirmed,
       PatientAppointmentStatus.Rescheduled,
+      PatientAppointmentStatus.Completed,
+      PatientAppointmentStatus.Canceled,
+    ].includes(status);
+  }
+
+  isTerminalOrStarted(status: PatientAppointmentStatus): boolean {
+    return [
+      PatientAppointmentStatus.Started,
       PatientAppointmentStatus.Completed,
       PatientAppointmentStatus.Canceled,
     ].includes(status);

@@ -1,7 +1,9 @@
 import { LocalstorageService } from './../../../../core/services/localstorage.service';
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PatientReportsService } from '../../service/patient-reports.service';
+import { NotificationService } from '../../service/notification.service';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { TranslateModule } from '@ngx-translate/core';
@@ -20,6 +22,8 @@ export class PatientReportPrescriptionsSectionComponent implements OnInit {
   );
   readonly localStorageServices: LocalstorageService =
     inject(LocalstorageService);
+  private readonly notificationService = inject(NotificationService);
+  private readonly destroyRef = inject(DestroyRef);
 
   data: any;
 
@@ -30,6 +34,13 @@ export class PatientReportPrescriptionsSectionComponent implements OnInit {
       JSON.parse(this.localStorageServices.get('patients')) || null;
     this.patients = patients[0];
     this.getAllPrescription();
+
+    // Refresh live when the doctor issues a new prescription (or any report event).
+    const patientId = this.localStorageServices.loggedInPatientId();
+    if (patientId) this.notificationService.startPatientConnection(patientId);
+    this.notificationService.reportEvents$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.getAllPrescription());
   }
 
   getAllPrescription() {
@@ -43,7 +54,6 @@ export class PatientReportPrescriptionsSectionComponent implements OnInit {
     if (!patients) return;
     this.prescriptionServices.getAllprescription(patients).subscribe({
       next: (res: any) => {
-        console.log('ssssssssssssssssssssssssssss');
         console.log(res);
 
         this.data = res;

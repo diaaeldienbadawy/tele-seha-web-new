@@ -5,12 +5,14 @@ import { catchError, switchMap, throwError } from 'rxjs';
 import { RefreshTokenService } from '../../shared/services/refresh-token.service';
 import { Router } from '@angular/router';
 import { GlobalUserStateService } from '../services/state/global-user-state.service';
+import { LocalstorageService } from '../services/localstorage.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const platformId = inject(PLATFORM_ID);
   const refreshService = inject(RefreshTokenService);
   const router = inject(Router);
   const globalUserStateService = inject(GlobalUserStateService);
+  const localStorageService = inject(LocalstorageService);
 
   const isRefreshRequest = req.url.includes('refresh-login');
 
@@ -41,6 +43,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
               // Instead of manually setting tokens, hydrate the whole state like the guard does
               globalUserStateService.hydrateFromLoginResponse(res);
+              localStorageService.hydrateFromLoginResponse(res);
 
               const retryReq = req.clone({
                 setHeaders: {
@@ -54,6 +57,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
             catchError((refreshErr: HttpErrorResponse) => {
               if (refreshErr.status === 401 || refreshErr.status === 403) {
                 globalUserStateService.clearUserData();
+                localStorageService.clearUserData();
                 router.navigate(['/']);
               }
               return throwError(() => refreshErr);
@@ -62,6 +66,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         }
 
         globalUserStateService.clearUserData();
+        localStorageService.clearUserData();
         router.navigate(['/']);
       }
 

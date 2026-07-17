@@ -131,7 +131,10 @@
       <div class="pt-4 max-w-sm mx-auto">
         @if((item?.turn - session?.currentTurn) <= 0){
         <button
-          class="ts-btn-primary w-full py-4 text-base font-extrabold shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/35 hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer"
+          type="button"
+          (click)="joinCall()"
+          [disabled]="!startedData"
+          class="ts-btn-primary w-full py-4 text-base font-extrabold shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/35 hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
         >
           <i class="fa-solid fa-video mr-2 rtl:ml-2"></i>
           {{ 'waitingSession.join' | translate }}

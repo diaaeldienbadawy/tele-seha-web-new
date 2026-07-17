@@ -11,6 +11,7 @@ import { PatientAuthService } from '../../service/patient-auth.service';
 import { Router } from '@angular/router';
 import { SpecialtiesService } from '../../../../shared/services/specialties.service';
 import { GlobalUserStateService } from '../../../../core/services/state/global-user-state.service';
+import { LocalstorageService } from '../../../../core/services/localstorage.service';
 import { PatientRegistrationStateService } from '../../../../core/services/state/patient-registration-state.service';
 import { PatientService } from '../../../../shared/services/patient.service';
 import { PatientRegistrationListsStateService } from '../../../../core/services/state/patient-registration-lists-state.service';
@@ -41,6 +42,7 @@ export class InfoAboutYouComponent implements OnInit {
     private patientAuthService: PatientAuthService,
     private route: Router,
     private globalUserStateService: GlobalUserStateService,
+    private localStorageService: LocalstorageService,
     private patientRegistrationStateService: PatientRegistrationStateService,
     private patientService: PatientService,
     private listsStateService: PatientRegistrationListsStateService,
@@ -66,6 +68,9 @@ export class InfoAboutYouComponent implements OnInit {
     this.patientService.getPatientProfile(Number(this.patientId)).subscribe({
       next: (data: any) => {
         if (data) {
+          if (data.name) {
+            this.patientRegistrationStateService.setPatientName(data.name);
+          }
           this.basicInfoForm.patchValue({
             Country: data.countryId || data.country || '',
           });
@@ -189,6 +194,14 @@ export class InfoAboutYouComponent implements OnInit {
       .subscribe({
         next: (res) => {
           this.toastr.success('Profile completed successfully');
+          const name = this.patientRegistrationStateService.patientName();
+          if (this.patientId && name) {
+            this.globalUserStateService.selectPatientProfile(this.patientId, name);
+            this.localStorageService.setPatientName(name);
+            this.localStorageService.setPatientId(this.patientId);
+            this.localStorageService.setLoggedInPatientId(this.patientId);
+            this.localStorageService.setRole('Patient');
+          }
           this.route.navigate(['/patient/home']);
           this.basicInfoForm.reset();
         },

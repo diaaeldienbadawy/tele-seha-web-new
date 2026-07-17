@@ -18,6 +18,8 @@ import { DoctorRegistrationStateService } from '../../../../core/services/state/
 import { SpecialtiesService } from '../../../../shared/services/specialties.service';
 import { DoctorAuthService } from '../../service/doctor-auth.service';
 
+import { TranslateModule } from '@ngx-translate/core';
+
 @Component({
   selector: 'app-doctor-register-step3',
   imports: [
@@ -26,6 +28,7 @@ import { DoctorAuthService } from '../../service/doctor-auth.service';
     RouterLink,
     FormsModule,
     ReactiveFormsModule,
+    TranslateModule,
   ],
   templateUrl: './doctor-register-step3.component.html',
   styleUrl: './doctor-register-step3.component.css',

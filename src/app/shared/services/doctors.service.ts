@@ -97,10 +97,17 @@ export class DoctorsService {
   //   );
   // }
 
-  // Get Appointment Today
-  getAppointmentsToday(doctorId: number): Observable<any> {
+  /**
+   * مواعيد النهاردة. افتراضياً بترجّع الطابور النشط بس؛
+   * `includeCompleted` بتضيف اللي خلص/اتلغى النهاردة كمان.
+   */
+  getAppointmentsToday(
+    doctorId: number,
+    includeCompleted = false,
+  ): Observable<any> {
+    const query = includeCompleted ? '?includeCompleted=true' : '';
     return this.http.get<any>(
-      `${Environment.apiUrl}/api/doctor-app/appointment/today/${doctorId}`,
+      `${Environment.apiUrl}/api/doctor-app/appointment/today/${doctorId}${query}`,
     );
   }
 

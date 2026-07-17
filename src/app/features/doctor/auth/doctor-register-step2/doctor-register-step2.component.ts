@@ -20,6 +20,8 @@ import { PatientAuthService } from '../../../patient/service/patient-auth.servic
 import { DatePickerModule } from 'primeng/datepicker';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
+import { TranslateModule } from '@ngx-translate/core';
+
 @Component({
   selector: 'app-doctor-register-step2',
   imports: [
@@ -29,6 +31,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     Select,
     ReactiveFormsModule,
     DatePickerModule,
+    TranslateModule,
   ],
   templateUrl: './doctor-register-step2.component.html',
   styleUrl: './doctor-register-step2.component.css',

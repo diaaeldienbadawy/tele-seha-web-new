@@ -104,7 +104,6 @@ export class PatientAllDoctorsSectionComponent implements OnInit {
     from: number | null = null,
     SortBy: string | null = null,
   ) {
-    console.log("sssssssssssssssssss");
     console.log(LastId , from, SortBy);
 
     this.doctorsService

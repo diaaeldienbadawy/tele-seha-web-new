@@ -21,6 +21,8 @@ import { INextStepEnum } from '../../../../core/models/nextStepEnum';
 import { DoctorsService } from '../../../../shared/services/doctors.service';
 import { PatientAuthService } from '../../../patient/service/patient-auth.service';
 
+import { TranslateModule } from '@ngx-translate/core';
+
 @Component({
   selector: 'app-doctor-register-step1',
   imports: [
@@ -29,6 +31,7 @@ import { PatientAuthService } from '../../../patient/service/patient-auth.servic
     RouterLink,
     ReactiveFormsModule,
     Select,
+    TranslateModule,
   ],
   templateUrl: './doctor-register-step1.component.html',
   styleUrl: './doctor-register-step1.component.css',

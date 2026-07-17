@@ -1,3 +1,4 @@
+@if (isMeetingValid) {
 <section class="videocall relative h-screen overflow-hidden">
 
   <div class="flex justify-between items-center h-full">
@@ -35,4 +36,14 @@
   </div>
 
 </div>
+}
+}
+
+@if (isValidating) {
+  <div class="flex justify-center items-center h-screen bg-[#001725] text-white">
+    <div class="text-center">
+      <i class="fa-solid fa-circle-notch fa-spin text-5xl mb-4 text-[#007BBD]"></i>
+      <p class="text-lg font-semibold tracking-wide">جاري التحقق من صلاحية الجلسة...</p>
+    </div>
+  </div>
 }

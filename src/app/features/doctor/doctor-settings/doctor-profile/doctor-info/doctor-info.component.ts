@@ -211,11 +211,6 @@ export class DoctorInfoComponent implements OnInit {
           { emitEvent: false },
         );
 
-        console.log(
-          'this.basicInfoForm.valuessssssssssssssssssssssssssssssssssss',
-        );
-        console.log(this.basicInfoForm.value);
-
         this.basicInfoForm.disable({ emitEvent: false });
 
         if (profile?.imageUrl) {

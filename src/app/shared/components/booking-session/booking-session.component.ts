@@ -121,7 +121,15 @@ export class BookingSessionComponent implements OnChanges {
     console.log('this.patientId, this.selectedSessionId');
     console.log(this.patientId, this.selectedSessionId);
 
-    if (!this.patientId || !this.selectedSessionId) return;
+    if (!this.patientId) {
+      this.toastr.warning('Please log in first to book a session.');
+      return;
+    }
+
+    if (!this.selectedSessionId) {
+      this.toastr.warning('Please select a time slot before booking.');
+      return;
+    }
 
     console.log('this.patientId, this.selectedSessionId');
     console.log(this.patientId, this.selectedSessionId);

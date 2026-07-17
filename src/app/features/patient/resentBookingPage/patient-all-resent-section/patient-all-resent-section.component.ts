@@ -1,4 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { LocalstorageService } from '../../../../core/services/localstorage.service';
 import { RecentAppointmentsService } from '../../../../shared/services/recent-appointments.service';
@@ -9,6 +12,7 @@ import { FormsModule } from '@angular/forms';
 import { SessionStateService } from '../../../../shared/services/session-state.service';
 import { ToastrService } from 'ngx-toastr';
 import { TranslateModule } from '@ngx-translate/core';
+import { NotificationService } from '../../../patient/service/notification.service';
 
 @Component({
   selector: 'app-patient-all-resent-section',
@@ -28,6 +32,8 @@ export class PatientAllResentSectionComponent implements OnInit {
   showPopupRating: boolean = false;
   showPopupChatAI: boolean = false;
 
+  private destroyRef = inject(DestroyRef);
+
   constructor(
     readonly localStorageService: LocalstorageService,
     readonly recentAppointmentService: RecentAppointmentsService,
@@ -35,24 +41,49 @@ export class PatientAllResentSectionComponent implements OnInit {
     readonly toaster: ToastrService,
     readonly patientChatAi: PatientChatAiForEnterSessionService,
     readonly sessionState: SessionStateService,
+    readonly notificationService: NotificationService,
   ) {
     this.patientId = this.localStorageService.loggedInPatientId() || null;
   }
 
   ngOnInit(): void {
     this.loadAppointmentComming();
+
+    // Ensure the realtime hub is connected even when this page is opened directly
+    // (deep-link / refresh) rather than only after visiting the home page.
+    if (this.patientId) {
+      this.notificationService.startPatientConnection(this.patientId);
+    }
+
+    // Real-time appointment updates (unsubscribed automatically on destroy)
+    this.notificationService.appointmentEvents$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.loadAppointmentComming();
+      });
   }
 
   loadAppointmentComming() {
     if (!this.patientId) return;
-    this.recentAppointmentService
-      .appointmentComming(Number(this.patientId))
-      .subscribe({
-        next: (res) => {
-          this.data = res;
-          console.log(this.data);
-        },
-      });
+    const pid = Number(this.patientId);
+    // Show upcoming AND past bookings together: `comming` (Status <= Started) 404s / returns
+    // nothing once every booking is finished, so on its own the page emptied out and the whole
+    // history was lost. History (Completed/Canceled) is appended after the active ones. Each
+    // call is guarded so one empty/failed side does not blank the other.
+    forkJoin({
+      comming: this.recentAppointmentService
+        .appointmentComming(pid)
+        .pipe(catchError(() => of([]))),
+      history: this.recentAppointmentService
+        .appointmentHistory(pid)
+        .pipe(catchError(() => of([]))),
+    }).subscribe({
+      next: ({ comming, history }) => {
+        const active = Array.isArray(comming) ? comming : [];
+        const past = Array.isArray(history) ? history : [];
+        this.data = [...active, ...past];
+      },
+    });
   }
 
   getButtonText(status: PatientAppointmentStatus | string): string {
@@ -79,8 +110,10 @@ export class PatientAllResentSectionComponent implements OnInit {
   getButtonColor(status: PatientAppointmentStatus | string): string {
     switch (status) {
       case PatientAppointmentStatus.Created:
-      case PatientAppointmentStatus.Pending:
         return 'bg-slate-300 text-slate-500 border-transparent cursor-not-allowed';
+      case PatientAppointmentStatus.Pending:
+        // Pending IS clickable — it navigates to the waiting room — so it must not look disabled.
+        return 'bg-sky-500 text-white border-transparent hover:bg-sky-600 hover:-translate-y-0.5 active:translate-y-0 shadow-md shadow-sky-500/10 hover:shadow-lg transition-all duration-300';
       case PatientAppointmentStatus.Confirmed:
       case PatientAppointmentStatus.Started:
         return 'bg-emerald-500 text-white border-transparent hover:bg-emerald-600 hover:-translate-y-0.5 active:translate-y-0 shadow-md shadow-emerald-500/10 hover:shadow-lg transition-all duration-300';
@@ -155,9 +188,14 @@ export class PatientAllResentSectionComponent implements OnInit {
   }
 
   goToSession(session: any) {
-    console.log(session);
+    // Pick the CURRENT (ongoing) meeting, not meetings[0]. For a check-up with
+    // follow-ups, meetings[0] is the oldest/closed meeting, whose channel/token
+    // would be wrong. Fall back to the most recent meeting if none is flagged ongoing.
+    const meetings: any[] = session?.checkUp?.meetings ?? [];
+    const meeting =
+      meetings.find((m) => m?.status === 'Ongoing') ??
+      meetings[meetings.length - 1];
 
-    const meeting = session?.checkUp?.meetings?.[0];
     if (!meeting || session.status !== 'Started') return;
 
     const videoCallData = {
@@ -171,21 +209,12 @@ export class PatientAllResentSectionComponent implements OnInit {
       JSON.stringify(videoCallData),
     );
 
-    localStorage.setItem(
-      'meetingId',
-      session.checkUp.meetings[0].id.toString(),
-    );
-    localStorage.setItem(
-      'channelName',
-      session.checkUp.meetings[0].channelName,
-    );
-    localStorage.setItem('token', session.checkUp.meetings[0].consumerToken);
+    localStorage.setItem('meetingId', meeting.id.toString());
+    localStorage.setItem('channelName', meeting.channelName);
+    localStorage.setItem('token', meeting.consumerToken);
     localStorage.setItem('doctorIdOnMeeting', session.doctorCard.doctorId);
     localStorage.setItem('patientId', this.patientId?.toString() || '');
-    localStorage.setItem(
-      'agoraDetailsPatient',
-      JSON.stringify(session.checkUp.meetings[0]),
-    );
+    localStorage.setItem('agoraDetailsPatient', JSON.stringify(meeting));
     this.route.navigate(['/patient/videoCall/' + session.checkUp.id]);
   }
 

@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { LocalstorageService } from '../../../../core/services/localstorage.service';
 import { DoctorsService } from '../../../../shared/services/doctors.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -6,6 +7,7 @@ import { ToastrService } from 'ngx-toastr';
 import { PatientAppointmentStatus } from '../../../../core/enum/patientAppointmentStatus';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
+import { NotificationService } from '../../../patient/service/notification.service';
 
 type ReportItem = {
   type: 'LAB' | 'RADIOLOGY';
@@ -27,17 +29,39 @@ export class DoctorFollowUpSectionComponent implements OnInit {
   selectedDate: string | null = null;
   patientId: number | null = null;
   doctorId: number | null = null;
+  private destroyRef = inject(DestroyRef);
+
   constructor(
     readonly doctorService: DoctorsService,
     readonly localStorageService: LocalstorageService,
     readonly route: ActivatedRoute,
     readonly router: Router,
     readonly toaster: ToastrService,
+    readonly notificationService: NotificationService,
   ) {}
 
   ngOnInit() {
     this.doctorId = Number(this.localStorageService.get('doctorId')) || null;
     this.loadTodaysAppointments();
+
+    // Keep the follow-up list live like the other doctor lists (today / home / weeks):
+    // reload on any appointment/session event (e.g. a patient paying a follow-up).
+    this.notificationService.appointmentEvents$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.loadTodaysAppointments();
+      });
+
+    // When the patient uploads lab / radiology results, the server pushes a report event to
+    // the doctor. This was the only doctor screen that shows those results, yet nothing here
+    // listened — so an open reports popup stayed stale. Refresh it live while it is open.
+    this.notificationService.reportEvents$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.showPopupReports && this.currentReportMeetingId != null) {
+          this.showReports(this.currentReportMeetingId);
+        }
+      });
   }
 
   data: any;
@@ -78,12 +102,14 @@ export class DoctorFollowUpSectionComponent implements OnInit {
   reports: ReportItem[] = [];
 
   selectedImage: string | null = null;
+  /** Meeting id whose reports popup is open — lets a live report event refresh it in place. */
+  currentReportMeetingId: number | null = null;
 
   showReports(id: number) {
     console.log(id);
+    this.currentReportMeetingId = id;
     this.doctorService.getReports(id).subscribe({
       next: (res) => {
-        console.log('sssssssssssssssssssssssssssss');
         this.reports = [];
 
         // ===== LAB =====
@@ -217,10 +243,11 @@ export class DoctorFollowUpSectionComponent implements OnInit {
       this.localStorageService.set('patientId', res.checkUp.patientId);
       this.localStorageService.set(
         'medicalHistory',
-        JSON.stringify(res.patient.sections),
+        JSON.stringify(res.patient?.sections || []),
       );
       this.localStorageService.set('meetingToken', res.providerToken);
       this.localStorageService.set('agoraDetails', JSON.stringify(res));
+      this.router.navigate([`/doctor/videoCall/${res.id}`]);
     });
   }
 
@@ -357,6 +384,14 @@ export class DoctorFollowUpSectionComponent implements OnInit {
     ].includes(status);
   }
 
+  isTerminalOrStarted(status: PatientAppointmentStatus): boolean {
+    return [
+      PatientAppointmentStatus.Started,
+      PatientAppointmentStatus.Completed,
+      PatientAppointmentStatus.Canceled,
+    ].includes(status);
+  }
+
   getButtonClass(status: PatientAppointmentStatus): string {
     switch (status) {
       case PatientAppointmentStatus.Created:
@@ -372,7 +407,6 @@ export class DoctorFollowUpSectionComponent implements OnInit {
   }
 
   handleAction(item: any) {
-    console.log('ssssssssssssssssssssssssssssss');
     console.log(item.id);
     console.log(item);
 
@@ -393,33 +427,29 @@ export class DoctorFollowUpSectionComponent implements OnInit {
 
         break;
 
-      case PatientAppointmentStatus.Started:
-        // this.joinMeeting(item);
-        console.log(item);
+      case PatientAppointmentStatus.Started: {
+        // Join the CURRENT (ongoing) meeting, not meetings[0]: with follow-ups the first
+        // meeting is the oldest/closed one and its channel/token would be wrong (this is the
+        // same fix already applied in the today-appointments list).
+        const meetings: any[] = item?.checkUp?.meetings ?? [];
+        const meeting =
+          meetings.find((m) => m?.status === 'Ongoing') ??
+          meetings[meetings.length - 1];
+        if (!meeting) return;
 
-        this.localStorageService.set('meetingId', item.checkUp.meetings[0].id);
-        this.localStorageService.set(
-          'channelName',
-          item.checkUp.meetings[0].channelName,
-        );
-        this.localStorageService.set('checkUpId', item.checkUp.meetings[0].id);
+        this.localStorageService.set('meetingId', meeting.id);
+        this.localStorageService.set('channelName', meeting.channelName);
+        this.localStorageService.set('checkUpId', item.checkUp.id);
         this.localStorageService.set('patientId', item.patient.patientId);
         this.localStorageService.set(
           'medicalHistory',
           JSON.stringify(item.patient.sections),
         );
-        this.localStorageService.set(
-          'meetingToken',
-          item.checkUp.meetings[0].providerToken,
-        );
-        this.localStorageService.set(
-          'agoraDetails',
-          JSON.stringify(item.checkUp.meetings[0]),
-        );
-        this.router.navigate([
-          `/doctor/videoCall/${item.checkUp.meetings[0].id}`,
-        ]);
+        this.localStorageService.set('meetingToken', meeting.providerToken);
+        this.localStorageService.set('agoraDetails', JSON.stringify(meeting));
+        this.router.navigate([`/doctor/videoCall/${meeting.id}`]);
         break;
+      }
     }
   }
 }

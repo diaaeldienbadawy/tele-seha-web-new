@@ -6,6 +6,7 @@ import { AuthLogoComponent } from '../../../../shared/components/auth-logo/auth-
 import { ToastrService } from 'ngx-toastr';
 import { INextStepEnum } from '../../../../core/models/nextStepEnum';
 import { GlobalUserStateService } from '../../../../core/services/state/global-user-state.service';
+import { LocalstorageService } from '../../../../core/services/localstorage.service';
 import { AuthProcessStateService } from '../../../../core/services/state/auth-process-state.service';
 import {
   IpatientLoginRequest,
@@ -36,6 +37,7 @@ export class DoctorPasswordComponent implements OnInit {
     readonly route: Router,
     readonly doctorAuthtService: DoctorAuthService,
     readonly globalUserStateService: GlobalUserStateService,
+    readonly localStorageService: LocalstorageService,
     readonly authProcessStateService: AuthProcessStateService,
     readonly toastr: ToastrService,
   ) {
@@ -184,6 +186,7 @@ export class DoctorPasswordComponent implements OnInit {
       next: (res: any) => {
         this.isLoading = false;
         this.globalUserStateService.hydrateFromLoginResponse(res);
+        this.localStorageService.hydrateFromLoginResponse(res);
 
         switch (res.nextStep) {
           case INextStepEnum.CreatePassword:
@@ -234,6 +237,7 @@ export class DoctorPasswordComponent implements OnInit {
         this.isLoading = false;
         this.toastr.success('Password Created Successfully');
         this.globalUserStateService.hydrateFromLoginResponse(res);
+        this.localStorageService.hydrateFromLoginResponse(res);
 
         switch (res.nextStep) {
           case INextStepEnum.CreateProfile:

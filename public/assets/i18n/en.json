@@ -259,6 +259,7 @@
     "invalidOtp": "Invalid OTP. Please enter a valid OTP."
   },
   "auth": {
+    "logout": "Logout",
     "welcomeBack": "Welcome Back",
     "signInToAccount": "Sign in to your account",
     "phone": "Phone Number",

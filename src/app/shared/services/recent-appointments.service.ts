@@ -20,6 +20,14 @@ export class RecentAppointmentsService {
     );
   }
 
+  // Past bookings (Completed / Canceled). Kept separate from `comming` (upcoming only) so a
+  // finished check-up still shows in the patient's booking history instead of disappearing.
+  appointmentHistory(patientId: number): Observable<any> {
+    return this.http.get<any>(
+      `${Environment.apiUrl}/api/appointment/history/${patientId}`,
+    );
+  }
+
   getMeetingSatisfactionRatio(checkupId: number, data: any): Observable<any> {
     return this.http.put(
       `${Environment.apiUrl}/api/meeting/satisfaction-ratio/${checkupId}`,

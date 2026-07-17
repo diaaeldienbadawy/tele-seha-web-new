@@ -207,7 +207,6 @@ export class DoctorRecurringAppointmentsComponent implements OnInit {
         .updateDoctorSchedule(body, this.doctorScheduleId)
         .subscribe({
           next: (res) => {
-            console.log('sssssssssssssssssssss');
             console.log(res);
             this.toastr.success('Updated Successfully');
             this.loadDoctorSchedule();

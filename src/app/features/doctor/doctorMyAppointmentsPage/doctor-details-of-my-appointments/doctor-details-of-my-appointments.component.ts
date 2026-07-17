@@ -36,7 +36,6 @@ export class DoctorDetailsOfMyAppointmentsComponent implements OnInit {
   data: any[] = [];
   getAppointmentsWeekNumber() {
     if (!this.weekNumber) return;
-    console.log('sssssssssssssssssssssss');
 
     this.doctorService
       .getAppointmentsWeekNumber(this.weekNumber, Number(this.doctorId))

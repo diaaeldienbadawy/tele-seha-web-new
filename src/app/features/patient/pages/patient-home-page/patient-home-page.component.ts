@@ -48,9 +48,9 @@ export class PatientHomePageComponent implements OnInit {
       }
     }
 
-    const userId = this.globalUserStateService.userId();
-    if (userId) {
-      this.notificationService.startPatientConnection(userId);
+    const patientId = this.localStorageService.get('patientId');
+    if (patientId) {
+      this.notificationService.startPatientConnection(patientId);
     }
   }
 }

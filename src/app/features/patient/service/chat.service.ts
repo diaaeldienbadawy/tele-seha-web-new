@@ -4,6 +4,7 @@ import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http'
 import { catchError, map, Observable, throwError } from 'rxjs';
 import * as signalR from '@microsoft/signalr';
 import { Environment } from '../../../../environments/environment.development';
+import { GlobalUserStateService } from '../../../core/services/state/global-user-state.service';
 
 export type ChatMediaUploadErrorKind =
   | 'unauthorized'
@@ -68,6 +69,7 @@ export class ChatService implements OnDestroy {
 
   private http = inject(HttpClient);
   private platformId = inject(PLATFORM_ID);
+  private userState = inject(GlobalUserStateService);
   private hubConnection: signalR.HubConnection | null = null;
   private currentRoomId: string | number | null = null;
   private joinedSignalRGroup: string | null = null;
@@ -79,9 +81,14 @@ export class ChatService implements OnDestroy {
   /** ChatMessage API (kebab routing → same as /api/ChatMessage/... on the server). */
   private readonly chatMessageApiBase = `${Environment.apiUrl}/api/chat-message`;
 
+  /** التوكن متخزن في الـ memory (signal) مش في localStorage. */
+  private _accessToken(): string {
+    return this.userState.accessToken() ?? '';
+  }
+
   private _chatAuthHeaders(): { headers: { Authorization: string } } | undefined {
     if (!isPlatformBrowser(this.platformId)) return undefined;
-    const token = localStorage.getItem('accessToken') ?? '';
+    const token = this._accessToken();
     if (!token) return undefined;
     return { headers: { Authorization: `Bearer ${token}` } };
   }
@@ -213,10 +220,7 @@ export class ChatService implements OnDestroy {
 
     this.hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(`${Environment.chatHubUrl}?userId=${userId}`, {
-        accessTokenFactory: () =>
-          isPlatformBrowser(this.platformId)
-            ? localStorage.getItem('accessToken') ?? ''
-            : '',
+        accessTokenFactory: () => this._accessToken(),
         withCredentials: false,
         transport: signalR.HttpTransportType.LongPolling
       })
@@ -509,7 +513,13 @@ export class ChatService implements OnDestroy {
         const list = Array.isArray(raw) ? raw : [];
         const messages = list
           .map((m: any) => this._normalizeMessage(m, checkupId))
-          .filter(Boolean);
+          .filter(Boolean)
+          .sort((a: any, b: any) => {
+            const ai = Number(a.id);
+            const bi = Number(b.id);
+            if (Number.isFinite(ai) && Number.isFinite(bi)) return ai - bi;
+            return 0;
+          });
 
         this.messages.set(messages);
 

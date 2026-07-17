@@ -7,12 +7,13 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { ChatService } from '../../service/chat.service';
 import { LocalstorageService } from '../../../../core/services/localstorage.service';
 
 @Component({
   selector: 'app-patient-chat-video-call',
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './patient-chat-video-call.component.html',
   styleUrl: './patient-chat-video-call.component.css',
 })

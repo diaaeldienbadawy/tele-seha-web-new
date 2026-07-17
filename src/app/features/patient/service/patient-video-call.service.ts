@@ -29,5 +29,9 @@ export class PatientVideoCallService {
       `${Environment.apiUrl}/api/meeting/reports/${mettingId}`,
     );
   }
-
+  getMeetingReportsByCheckup(checkupId: number): Observable<any> {
+    return this.http.get<any>(
+      `${Environment.apiUrl}/api/meeting/reports/checkup/${checkupId}?withReports=true`,
+    );
+  }
 }

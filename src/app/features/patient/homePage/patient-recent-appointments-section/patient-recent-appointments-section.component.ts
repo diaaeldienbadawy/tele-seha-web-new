@@ -5,6 +5,7 @@ import { RecentAppointmentsService } from '../../../../shared/services/recent-ap
 
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
+import { NotificationService } from '../../../patient/service/notification.service';
 
 @Component({
   selector: 'app-patient-recent-appointments-section',
@@ -17,12 +18,18 @@ export class PatientRecentAppointmentsSectionComponent implements OnInit {
   constructor(
     readonly localStorageService: LocalstorageService,
     readonly recentAppointmentService: RecentAppointmentsService,
+    readonly notificationService: NotificationService,
   ) {
     this.patientId = this.localStorageService.loggedInPatientId() || null;
   }
 
   ngOnInit(): void {
     this.loadAppointmentComming();
+
+    // Real-time appointment updates
+    this.notificationService.appointmentEvents$.subscribe(() => {
+      this.loadAppointmentComming();
+    });
   }
 
   data: any;

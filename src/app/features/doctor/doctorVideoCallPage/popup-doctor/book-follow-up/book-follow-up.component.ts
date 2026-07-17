@@ -1,5 +1,6 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 import { LocalstorageService } from '../../../../../core/services/localstorage.service';
 import { DoctorsService } from '../../../../../shared/services/doctors.service';
 import { CommonModule } from '@angular/common';
@@ -28,6 +29,7 @@ export class BookFollowUpComponent implements OnInit {
     readonly localStorageService: LocalstorageService,
     readonly route: ActivatedRoute,
     readonly router: Router,
+    readonly toaster: ToastrService,
   ) {}
 
   checkUpId!: number;
@@ -40,8 +42,6 @@ export class BookFollowUpComponent implements OnInit {
     );
     this.checkUpId = Number(agoraDetails?.checkUpId);
     this.patientId = Number(this.localStorageService.get('patientId'));
-    console.log('sssssssssssssssssssssssssssssssss', this.checkUpId);
-    console.log('sssssssssssssssssssssssssssssssss', this.patientId);
 
     this.getSession();
   }
@@ -98,35 +98,30 @@ export class BookFollowUpComponent implements OnInit {
   }
 
   bookingSession() {
-    console.log(this.selectedSessionId);
-
     if (!this.patientId || !this.checkUpId) return;
 
-    this.closeBookFollowUp.emit();
+    // Guard: a session must be chosen — otherwise the request 404s on the server and,
+    // because the popup used to close first, the doctor thought the follow-up was booked.
+    if (!this.selectedSessionId) {
+      this.toaster.error('اختر موعدًا للمتابعة أولًا.');
+      return;
+    }
+
     const payload = {
       patientId: this.patientId,
       sessionId: this.selectedSessionId,
     };
 
-    this.doctorAuthService
-      .bookingFollowup(payload, this.checkUpId)
-      .subscribe({
-        next: (res) => {
-          console.log(res);
-        },
-        error: (err) => {
-          console.log(err);
-          console.log(err.error.message);
-        },
-      });
-
-    // this.doctorService
-    //   .updateAppointment(this.appointmentId, this.selectedSessionId)
-    //   .subscribe((res: any) => {
-    //     // console.log(res);
-    //     this.getAppointmentsDay();
-    //     this.showPopup = false;
-    //   });
+    this.doctorAuthService.bookingFollowup(payload, this.checkUpId).subscribe({
+      next: () => {
+        // Close only AFTER the server confirms, and confirm to the doctor.
+        this.toaster.success('تم حجز المتابعة بنجاح.');
+        this.closeBookFollowUp.emit();
+      },
+      error: (err) => {
+        this.toaster.error(err?.error?.message || 'تعذّر حجز المتابعة.');
+      },
+    });
   }
 
   formatTime(time: string): string {

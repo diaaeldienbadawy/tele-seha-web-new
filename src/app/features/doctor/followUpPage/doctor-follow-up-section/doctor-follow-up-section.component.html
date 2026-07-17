@@ -70,7 +70,7 @@
                 </button>
 
                 <!-- Reschedule -->
-                <button (click)="showModal(appointment)" 
+                <button *ngIf="!isTerminalOrStarted(appointment.status)" (click)="showModal(appointment)" 
                         class="py-3 px-4 rounded-xl border border-slate-200 text-slate-600 bg-white font-semibold text-xs md:text-sm hover:bg-slate-50 hover:border-slate-300 transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
                   <i class="fa-regular fa-calendar-plus text-[#007BBD]"></i> Reschedule
                 </button>
@@ -82,7 +82,7 @@
                 </button>
 
                 <!-- Cancel -->
-                <button (click)="cancelAppointment(appointment.id)" 
+                <button *ngIf="!isTerminalOrStarted(appointment.status)" (click)="cancelAppointment(appointment.id)" 
                         class="py-3 px-4 rounded-xl border border-rose-100 text-rose-600 bg-white hover:bg-rose-50 hover:border-rose-200 transition-colors flex items-center justify-center cursor-pointer">
                   <i class="fa-regular fa-trash-can"></i>
                 </button>

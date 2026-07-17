@@ -8,7 +8,8 @@ export class Environment {
 
   public static readonly agoraAppId = '228103341f494da7ba7fcc336963a004';
 
-  public static readonly agoraCertificateId = '4a3bba9e01f345828796240237b03a37';
+  // NOTE: The Agora app certificate is a SECRET and must never be shipped to the client.
+  // RTC tokens are issued by the backend at GET /api/meeting/rtc-token/{checkUpId}.
 
   public static readonly patientnotificationHubUrl =
     'https://teleseha5-001-site1.ftempurl.com/hubs/patient_notification';

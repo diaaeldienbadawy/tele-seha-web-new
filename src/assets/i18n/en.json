@@ -60,7 +60,8 @@
     "selectTime": "Select Time Slot",
     "confirmReschedule": "Confirm Reschedule",
     "noScheduleTitle": "No available schedule slots",
-    "noScheduleSub": "No available schedule slots found. Please configure clinic sessions in settings."
+    "noScheduleSub": "No available schedule slots found. Please configure clinic sessions in settings.",
+    "completedAppointments": "Completed Consultations"
   },
   "doctorStatus": {
     "confirm": "Confirm Appointment",
@@ -259,6 +260,7 @@
     "invalidOtp": "Invalid OTP. Please enter a valid OTP."
   },
   "auth": {
+    "logout": "Logout",
     "welcomeBack": "Welcome Back",
     "signInToAccount": "Sign in to your account",
     "phone": "Phone Number",

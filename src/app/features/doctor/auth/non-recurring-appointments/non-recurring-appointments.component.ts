@@ -222,7 +222,6 @@ export class NonRecurringAppointmentsComponent implements OnInit {
         .updateDoctorSession(body, this.sessionId)
         .subscribe({
           next: (res) => {
-            console.log('sssssssssssssssssssss');
             console.log(res);
             this.loadDoctorSession();
             this.sessionId = undefined!;

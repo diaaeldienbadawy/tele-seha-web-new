@@ -185,6 +185,25 @@ export class LocalstorageService {
     }
   }
 
+  /**
+   * المفاتيح غير المُدارة كـ signals (meetingId, checkUpId, agoraDetails, ...)
+   * بتتخزن/بتتقرأ من localStorage الحقيقي عشان شاشة الـ meeting/الشات تشتغل صح.
+   */
+  private _rawGet(key: string): string {
+    if (!isPlatformBrowser(this.platformId)) return '';
+    return localStorage.getItem(key) ?? '';
+  }
+
+  private _rawSet(key: string, value: string): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    localStorage.setItem(key, value ?? '');
+  }
+
+  private _rawRemove(key: string): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    localStorage.removeItem(key);
+  }
+
   /** @deprecated — استخدم الـ signals مباشرة */
   get(key: string): string {
     switch (key) {
@@ -199,7 +218,7 @@ export class LocalstorageService {
       case 'patientId': return this._patientId();
       case 'loggedInPatientId': return this._loggedInPatientId() || '';
       case 'mobile': return this._mobile();
-      default: return '';
+      default: return this._rawGet(key);
     }
   }
 
@@ -217,6 +236,7 @@ export class LocalstorageService {
       case 'patientId': this._patientId.set(value); break;
       case 'loggedInPatientId': this._loggedInPatientId.set(value || null); break;
       case 'mobile': this._mobile.set(value); break;
+      default: this._rawSet(key, value);
     }
   }
 
@@ -233,6 +253,7 @@ export class LocalstorageService {
       case 'patientId': this._patientId.set(''); break;
       case 'loggedInPatientId': this._loggedInPatientId.set(null); break;
       case 'mobile': this._mobile.set(''); break;
+      default: this._rawRemove(key);
     }
   }
 

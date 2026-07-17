@@ -34,14 +34,22 @@ export class HeaderNotificationComponent implements OnInit {
     const role = this.localStorageService.get('role');
     const accesstoken = this.localStorageService.get('accessToken');
 
+    // The header is rendered on every page, so it is the one reliable place to open the
+    // realtime connection. Previously only a couple of pages did it (e.g. the doctor connected
+    // ONLY from the home page), so a deep-link or refresh on today/week/follow-up got zero live
+    // updates. The connection is idempotent per id, so this coexists with any page-level calls.
     if (accesstoken && role === 'Patient') {
       this.role = role;
       this.isLoggedIn = true;
+      const patientId = this.localStorageService.get('patientId');
+      if (patientId) this.notificationService.startPatientConnection(patientId);
     }
 
     if (accesstoken && role === 'Doctor') {
       this.role = role;
       this.isLoggedIn = true;
+      const doctorId = this.localStorageService.get('doctorId');
+      if (doctorId) this.notificationService.startDoctorConnection(doctorId);
     }
   }
 

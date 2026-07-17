@@ -10,7 +10,6 @@ import {
 } from '@angular/core';
 import { AgoraService } from '../../../doctor/service/agora.service';
 import { LocalstorageService } from '../../../../core/services/localstorage.service';
-import { DoctorsService } from '../../../../shared/services/doctors.service';
 
 const CALL_DURATION_SEC = 15 * 60;
 
@@ -26,7 +25,6 @@ export class PatientMeetingVideoCallComponent implements OnDestroy {
   private agoraService: AgoraService = inject(AgoraService);
   private localStorageService: LocalstorageService =
     inject(LocalstorageService);
-  private doctorService: DoctorsService = inject(DoctorsService);
   localTracks: any[] | null = null;
   micMuted = false;
   cameraOff = false;
@@ -52,7 +50,7 @@ export class PatientMeetingVideoCallComponent implements OnDestroy {
 
   ngOnInit() {
     this.meetingId = Number(this.localStorageService.get('meetingId'));
-    const stored: any = JSON.parse(
+    const stored: any = this.parseStored(
       this.localStorageService.get('agoraDetailsPatient'),
     );
     this.userId = this.localStorageService.userId() ?? 0;
@@ -80,6 +78,16 @@ export class PatientMeetingVideoCallComponent implements OnDestroy {
     }
   }
 
+  /** بيقرأ JSON بأمان من غير ما يرمي exception لو القيمة فاضية/غلط. */
+  private parseStored(raw: string | null): any {
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  }
+
   openWhatsApp() {
     this.openWhatsapp.emit();
   }
@@ -95,29 +103,39 @@ export class PatientMeetingVideoCallComponent implements OnDestroy {
 
   async startCall() {
     const AgoraRTC = (await import('agora-rtc-sdk-ng')).default;
-    let channel = this.agoraDetails().channel;
-    let token = this.agoraDetails().token;
-    let uid = this.agoraDetails().uid;
+    const channel = this.agoraDetails().channel;
+    const token = this.agoraDetails().token;
+    const uid = this.agoraDetails().uid;
 
-    // channel = 'test';
-    // token = '007eJxSYEhfeWlBt0QZo/eM2zcPsdYcZZSRvj/H4Z1hhp80Y+7KlGkKDGkWFmnJRpYWpkbJySbJqQaJacaWqUkWhiaGaYmWZimGt3l3Zzo48TPMmS3MyMjAyMDCwMgA4jOBSWYwyQIlS1KLSxgZTAEBAAD//ydGH9Q=';
-    // uid = 5;
+    // لازم نسجّل الـ listeners قبل الـ join عشان منفوتش الطرف
+    // اللي يكون ناشر الفيديو/الصوت قبل ما ندخل القناة.
+    const client = await this.agoraService.ensureClient();
+    client.removeAllListeners('user-published');
+    client.removeAllListeners('user-unpublished');
+    client.removeAllListeners('user-left');
+
+    client.on('user-published', async (user: any, mediaType: any) => {
+      await client.subscribe(user, mediaType);
+      if (mediaType === 'video') {
+        user.videoTrack?.play('remote-video');
+        this.showWaitingForOtherParticipant.set(false);
+      }
+      if (mediaType === 'audio') {
+        user.audioTrack?.play();
+      }
+    });
+
+    client.on('user-unpublished', (_user: any, mediaType: any) => {
+      if (mediaType === 'video') {
+        this.showWaitingForOtherParticipant.set(true);
+      }
+    });
+
+    client.on('user-left', () => {
+      this.showWaitingForOtherParticipant.set(true);
+    });
 
     await this.agoraService.joinChannel(channel, token, uid);
-
-    this.agoraService.client.on(
-      'user-published',
-      async (user: any, mediaType: any) => {
-        await this.agoraService.client.subscribe(user, mediaType);
-        if (mediaType === 'video') {
-          user.videoTrack?.play('remote-video');
-          this.showWaitingForOtherParticipant.set(false);
-        }
-        if (mediaType === 'audio') {
-          user.audioTrack?.play();
-        }
-      },
-    );
 
     try {
       this.localTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
@@ -139,25 +157,38 @@ export class PatientMeetingVideoCallComponent implements OnDestroy {
       }
     }
 
-    this.startCallTimer();
+    this.startCallTimer(this.details?.start || this.details?.Start);
+  }
+  /** Call length in seconds: the session's configured duration (minutes), or 15-min fallback. */
+  private callDurationSec(): number {
+    const minutes = Number(this.details?.duration);
+    return Number.isFinite(minutes) && minutes > 0 ? minutes * 60 : CALL_DURATION_SEC;
   }
 
-  private startCallTimer(): void {
+  private startCallTimer(startDateString?: string): void {
     this.resetCallTimer();
-    this.callRemainingSeconds.set(CALL_DURATION_SEC);
-    this.callTimerId = setInterval(() => {
-      this.callRemainingSeconds.update((prev) => {
-        if (prev === null || prev <= 0) {
-          return 0;
-        }
-        return prev - 1;
-      });
-      const left = this.callRemainingSeconds();
-      if (left === 0) {
+    const durationSec = this.callDurationSec();
+
+    const updateTimer = () => {
+      let remaining = durationSec;
+      if (startDateString) {
+        const startTime = new Date(startDateString).getTime();
+        const now = new Date().getTime();
+        const elapsed = Math.floor((now - startTime) / 1000);
+        remaining = durationSec - elapsed;
+      }
+      
+      if (remaining <= 0) {
+        this.callRemainingSeconds.set(0);
         this.clearCallTimerInterval();
         this.endCall();
+      } else {
+        this.callRemainingSeconds.set(remaining);
       }
-    }, 1000);
+    };
+
+    updateTimer();
+    this.callTimerId = setInterval(updateTimer, 1000);
   }
 
   private clearCallTimerInterval(): void {
@@ -188,20 +219,9 @@ export class PatientMeetingVideoCallComponent implements OnDestroy {
 
     console.log('Session ended');
 
-    this.closeMeeting();
+    // الإغلاق الفعلي للاجتماع مسؤولية الطبيب (endpoint خاص بالطبيب).
+    // المريض بس بيغادر القناة ويظهر شاشة انتهاء الجلسة.
     this.sessionEnded.emit();
-  }
-
-  closeMeeting() {
-    this.doctorService.closeMeeting(this.meetingId).subscribe({
-      next: (res) => {
-        console.log('res');
-        console.log(res);
-      },
-      error: (err) => {
-        console.error(err);
-      },
-    });
   }
 
   async toggleMic() {

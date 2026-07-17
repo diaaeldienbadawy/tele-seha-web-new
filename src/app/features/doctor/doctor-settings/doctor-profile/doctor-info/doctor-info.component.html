@@ -172,6 +172,7 @@
                [ngClass]="{'opacity-75 bg-slate-100/50 cursor-not-allowed': basicInfoForm.disabled}">
             <i class="fa-solid fa-calendar-days text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
             <p-datepicker class="custom-datepicker w-full" formControlName="BirthDate" [showButtonBar]="true"
+              todayButtonStyleClass="hide-today-btn"
               placeholder="Select birth date" dateFormat="dd/mm/yy" [maxDate]="today" appendTo="body">
             </p-datepicker>
           </div>

@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { LocalstorageService } from '../../../../core/services/localstorage.service';
 import { PatientReportsService } from '../../service/patient-reports.service';
+import { NotificationService } from '../../service/notification.service';
 import { PopupUploadComponent } from '../popup-upload/popup-upload.component';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -22,6 +24,8 @@ export class PatientReportLabTestsSectionComponent implements OnInit {
   );
   readonly localStorageServices: LocalstorageService =
     inject(LocalstorageService);
+  private readonly notificationService = inject(NotificationService);
+  private readonly destroyRef = inject(DestroyRef);
 
   selectedId: number | null = null;
 
@@ -30,10 +34,24 @@ export class PatientReportLabTestsSectionComponent implements OnInit {
   patients: any;
 
   ngOnInit(): void {
-    const patients =
-      JSON.parse(this.localStorageServices.get('patients')) || null;
-    this.patients = patients[0];
+    // Guard against a missing/malformed 'patients' entry: JSON.parse(null) and null[0]
+    // both throw and used to crash the whole reports page on load.
+    const raw = this.localStorageServices.get('patients');
+    let parsed: any = null;
+    try {
+      parsed = raw ? JSON.parse(raw) : null;
+    } catch {
+      parsed = null;
+    }
+    this.patients = Array.isArray(parsed) ? parsed[0] : null;
     this.getAllLabTests();
+
+    // Refresh live when the doctor requests a new lab analysis (or any report event).
+    const patientId = this.localStorageServices.loggedInPatientId();
+    if (patientId) this.notificationService.startPatientConnection(patientId);
+    this.notificationService.reportEvents$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.getAllLabTests());
   }
 
   getAllLabTests() {
@@ -75,11 +93,18 @@ export class PatientReportLabTestsSectionComponent implements OnInit {
       return;
     }
 
+    if (this.selectedId == null) {
+      alert('No lab request selected.');
+      return;
+    }
+
     const formData = new FormData();
-    formData.append('RadiologicalExaminationRequestId', '1');
+    // This is the LAB section: attach to the selected LabAnalysisRequest (not a hardcoded
+    // radiology id). The primary upload path is <app-popup-upload>; this stays correct in
+    // case it is ever re-wired.
+    formData.append('LabAnalysisRequestId', String(this.selectedId));
 
     files.forEach((file) => {
-      // formData.append('Files[]', file);
       formData.append('Files', file);
     });
 

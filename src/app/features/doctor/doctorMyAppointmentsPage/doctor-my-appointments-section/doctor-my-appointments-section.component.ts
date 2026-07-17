@@ -4,6 +4,7 @@ import { DoctorsService } from '../../../../shared/services/doctors.service';
 import { LocalstorageService } from '../../../../core/services/localstorage.service';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
+import { NotificationService } from '../../../../features/patient/service/notification.service';
 
 @Component({
   selector: 'app-doctor-my-appointments-section',
@@ -16,12 +17,18 @@ export class DoctorMyAppointmentsSectionComponent implements OnInit {
   constructor(
     readonly doctorService: DoctorsService,
     readonly localStorageService: LocalstorageService,
-    readonly route : Router
+    readonly route : Router,
+    readonly notificationService: NotificationService,
   ) {}
 
   ngOnInit() {
     this.doctorId = this.localStorageService.get('doctorId') || null;
     this.getAllAppointments();
+
+    // Real-time appointment updates
+    this.notificationService.appointmentEvents$.subscribe(() => {
+      this.getAllAppointments();
+    });
   }
 
   data: any;

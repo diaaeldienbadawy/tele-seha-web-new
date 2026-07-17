@@ -118,10 +118,11 @@ export class DoctorDayAppointmentsComponent {
       this.localStorageService.set('patientId', res.checkUp.patientId);
       this.localStorageService.set(
         'medicalHistory',
-        JSON.stringify(res.patient.sections),
+        JSON.stringify(res.patient?.sections || []),
       );
       this.localStorageService.set('meetingToken', res.providerToken);
       this.localStorageService.set('agoraDetails', JSON.stringify(res));
+      this.router.navigate([`/doctor/videoCall/${res.id}`]);
     });
   }
 
@@ -248,6 +249,14 @@ export class DoctorDayAppointmentsComponent {
     ].includes(status);
   }
 
+  isTerminalOrStarted(status: PatientAppointmentStatus): boolean {
+    return [
+      PatientAppointmentStatus.Started,
+      PatientAppointmentStatus.Completed,
+      PatientAppointmentStatus.Canceled,
+    ].includes(status);
+  }
+
   getButtonClass(status: PatientAppointmentStatus): string {
     switch (status) {
       case PatientAppointmentStatus.Created:
@@ -263,7 +272,6 @@ export class DoctorDayAppointmentsComponent {
   }
 
   handleAction(item: any) {
-    console.log('ssssssssssssssssssssssssssssss');
     console.log(item.id);
 
     switch (item.status) {
@@ -289,7 +297,7 @@ export class DoctorDayAppointmentsComponent {
           'channelName',
           item.checkUp.meetings[0].channelName,
         );
-        this.localStorageService.set('checkUpId', item.checkUp.meetings[0].id);
+        this.localStorageService.set('checkUpId', item.checkUp.id);
         this.localStorageService.set('patientId', item.patient.patientId);
         this.localStorageService.set(
           'medicalHistory',

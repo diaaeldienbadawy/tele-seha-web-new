@@ -164,7 +164,7 @@
       <div *ngIf="!isLoadingSchedule">
         <div *ngIf="hasAppointments()" class="grid grid-cols-1 gap-4">
           
-          <ng-container *ngFor="let session of allAppointments">
+          <ng-container *ngFor="let session of activeAppointments">
             <ng-container *ngFor="let appointment of session.appointments; let i = index">
               
               <!-- Patient Row Card -->
@@ -212,7 +212,7 @@
                   </button>
 
                   <!-- Secondary Controls -->
-                  <div class="flex gap-2">
+                  <div class="flex gap-2" *ngIf="!isTerminalOrStarted(appointment.status)">
                     <!-- Reschedule -->
                     <button (click)="showModal(appointment)" 
                             class="flex-1 sm:flex-initial py-3 px-4 rounded-xl border border-slate-200 text-slate-600 bg-white font-semibold text-xs md:text-sm hover:bg-slate-50 hover:border-slate-300 transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
@@ -234,8 +234,52 @@
 
         </div>
 
-        <!-- Empty State -->
-        <div *ngIf="!hasAppointments()" class="bg-white border border-slate-100 rounded-3xl p-10 text-center shadow-[0_10px_30px_rgba(0,0,0,0.01)]">
+        <!-- Completed Appointments Section -->
+        <div *ngIf="completedAppointments.length > 0" class="mt-8">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-2.5 h-6 rounded-full bg-emerald-500"></div>
+            <h3 class="text-lg font-bold text-slate-600">{{ 'doctor.completedAppointments' | translate }}</h3>
+          </div>
+          <div class="grid grid-cols-1 gap-3">
+            <ng-container *ngFor="let session of completedAppointments">
+              <ng-container *ngFor="let appointment of session.appointments; let i = index">
+                <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4 flex flex-col lg:flex-row gap-4 items-stretch lg:items-center justify-between opacity-70">
+                  <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center flex-1">
+                    <div class="w-12 h-12 rounded-xl bg-white border border-emerald-100 flex flex-col items-center justify-center text-emerald-500 font-bold shadow-sm flex-shrink-0">
+                      <i class="fa-solid fa-circle-check text-lg"></i>
+                    </div>
+                    <div class="space-y-1">
+                      <h3 class="text-base font-bold text-slate-600 flex items-center gap-2">
+                        {{ appointment.patient?.name }}
+                      </h3>
+                      <div class="flex flex-wrap gap-2 items-center text-xs">
+                        <span class="px-2 py-0.5 rounded-full font-semibold"
+                              [ngClass]="appointment.isFollowUp ? 'bg-amber-50 text-amber-600' : 'bg-blue-50 text-blue-600'">
+                          {{ (appointment.isFollowUp ? 'doctor.followUp' : 'doctor.newConsultation') | translate }}
+                        </span>
+                        <span class="text-slate-300">|</span>
+                        <span class="text-slate-400 font-medium flex items-center gap-1">
+                          <i class="fa-regular fa-clock"></i>
+                          {{ formatTime(session.sessionStart) }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex items-center">
+                    <span class="py-2 px-4 rounded-xl text-xs font-bold"
+                          [ngClass]="appointment.status === 'Completed' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'">
+                      {{ getButtonText(appointment.status) | translate }}
+                    </span>
+                  </div>
+                </div>
+              </ng-container>
+            </ng-container>
+          </div>
+        </div>
+
+        <!-- Empty State: only when there is nothing at all today, so a day whose work is
+             already finished shows the completed list instead of "no appointments". -->
+        <div *ngIf="hasNothingToday()" class="bg-white border border-slate-100 rounded-3xl p-10 text-center shadow-[0_10px_30px_rgba(0,0,0,0.01)]">
           <div class="w-20 h-20 rounded-full bg-slate-50 flex items-center justify-center mx-auto text-3xl text-slate-300 mb-4">
             <i class="fa-solid fa-hospital-user"></i>
           </div>

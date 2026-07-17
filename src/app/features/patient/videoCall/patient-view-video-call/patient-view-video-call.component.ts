@@ -1,6 +1,9 @@
 import { doctorGuard } from './../../../../core/guards/doctor.guard';
+import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { Component, DestroyRef, inject, Inject, OnInit, PLATFORM_ID, ViewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NotificationService } from '../../service/notification.service';
 import { PatientMeetingVideoCallComponent } from '../patient-meeting-video-call/patient-meeting-video-call.component';
 import { PatientSendPictureVideoCallComponent } from '../patient-send-picture-video-call/patient-send-picture-video-call.component';
 import { PatientChatVideoCallComponent } from '../patient-chat-video-call/patient-chat-video-call.component';
@@ -35,6 +38,15 @@ export class PatientViewVideoCallComponent implements OnInit {
   currentSection = 0; // 0: Lab, 1: Radiology, 2: Prescription
 
   meetingId!: number;
+  sessionId!: number;
+  isValidating = true;
+  isMeetingValid = false;
+
+  @ViewChild(PatientMeetingVideoCallComponent)
+  private meetingChild?: PatientMeetingVideoCallComponent;
+
+  private destroyRef = inject(DestroyRef);
+
   constructor(
     @Inject(PLATFORM_ID) readonly platformId: Object,
     readonly patientService: PatientService,
@@ -42,13 +54,34 @@ export class PatientViewVideoCallComponent implements OnInit {
     private localstorageService: LocalstorageService,
     readonly toastr: ToastrService,
     readonly fb: FormBuilder,
+    private router: Router,
+    private route: ActivatedRoute,
+    private notificationService: NotificationService,
   ) {}
   ngOnInit() {
-    this.meetingId = Number(this.localstorageService.get('meetingId'));
-    if (this.meetingId) {
-      this.getMettingDetails();
-      this.getMeetingReports();
+    this.route.params.subscribe((params) => {
+      this.sessionId = Number(params['sessionId']);
+      if (this.sessionId) {
+        this.getMeetingReportsByCheckup(this.sessionId);
+      }
+    });
+
+    // When the doctor ends the meeting, the backend pushes `meeting_closed`. Leave the
+    // channel immediately and show the "session ended" screen instead of leaving the
+    // patient staring at a dead call until the fallback timer fires.
+    const patientId = this.localstorageService.loggedInPatientId();
+    if (patientId) {
+      this.notificationService.startPatientConnection(patientId);
     }
+    this.notificationService.meetingEvents$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((evt: any) => {
+        if (evt?.event === 'meeting_closed') {
+          void this.meetingChild?.endCall();
+          this.showPopupSessionSuccess = true;
+        }
+      });
+
     const data = this.localstorageService.get('agoraDetailsPatient');
     const doctorId = Number(this.localstorageService.get('doctorIdOnMeeting'));
     if (data) {
@@ -64,32 +97,53 @@ export class PatientViewVideoCallComponent implements OnInit {
       is_first_advantage: [false],
       is_second_advantage: [false],
       is_third_advantage: [false],
-      meeting_id: [this.meetingId],
+      meeting_id: [0],
       doctor_id: [doctorId || 0],
     });
   }
 
   getMettingDetails() {
     this.patientVideoCall.getMeetingDetails(this.meetingId).subscribe({
-      next: (res) => {
-        console.log(
-          'sssssssssssssssssssssssssssssssssssssssssssssssssssss getMettingDetails:',
-          res,
-        );
-        console.log(res);
-      },
+      next: () => {},
       error: (err) => {
-        console.log(err);
+        console.error('[VideoCall] Failed to load meeting details:', err);
       },
     });
   }
-  getMeetingReports() {
-    this.patientVideoCall.getMeetingReports(this.meetingId).subscribe({
+  getMeetingReportsByCheckup(sessionId: number) {
+    this.patientVideoCall.getMeetingReportsByCheckup(sessionId).subscribe({
       next: (res) => {
         this.meetingReport = res;
+        this.meetingId = res?.meetingId;
         this.currentSection = 0;
+
+        // حالة الاجتماع بتيجي من السيرفر بس — مش من ساعة المتصفح. العيادات بتتأخر،
+        // فطالما الطبيب لسه ماقفلش المكالمة المريض يفضل جواها حتى لو عدّت مدة الـ slot.
+        // بنطرد المريض بس لو السيرفر قال Completed(2) أو Canceled(3)؛ إنهاء المكالمة
+        // الحقيقي بيوصل لحظيًا عبر meetingEvents$ (meeting_closed).
+        if (res?.status === 2 || res?.status === 3) {
+          const message = res?.status === 3
+            ? 'هذه الجلسة تم إلغاؤها'
+            : 'هذه الجلسة انتهت بالفعل';
+          this.toastr.warning(message);
+          this.router.navigate(['/patient/home']);
+          return;
+        }
+
+        // Only render the meeting if it's ongoing and valid
+        this.isMeetingValid = true;
+        this.isValidating = false;
+
+        if (this.meetingId) {
+          this.ratingForm.patchValue({ meeting_id: this.meetingId });
+          this.getMettingDetails();
+        }
       },
-      error: (err) => console.error(err),
+      error: (err) => {
+        console.error(err);
+        this.toastr.error('فشل تحميل بيانات الجلسة');
+        this.router.navigate(['/patient/home']);
+      },
     });
   }
 
@@ -97,8 +151,16 @@ export class PatientViewVideoCallComponent implements OnInit {
     if (this.currentSection < 2) {
       this.currentSection++;
     } else {
-      this.currentSection = 0; // loop back to first section if needed
+      this.currentSection = 0;
     }
+  }
+
+  setSection(index: number) {
+    this.currentSection = index;
+  }
+
+  exitMeeting() {
+    this.router.navigate(['/patient/home']);
   }
 
   downloadPrescription() {
@@ -212,7 +274,9 @@ export class PatientViewVideoCallComponent implements OnInit {
       next: (res) => {
         console.log('Success', res);
         this.toastr.success('Review submitted successfully');
-        this.getMeetingReports();
+        if (this.sessionId) {
+          this.getMeetingReportsByCheckup(this.sessionId);
+        }
         this.showPopupRating = false;
         this.showPopupPrescription = true;
       },

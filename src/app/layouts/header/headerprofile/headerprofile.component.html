@@ -30,7 +30,7 @@
       @if (doctorIamge()) {
       <img [src]="doctorIamge()" class="w-[40px] h-[40px] rounded-full object-cover" alt="profile" />
       }
-      @else if (doctorName() || patientName()) {
+      @else if (doctorName()) {
       <div class="w-[35px] h-[35px] rounded-full bg-[#007BBD]/10 flex items-center justify-center">
         <i class="fa-solid fa-user text-[#007BBD] text-[16px]"></i>
       </div>

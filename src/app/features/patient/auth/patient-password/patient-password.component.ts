@@ -4,6 +4,7 @@ import { AuthLeftSideComponent } from '../../../../shared/components/auth-left-s
 import { Router } from '@angular/router';
 import { PatientAuthService } from '../../service/patient-auth.service';
 import { GlobalUserStateService } from '../../../../core/services/state/global-user-state.service';
+import { LocalstorageService } from '../../../../core/services/localstorage.service';
 import { AuthProcessStateService } from '../../../../core/services/state/auth-process-state.service';
 import { CommonModule } from '@angular/common';
 import {
@@ -38,6 +39,7 @@ export class PatientPasswordComponent {
     readonly route: Router,
     readonly patientService: PatientAuthService,
     readonly globalUserStateService: GlobalUserStateService,
+    readonly localStorageService: LocalstorageService,
     readonly authProcessStateService: AuthProcessStateService,
     readonly toastr: ToastrService,
   ) {
@@ -191,6 +193,7 @@ export class PatientPasswordComponent {
       next: (res: IpatientLoginResponse) => {
         this.isLoading = false;
         this.globalUserStateService.hydrateFromLoginResponse(res);
+        this.localStorageService.hydrateFromLoginResponse(res);
 
         switch (res.nextStep) {
           case INextStepEnum.CreatePassword:
@@ -234,6 +237,7 @@ export class PatientPasswordComponent {
         this.isLoading = false;
         this.toastr.success('Password Created Successfully');
         this.globalUserStateService.hydrateFromLoginResponse(res);
+        this.localStorageService.hydrateFromLoginResponse(res);
         switch (res.nextStep) {
           case INextStepEnum.CreateProfile:
             this.route.navigate(['patient/auth/register/basic-info'], { replaceUrl: true });

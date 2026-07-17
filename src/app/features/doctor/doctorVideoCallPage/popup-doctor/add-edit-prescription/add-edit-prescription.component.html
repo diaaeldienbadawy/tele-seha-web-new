@@ -5,44 +5,33 @@
 
       @for (item of medicines.controls; track item; let i = $index) {
 
-      <div class="mb-[20px] w-full relative" [formGroupName]="i">
+      <div class="ts-item-card" [formGroupName]="i">
 
         <!-- Label -->
-        <label class="block text-(--text-color) text-[12px] font-semibold mb-[10px]">
-          Drug {{ $index + 1 }}
-        </label>
+        <div class="ts-item-label">
+          <span class="ts-item-number">{{ $index + 1 }}</span>
+          <span class="ts-item-label-text">Drug {{ $index + 1 }}</span>
+        </div>
 
         <!-- Select -->
-        <div class="border border-(--primary-color) rounded-full p-[10px] flex items-center gap-[10px]">
-
+        <div class="ts-select-wrapper">
           <p-select
-          class="custom-select w-full"
-  formControlName="id"
-  [options]="drugs"
-  optionLabel="name"
-  optionValue="id"
-  [filter]="true"
-  (onFilter)="onSearch($event)"
-  (onChange)="onDrugSelect($event, $index)"
-  placeholder="Select the drug">
-</p-select>
-
+            class="custom-select w-full"
+            formControlName="id"
+            [options]="drugs"
+            optionLabel="name"
+            optionValue="id"
+            [filter]="true"
+            (onFilter)="onSearch($event)"
+            (onChange)="onDrugSelect($event, $index)"
+            placeholder="Select the drug">
+          </p-select>
         </div>
 
         <!-- Remove Button -->
         @if (medicines.length > 1) {
-        <button type="button" (click)="removeMedicine($index)" class="absolute -top-2 -right-2
-                 w-[28px] h-[28px]
-                 flex items-center justify-center
-                 rounded-full
-                 bg-red-50
-                 text-red-600
-                 border border-red-200
-                 hover:bg-red-100
-                 transition">
-
-          ✕
-
+        <button type="button" (click)="removeMedicine($index)" class="ts-item-remove">
+          <i class="fa-solid fa-trash-can"></i>
         </button>
         }
 
@@ -53,29 +42,25 @@
     </div>
 
     <!-- Add -->
-    <div class="w-full mb-[15px]">
-      <button type="button" (click)="addMedicine()" class="w-full btn-header border border-(--primary-color)
-               text-(--primary-color) rounded-full py-3 font-bold">
-        Add another medicine
-      </button>
-    </div>
+    <button type="button" (click)="addMedicine()" class="ts-add-btn">
+      <span class="ts-add-icon">+</span>
+      Add another medicine
+    </button>
 
     <!-- Notes -->
-    <div class="mb-[15px] w-full">
-      <label class="block text-(--text-color) text-[12px] font-semibold mb-[10px]">
+    <div class="ts-notes-section">
+      <label class="ts-notes-label">
         Notes (optional)
       </label>
-      <div class="border border-(--primary-color) rounded-full p-[16px] flex items-center gap-[10px]">
-        <input type="text" formControlName="notes" placeholder="Enter notes or unlisted radiology"
-          class="text-(--text-color) text-[14px] bg-transparent w-full">
-      </div>
+      <input type="text" formControlName="notes" placeholder="Enter notes or additional instructions"
+        class="ts-input">
     </div>
 
     <!-- Submit -->
-    <div class="w-full flex justify-center">
-      <button type="submit" class="w-full md:w-1/2 bg-(--primary-color)
-               text-white rounded-full py-4 font-bold">
-        Send
+    <div class="ts-submit-section">
+      <button type="submit" class="ts-btn-primary w-full">
+        <i class="fa-solid fa-paper-plane" style="margin-right: 8px;"></i>
+        Send Prescription
       </button>
     </div>
 
