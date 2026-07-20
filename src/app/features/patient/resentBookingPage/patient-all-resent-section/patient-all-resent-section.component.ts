@@ -32,6 +32,10 @@ export class PatientAllResentSectionComponent implements OnInit {
   showPopupRating: boolean = false;
   showPopupChatAI: boolean = false;
 
+  // الحجز اللي مستني المريض يجاوب على نسبة التحسن قبل ما يدخل مكالمته.
+  pendingSession: any = null;
+  sendingRatio = false;
+
   private destroyRef = inject(DestroyRef);
 
   constructor(
@@ -182,19 +186,46 @@ export class PatientAllResentSectionComponent implements OnInit {
         break;
 
       case PatientAppointmentStatus.Started:
-        this.goToSession(item);
+        this.enterStartedSession(item);
         break;
     }
   }
 
-  goToSession(session: any) {
-    // Pick the CURRENT (ongoing) meeting, not meetings[0]. For a check-up with
-    // follow-ups, meetings[0] is the oldest/closed meeting, whose channel/token
-    // would be wrong. Fall back to the most recent meeting if none is flagged ongoing.
+  /**
+   * Pick the CURRENT (ongoing) meeting, not meetings[0]. For a check-up with
+   * follow-ups, meetings[0] is the oldest/closed meeting, whose channel/token
+   * would be wrong. Fall back to the most recent meeting if none is flagged ongoing.
+   */
+  private currentMeeting(session: any): any | null {
     const meetings: any[] = session?.checkUp?.meetings ?? [];
-    const meeting =
+    return (
       meetings.find((m) => m?.status === 'Ongoing') ??
-      meetings[meetings.length - 1];
+      meetings[meetings.length - 1] ??
+      null
+    );
+  }
+
+  /**
+   * دخول جلسة شغّالة. لو دي متابعة ولسه محدّدش نسبة تحسنه، بنسأله الأول —
+   * السؤال نفسه ("مستوى تحسنك بعد الكشف الأخير") مالوش معنى في كشف أول،
+   * ومالوش لزوم تاني لو الرقم اتسجّل قبل كدا (خرج ورجع للمكالمة).
+   */
+  private enterStartedSession(item: any) {
+    const meeting = this.currentMeeting(item);
+
+    if (meeting?.isFollowUp && !meeting?.satisfactionRatio) {
+      this.pendingSession = item;
+      this.checkUpId = item?.checkUp?.id;
+      this.selectedStep = 0;
+      this.showPopupRating = true;
+      return;
+    }
+
+    this.goToSession(item);
+  }
+
+  goToSession(session: any) {
+    const meeting = this.currentMeeting(session);
 
     if (!meeting || session.status !== 'Started') return;
 
@@ -209,21 +240,26 @@ export class PatientAllResentSectionComponent implements OnInit {
       JSON.stringify(videoCallData),
     );
 
-    localStorage.setItem('meetingId', meeting.id.toString());
-    localStorage.setItem('channelName', meeting.channelName);
-    localStorage.setItem('token', meeting.consumerToken);
-    localStorage.setItem('doctorIdOnMeeting', session.doctorCard.doctorId);
+    // كل القيم defensive: أي نقص في البيانات ميمنعش الدخول للمكالمة —
+    // كراش هنا كان بيسيب المريض واقف واللستة بتقوله "ادخل الجلسة".
+    localStorage.setItem('meetingId', String(meeting.id));
+    localStorage.setItem('channelName', meeting.channelName ?? '');
+    localStorage.setItem('token', meeting.consumerToken ?? '');
+    localStorage.setItem('doctorIdOnMeeting', String(session.doctorCard?.doctorId ?? ''));
     localStorage.setItem('patientId', this.patientId?.toString() || '');
     localStorage.setItem('agoraDetailsPatient', JSON.stringify(meeting));
     this.route.navigate(['/patient/videoCall/' + session.checkUp.id]);
   }
 
-  openPopupRating() {
-    this.showPopupRating = true;
-  }
-
+  /**
+   * إغلاق/تخطي: التقييم مايمنعش المريض من دخول مكالمة طبية بأي حال —
+   * بنقفل البوب أب وندخّله الجلسة على طول.
+   */
   closePopupRating() {
     this.showPopupRating = false;
+    const session = this.pendingSession;
+    this.pendingSession = null;
+    if (session) this.goToSession(session);
   }
 
   openPopupChatAI() {
@@ -251,8 +287,8 @@ export class PatientAllResentSectionComponent implements OnInit {
   /** أول مرة فقط */
   startComplaint() {
     if (!this.firstComplaintText.trim() || !this.selectedAppointmentId) return;
-
-    console.log('firstComplaintText:', this.firstComplaintText);
+    if (this.loading) return;
+    this.loading = true;
 
     this.patientChatAi
       .startPatientComplaint(
@@ -261,7 +297,14 @@ export class PatientAllResentSectionComponent implements OnInit {
       )
       .subscribe({
         next: (res) => {
-          console.log(res);
+          this.loading = false;
+
+          // لما الفحص يكتمل السيرفر بيرجع 200 فاضي (من غير bodyValue) — الكود القديم
+          // كان بيعمل res.bodyValue على null فبيكرش والبوب أب يفضل معلّق للأبد.
+          if (!res || !res.bodyValue) {
+            this.finishComplaint();
+            return;
+          }
 
           this.complaintStarted = true;
           this.complaintId = res.patientMedicalComplaintId;
@@ -269,9 +312,40 @@ export class PatientAllResentSectionComponent implements OnInit {
           this.resetAnswers();
         },
         error: (err) => {
-          console.log(err);
+          this.loading = false;
+          this.showComplaintError(err);
         },
       });
+  }
+
+  /** الفحص خلص: اقفل البوب أب وحدّث اللستة وطمّن المريض. */
+  private finishComplaint() {
+    this.closePopupChatAI();
+    this.toaster.success('تم إرسال الشكوى بنجاح — الطبيب سيبدأ معك في موعد الجلسة.');
+    this.loadAppointmentComming();
+  }
+
+  private showComplaintError(err: any) {
+    const apiError = err?.error;
+    const message =
+      apiError?.message ??
+      (typeof apiError === 'string' && apiError ? apiError : null);
+
+    if (message === 'مقيد') {
+      // الموديل أنهى الحوار (إجابات خارج السياق مرتين): اقفل ورجّع المريض يبدأ من جديد.
+      this.toaster.warning('تم إنهاء المحادثة — برجاء المحاولة مرة أخرى بوصف واضح للشكوى.');
+      this.closePopupChatAI();
+      return;
+    }
+
+    if (message?.includes('ابدأ من جديد')) {
+      // الجلسة انتهت فعلاً (خمول طويل): نرجّع البوب أب لأول خطوة عشان يكتب شكوته تاني.
+      this.toaster.warning(message);
+      this.resetChatAI();
+      return;
+    }
+
+    this.toaster.error(message || 'تعذر التواصل مع المساعد الذكي، حاول مرة أخرى.');
   }
 
   /** رد المستخدم على AI */
@@ -304,16 +378,20 @@ export class PatientAllResentSectionComponent implements OnInit {
 
     this.patientChatAi.patientComplaint(answer, this.complaintId).subscribe({
       next: (res) => {
-        console.log('Two');
-        console.log(res);
+        this.loading = false;
+
+        // اكتمال الفحص = 200 فاضي: اقفل وحدّث بدل الكراش على res.bodyValue.
+        if (!res || !res.bodyValue) {
+          this.finishComplaint();
+          return;
+        }
 
         this.aiQuestion = res.bodyValue;
         this.resetAnswers();
-        this.loading = false;
       },
       error: (err) => {
-        console.log(err);
         this.loading = false;
+        this.showComplaintError(err);
       },
     });
   }
@@ -352,23 +430,36 @@ export class PatientAllResentSectionComponent implements OnInit {
 
   selectStep(value: number) {
     this.selectedStep = value;
-    console.log('selectedStep', this.selectedStep);
   }
 
   getSelectedColor() {
     return this.steps.find((s) => s.value === this.selectedStep);
   }
 
-  getMeetingSatisfactionRatio() {
-    if (!this.checkUpId) return;
+  /**
+   * إرسال نسبة التحسن ثم الدخول للجلسة. الإرسال بيروح على أحدث ميتينج في الكشف
+   * (وهو ميتينج المتابعة اللي داخل عليه دلوقتي) — دي دلالة الـ endpoint الحالية.
+   * فشل الإرسال بيتعرض كتوست بس ما بيوقفش الدخول: المكالمة أهم من الرقم.
+   */
+  sendSatisfactionRatio() {
+    if (!this.checkUpId || !this.selectedStep || this.sendingRatio) return;
+    this.sendingRatio = true;
+
     this.recentAppointmentService
       .getMeetingSatisfactionRatio(this.checkUpId, this.selectedStep)
       .subscribe({
-        next: (res) => {
-          console.log(res);
+        next: () => {
+          this.sendingRatio = false;
+          this.closePopupRating();
         },
         error: (err) => {
-          console.log(err);
+          this.sendingRatio = false;
+          const apiError = err?.error;
+          const message =
+            apiError?.message ??
+            (typeof apiError === 'string' && apiError ? apiError : null);
+          this.toaster.error(message || 'تعذر إرسال نسبة التحسن.');
+          this.closePopupRating();
         },
       });
   }

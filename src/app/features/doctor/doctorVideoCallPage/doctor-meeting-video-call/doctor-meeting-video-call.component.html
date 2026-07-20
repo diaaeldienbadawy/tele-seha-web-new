@@ -55,10 +55,10 @@
           title="Toggle mic">
           <i [class]="micMuted ? 'fa-solid fa-microphone-slash' : 'fa-solid fa-microphone'"></i>
         </button>
-        <button type="button" (click)="endCall()"
+        <button type="button" (click)="endCall()" [disabled]="isClosing"
           class="ts-video-btn-control end-call"
           title="End call">
-          <i class="fa-solid fa-phone-slash"></i>
+          <i [class]="isClosing ? 'fa-solid fa-circle-notch fa-spin' : 'fa-solid fa-phone-slash'"></i>
         </button>
         <button type="button" (click)="toggleCamera()"
           [class]="cameraOff ? 'ts-video-btn-control muted' : 'ts-video-btn-control active'"

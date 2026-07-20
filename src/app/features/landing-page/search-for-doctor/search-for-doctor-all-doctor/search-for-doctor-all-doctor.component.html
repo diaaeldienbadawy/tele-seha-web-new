@@ -41,7 +41,9 @@
                 <p class="text-[#555555] text-[16px] font-normal leading-[150%]">
                   ( Number of Consultations: {{  doctor.successfuls}} )
                 </p>
+                <!-- An advantage shows only when more than half of the raters granted it -->
                 <div class="flex flex-col sm:flex-row gap-2 lg:gap-5 mt-[15px] ">
+                  @if ((doctor.ratingCount || 0) > 0 && (doctor.firstAdvantageCount || 0) * 2 > doctor.ratingCount) {
                   <div
                     class="w-[60%] sm:w-fit text-left mx-auto sm:m-0 cursor-pointer bg-white border border-[#0000000D] rounded-[30px] py-[12px] px-[16px]">
                     <h5
@@ -50,7 +52,9 @@
                       Explains clearly
                     </h5>
                   </div>
+                  }
 
+                  @if ((doctor.ratingCount || 0) > 0 && (doctor.secondAdvantageCount || 0) * 2 > doctor.ratingCount) {
                   <div
                     class="w-[60%] sm:w-fit text-left mx-auto sm:m-0 cursor-pointer bg-white border border-[#0000000D] rounded-[30px] py-[12px] px-[16px]">
                     <h5
@@ -59,7 +63,9 @@
                       Good listener
                     </h5>
                   </div>
+                  }
 
+                  @if ((doctor.ratingCount || 0) > 0 && (doctor.thirdAdvantageVount || 0) * 2 > doctor.ratingCount) {
                   <div
                     class="w-[60%]  sm:w-fit text-left mx-auto sm:m-0 cursor-pointer bg-[#FFFFFF] border border-[#0000000D] rounded-[30px] py-[12px] px-[16px]  gap-2">
                     <h5
@@ -69,6 +75,7 @@
                     </h5>
 
                   </div>
+                  }
 
                 </div>
               </div>

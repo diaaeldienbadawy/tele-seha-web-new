@@ -1,8 +1,14 @@
 import { inject, PLATFORM_ID } from '@angular/core';
-import { HttpInterceptorFn } from '@angular/common/http';
+import { HttpContextToken, HttpInterceptorFn } from '@angular/common/http';
 import { isPlatformBrowser } from '@angular/common';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { finalize } from 'rxjs';
+
+/**
+ * طلبات خلفية خفيفة (زي البحث اللحظي عن الأدوية) متستدعيش سبينر يغطي الصفحة كلها —
+ * الكومبوننت بيعرض مؤشر صغير مكانه. حطها في الـ HttpContext بتاع الريكويست.
+ */
+export const SKIP_GLOBAL_LOADING = new HttpContextToken<boolean>(() => false);
 
 /** طلبات يجب تجاهلها (ما تشغّلش الـ spinner) */
 const SKIP_URLS = [
@@ -25,7 +31,7 @@ export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
     return next(req);
   }
 
-  if (shouldSkip(req.url)) {
+  if (shouldSkip(req.url) || req.context.get(SKIP_GLOBAL_LOADING)) {
     return next(req);
   }
 

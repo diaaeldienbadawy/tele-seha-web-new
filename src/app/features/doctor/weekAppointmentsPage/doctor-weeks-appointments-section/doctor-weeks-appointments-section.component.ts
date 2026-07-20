@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 import { LocalstorageService } from '../../../../core/services/localstorage.service';
 import { DoctorsService } from '../../../../shared/services/doctors.service';
@@ -21,6 +22,7 @@ export class DoctorWeeksAppointmentsSectionComponent implements OnInit {
   selectedDate: string | null = null;
 
   doctorId: number | null = null;
+  private destroyRef = inject(DestroyRef);
   constructor(
     readonly doctorService: DoctorsService,
     readonly localStorageService: LocalstorageService,
@@ -32,10 +34,12 @@ export class DoctorWeeksAppointmentsSectionComponent implements OnInit {
     this.doctorId = Number(this.localStorageService.get('doctorId')) || null;
     this.loadTodaysAppointments();
 
-    // Real-time appointment updates
-    this.notificationService.appointmentEvents$.subscribe(() => {
-      this.loadTodaysAppointments();
-    });
+    // Real-time appointment updates (auto-unsubscribed on destroy)
+    this.notificationService.appointmentEvents$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.loadTodaysAppointments();
+      });
   }
 
   data: any;

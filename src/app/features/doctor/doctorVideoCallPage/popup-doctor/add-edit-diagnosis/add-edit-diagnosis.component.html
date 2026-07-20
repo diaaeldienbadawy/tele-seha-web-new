@@ -1,0 +1,65 @@
+<div>
+  <form [formGroup]="diagnosisForm" (ngSubmit)="submitDiagnosis()">
+
+    <div formArrayName="diagnosesList">
+
+      @for (item of diagnosisRows.controls; track $index; let i = $index) {
+
+      <div class="ts-item-card" [formGroupName]="$index">
+
+        <!-- Label -->
+        <div class="ts-item-label">
+          <span class="ts-item-number diagnosis">{{ $index + 1 }}</span>
+          <span class="ts-item-label-text">Diagnosis {{ $index + 1 }}</span>
+        </div>
+
+        <!-- Select -->
+        <div class="ts-select-wrapper relative">
+          <p-select
+            class="custom-select w-full"
+            formControlName="id"
+            [options]="diagnoses"
+            optionLabel="name"
+            optionValue="id"
+            [filter]="true"
+            (onFilter)="onDiagnosisSearch($event)"
+            (onChange)="onDiagnosisSelect($event, i)"
+            placeholder="Select the diagnosis">
+          </p-select>
+          <!-- Small inline search indicator — lookup must not raise the page spinner -->
+          @if (isSearching) {
+            <span class="absolute top-1/2 -translate-y-1/2 ltr:right-10 rtl:left-10 text-slate-400 pointer-events-none">
+              <i class="fa-solid fa-circle-notch fa-spin text-sm"></i>
+            </span>
+          }
+        </div>
+
+        <!-- Remove Button -->
+        @if (diagnosisRows.length > 1) {
+        <button type="button" (click)="removeDiagnosis($index)" class="ts-item-remove">
+          <i class="fa-solid fa-trash-can"></i>
+        </button>
+        }
+
+      </div>
+
+      }
+
+    </div>
+
+    <!-- Add -->
+    <button type="button" (click)="addDiagnosis()" class="ts-add-btn">
+      <span class="ts-add-icon">+</span>
+      Add another diagnosis
+    </button>
+
+    <!-- Submit -->
+    <div class="ts-submit-section">
+      <button type="submit" class="ts-btn-primary w-full">
+        <i class="fa-solid fa-floppy-disk" style="margin-right: 8px;"></i>
+        Save Diagnosis
+      </button>
+    </div>
+
+  </form>
+</div>

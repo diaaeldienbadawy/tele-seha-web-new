@@ -11,7 +11,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import { Select } from 'primeng/select';
 import { CommonModule } from '@angular/common';
-import { LocalstorageService } from '../../../../../core/services/localstorage.service';
+import { DoctorsService } from '../../../../../shared/services/doctors.service';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
@@ -28,10 +28,7 @@ export class AddEditRadiologyComponent implements OnInit {
   private readonly radiologySearchSubject$ = new Subject<string>();
   @Output() closeRadiology = new EventEmitter<void>();
   readonly toastr = inject(ToastrService);
-
-  readonly localstorageService = inject(LocalstorageService);
-
-  radiologyId!: number;
+  private readonly doctorsService = inject(DoctorsService);
 
   meetingId!: number;
   private readonly fb = inject(FormBuilder);
@@ -47,29 +44,26 @@ export class AddEditRadiologyComponent implements OnInit {
     this.initRadiologyForm();
     this.radiologySearchSubject();
 
-    this.radiologyId = Number(this.localstorageService.get('radiologyId'));
-
-    console.log('radiologyId', this.radiologyId);
-
-    if (this.radiologyId) {
-      this.getRadiologyById(this.radiologyId);
-    }
+    // طلب الأشعة الحالي بييجي من الميتينج نفسه — مش من id متخزن في localStorage
+    // (المفتاح المتخزن كان بيعيش عبر الميتينجات → تعديل طلب ميتينج قديم = 403).
+    this.prefillFromMeeting();
   }
 
-  getRadiologyById(id: number) {
-    this.DoctorAuthService.getRadiologyById(id).subscribe({
+  private prefillFromMeeting(): void {
+    this.doctorsService.getReports(this.meetingId, true).subscribe({
       next: (res: any) => {
-        console.log('etRadiologyById', res);
+        const request = res?.radiologicalExaminationRequest;
+        if (!request) return;
 
         this.radiologyForm.patchValue({
-          meetingId: res.meetingId,
-          notes: res.notes || '',
+          meetingId: this.meetingId,
+          notes: request.notes || '',
         });
 
         const examinationsArray = this.radiologyMedicines;
         examinationsArray.clear();
 
-        (res.radiologicalExaminations || []).forEach((exam: any) => {
+        (request.radiologicalExaminations || []).forEach((exam: any) => {
           examinationsArray.push(
             this.fb.group({
               id: [exam.id, Validators.required],
@@ -79,8 +73,10 @@ export class AddEditRadiologyComponent implements OnInit {
             }),
           );
         });
+
+        if (!examinationsArray.length) examinationsArray.push(this.createRadiology());
       },
-      error: (err) => console.log(err),
+      error: (err) => console.error('Failed to load current radiology request:', err),
     });
   }
 
@@ -92,6 +88,9 @@ export class AddEditRadiologyComponent implements OnInit {
     });
   }
 
+  /** مؤشر بحث صغير — البحث اللحظي مبقاش يرفع سبينر الصفحة. */
+  isSearching = false;
+
   radiologySearchSubject() {
     this.radiologySearchSubject$
       .pipe(
@@ -99,8 +98,18 @@ export class AddEditRadiologyComponent implements OnInit {
         distinctUntilChanged(),
         switchMap((search) => this.DoctorAuthService.getRadiology(search)),
       )
-      .subscribe((res) => {
-        this.radiology = res;
+      .subscribe({
+        next: (res) => {
+          this.isSearching = false;
+          // منسبش الصفوف المختارة بالفعل من غير label بعد ما القائمة تتبدل
+          const selected = (this.radiologyMedicines.value ?? []).filter(
+            (m: any) => m?.id != null && !res.some((x: any) => x.id === m.id),
+          );
+          this.radiology = [...res, ...selected];
+        },
+        error: () => {
+          this.isSearching = false;
+        },
       });
   }
 
@@ -138,6 +147,7 @@ export class AddEditRadiologyComponent implements OnInit {
   }
 
   onRadiologySearch(event: any): void {
+    this.isSearching = true;
     this.radiologySearchSubject$.next(event.filter);
   }
 
@@ -161,36 +171,19 @@ export class AddEditRadiologyComponent implements OnInit {
       return;
     }
 
-    console.log('Final Payload:', this.radiologyForm.value);
-
-    this.closeRadiology.emit();
-
-    if (this.radiologyId) {
-      this.DoctorAuthService.updateRadiology(
-        this.radiologyForm.value,
-        this.radiologyId,
-      ).subscribe({
-        next: (res) => {
-          console.log(res);
-          this.toastr.success('Radiology updated successfully');
-        },
-        error: (err) => {
-          console.log(err.error.message);
-          this.toastr.error(err.error.message || 'Error updating radiology');
-        },
-      });
-    } else {
-      this.DoctorAuthService.sendRadiology(this.radiologyForm.value).subscribe({
-        next: (res) => {
-          console.log(res);
-          this.toastr.success('Radiology submitted successfully');
-          this.localstorageService.set('radiologyId', res.id);
-        },
-        error: (err) => {
-          console.log(err.error.message);
-          this.toastr.error(err.error.message || 'Failed to submit radiology');
-        },
-      });
-    }
+    // POST دايمًا: السيرفر بيعمل upsert على مستوى الميتينج — مفيش اعتماد على ids متخزنة.
+    this.DoctorAuthService.sendRadiology(this.radiologyForm.value).subscribe({
+      next: () => {
+        this.toastr.success('تم حفظ طلب الأشعة بنجاح');
+        this.closeRadiology.emit();
+      },
+      error: (err) => {
+        const apiError = err?.error;
+        this.toastr.error(
+          apiError?.message ||
+            (typeof apiError === 'string' && apiError ? apiError : 'تعذر حفظ طلب الأشعة'),
+        );
+      },
+    });
   }
 }

@@ -98,12 +98,20 @@ export class DoctorTodaysAppointmentsSectionComponent implements OnInit {
   cancelAppointment(appointmentId: number) {
     // console.log('Canceling appointment with ID:', appointmentId);
 
-    this.doctorService
-      .cancelAppointment(appointmentId)
-      .subscribe((res: any) => {
-        // console.log(res);
+    this.doctorService.cancelAppointment(appointmentId).subscribe({
+      next: () => {
+        this.toaster.success('تم إلغاء الموعد.');
         this.loadTodaysAppointments();
-      });
+      },
+      error: (err) => {
+        // رفض الإلغاء كان بيتبلع في صمت والطبيب فاكر إن الموعد اتلغى.
+        const apiError = err?.error;
+        this.toaster.error(
+          apiError?.message ||
+            (typeof apiError === 'string' && apiError ? apiError : 'تعذر إلغاء الموعد.'),
+        );
+      },
+    });
   }
 
   updateAppointment(appointmentId: number, newSessionId: number) {
@@ -117,20 +125,27 @@ export class DoctorTodaysAppointmentsSectionComponent implements OnInit {
 
   selectedMeetingId: number | null = null;
   openMeeting(appointmentId: number) {
-    this.doctorService.openAppointment(appointmentId).subscribe((res: any) => {
-      this.selectedMeetingId = res.id;
-      this.loadTodaysAppointments();
-      this.localStorageService.set('meetingId', res.id);
-      this.localStorageService.set('channelName', res.channelName);
-      this.localStorageService.set('checkUpId', res.checkUp.id);
-      this.localStorageService.set('patientId', res.checkUp.patientId);
-      this.localStorageService.set(
-        'medicalHistory',
-        JSON.stringify(res.patient?.sections || []),
-      );
-      this.localStorageService.set('meetingToken', res.providerToken);
-      this.localStorageService.set('agoraDetails', JSON.stringify(res));
-      this.router.navigate([`/doctor/videoCall/${res.id}`]);
+    this.doctorService.openAppointment(appointmentId).subscribe({
+      next: (res: any) => {
+        // كل القيم defensive: أي نقص في الرد ميمنعش الدخول للمكالمة —
+        // زرار "بدأ" لازم يدخل الطبيب على طول من غير ما يحتاج يدوس "انضمام" بعدها.
+        this.selectedMeetingId = res.id;
+        this.localStorageService.set('meetingId', res.id);
+        this.localStorageService.set('channelName', res.channelName ?? '');
+        this.localStorageService.set('checkUpId', res.checkUp?.id ?? res.checkUpId);
+        this.localStorageService.set('patientId', res.checkUp?.patientId ?? res.patient?.patientId);
+        this.localStorageService.set(
+          'medicalHistory',
+          JSON.stringify(res.patient?.sections || []),
+        );
+        this.localStorageService.set('meetingToken', res.providerToken ?? '');
+        this.localStorageService.set('agoraDetails', JSON.stringify(res));
+        this.router.navigate([`/doctor/videoCall/${res.id}`]);
+      },
+      error: (err) => {
+        console.error('Error starting video meeting:', err);
+        this.toaster.error(err?.error?.message || err?.error || 'تعذر بدء الكشف، حاول مرة أخرى');
+      },
     });
   }
 

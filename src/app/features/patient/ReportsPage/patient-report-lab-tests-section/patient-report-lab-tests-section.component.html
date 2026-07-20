@@ -46,6 +46,13 @@
             <i class="fa-regular fa-calendar-check text-xs"></i>
             <span>{{ 'doctor.selectDate' | translate }}: {{ item.meeting.start | date: 'dd/MM/yyyy' }}</span>
           </p>
+
+          @if (uploadedLinks(item).length > 0) {
+            <p class="text-emerald-600 text-xs sm:text-sm font-bold flex items-center gap-1.5 justify-center sm:justify-start bg-emerald-50 w-fit px-3 py-1 rounded-full border border-emerald-100">
+              <i class="fa-solid fa-circle-check text-xs"></i>
+              <span>{{ 'reports.sentResults' | translate }}: {{ uploadedLinks(item).length }}</span>
+            </p>
+          }
         </div>
       </div>
 
@@ -54,7 +61,7 @@
         <!-- Upload -->
         <button 
           (click)="showPopupUpload(item.id)"
-          class="ts-btn-primary w-full md:w-48 py-3 text-sm font-bold shadow-md shadow-blue-500/10 hover:shadow-lg transition-all duration-300 cursor-pointer"
+          class="ts-btn-primary w-full md:w-auto md:min-w-[12rem] px-6 py-3 text-sm font-bold shadow-md shadow-blue-500/10 hover:shadow-lg transition-all duration-300 cursor-pointer whitespace-nowrap"
         >
           <i class="fa-solid fa-upload mr-2 rtl:ml-2"></i>
           {{ 'reports.uploadBtn' | translate }}
@@ -63,7 +70,7 @@
         <!-- View -->
         <button 
           (click)="getById(item)"
-          class="ts-btn-secondary w-full md:w-48 py-3 text-sm font-bold hover:bg-slate-50 transition-all duration-300 cursor-pointer"
+          class="ts-btn-secondary w-full md:w-auto md:min-w-[12rem] px-6 py-3 text-sm font-bold hover:bg-slate-50 transition-all duration-300 cursor-pointer whitespace-nowrap"
         >
           <i class="fa-regular fa-eye mr-2 rtl:ml-2"></i>
           {{ 'reports.viewDocument' | translate }}
@@ -86,11 +93,12 @@
 
 <!-- Upload Popup Modal Wrapper -->
 @if(isPopupUpload){
-<div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-  <div class="w-full max-w-xl animate-scale-up">
-    <app-popup-upload 
-      (close)="closePopupUpload()" 
-      title="labTest" 
+<div class="ts-modal-overlay">
+  <div class="w-full max-w-xl">
+    <app-popup-upload
+      (close)="closePopupUpload()"
+      (uploaded)="getAllLabTests()"
+      title="labTest"
       [selectedId]="selectedId"
     >
     </app-popup-upload>
@@ -99,108 +107,89 @@
 }
 
 <!-- Lab Test Details Preview Modal -->
-@if(showPopupPrescription){
-<div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-  <div class="bg-white rounded-3xl shadow-2xl p-6 md:p-8 text-center max-h-[90vh] w-full max-w-3xl overflow-y-auto no-scrollbar relative border border-slate-100 animate-scale-up">
-    <!-- Close Button -->
-    <button 
-      (click)="showPopupPrescription = false"
-      class="absolute top-4 right-4 rtl:left-4 rtl:right-auto text-slate-400 hover:text-slate-600 transition-colors w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center cursor-pointer"
-    >
-      <i class="fa-solid fa-xmark text-lg"></i>
-    </button>
+@if (showPopupPrescription) {
+<div class="ts-modal-overlay">
+  <div class="ts-modal-card" style="max-width: 680px;">
 
-    <!-- Printable/Downloadable Container -->
-    <div id="labTestContent" class="p-6 md:p-10 bg-white text-left rtl:text-right border border-slate-100 rounded-2xl shadow-sm my-4">
-      
-      <!-- Lab Pad Header -->
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 pb-6 border-b-2 border-slate-100">
-        <div>
-          <div class="flex items-center gap-2 text-(--primary-color) font-extrabold text-lg sm:text-xl">
-            <i class="fa-solid fa-vial"></i>
-            <h2>{{ 'reports.labTests' | translate }}</h2>
-          </div>
-          <p class="text-slate-400 text-xs font-bold mt-1 tracking-wider">
-            LAB-20260612-00021
-          </p>
-        </div>
-        
-        <!-- QR Code -->
-        <div class="w-20 h-20 bg-slate-50 border border-slate-100 rounded-xl p-1 flex-shrink-0 self-center sm:self-auto">
-          <img 
-            class="w-full h-full object-contain" 
-            src="assets/images/2048px-QR_Code_Model_1_Example 1.png"
-            loading="lazy" 
-            alt="qr code"
-          />
-        </div>
+    <!-- Header -->
+    <div class="ts-modal-header">
+      <div class="ts-modal-header-icon labtest">
+        <i class="fa-solid fa-flask-vial"></i>
       </div>
-
-      <!-- Doctor & Patient Details -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 py-6 border-b-2 border-slate-100">
-        <!-- Doctor Info -->
-        <div class="space-y-1">
-          <div class="flex items-center gap-2">
-            <h3 class="text-slate-800 text-base sm:text-lg font-extrabold">
-              {{ labTest.doctor.name }}
-            </h3>
-            <div class="flex items-center gap-0.5 text-amber-500 text-xs font-bold">
-              <i class="fa-solid fa-star"></i>
-              <span class="text-slate-600">{{ labTest.doctor.ratingValue }}</span>
-            </div>
-          </div>
-          <h4 class="text-slate-500 text-sm font-semibold">
-            {{ labTest.doctor.specialty }}
-          </h4>
-          <p class="text-slate-400 text-xs font-medium">
-            {{ 'reports.licenseNumber' | translate }}: <span class="font-bold text-slate-600">1234567890</span>
-          </p>
-        </div>
-
-        <!-- Patient Info -->
-        <div class="space-y-1 md:text-right rtl:md:text-left">
-          <h4 class="text-slate-400 text-xs font-bold uppercase tracking-wider">
-            {{ 'reports.patientName' | translate }}
-          </h4>
-          <p class="text-slate-800 text-base sm:text-lg font-extrabold mt-1">
-            {{ patients?.name }}
-          </p>
-          <p class="text-slate-400 text-xs font-medium">
-            {{ 'doctor.selectDate' | translate }}: <span class="font-bold text-slate-600">{{ labTest.meeting.start | date: 'dd/MM/yyyy' }}</span>
-          </p>
-        </div>
+      <div class="ts-modal-header-text">
+        <h3>{{ 'reports.labTests' | translate }}</h3>
+        <p>LAB-{{ labTest?.id }}</p>
       </div>
-
-      <!-- Lab Analyses Requested List -->
-      <div class="py-6">
-        <h3 class="text-slate-800 text-base sm:text-lg font-extrabold mb-6 flex items-center gap-2">
-          <span class="w-1 h-5 bg-(--primary-color) rounded-full"></span>
-          {{ 'reports.labTests' | translate }} Requested Analyses
-        </h3>
-        
-        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-          @for (item of labTest.labAnalyses; track item.id) {
-          <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4 space-y-2">
-            <h4 class="text-(--primary-color) text-sm sm:text-base font-extrabold">
-              {{ item.name }}
-            </h4>
-            <p class="text-slate-500 text-xs sm:text-sm font-medium leading-relaxed">
-              Notes: {{ item.notes }}
-            </p>
-          </div>
-          }
-        </div>
-      </div>
-
+      <button class="ts-modal-close" (click)="showPopupPrescription = false">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
     </div>
 
-    <!-- Actions -->
-    <div class="mt-6 flex justify-center max-w-xs mx-auto">
-      <button 
-        (click)="downloadPDF()"
-        class="ts-btn-primary w-full py-3.5 text-base font-bold shadow-lg shadow-blue-500/25 hover:shadow-xl cursor-pointer"
-      >
-        <i class="fa-solid fa-download mr-2 rtl:ml-2"></i>
+    <!-- Body -->
+    <div class="ts-modal-body">
+      <div id="labTestContent" class="rpt-doc">
+
+        <!-- Doctor & patient -->
+        <div class="rpt-parties">
+          <div>
+            <div class="rpt-doc-name">
+              <span>{{ labTest?.doctor?.name || '—' }}</span>
+              @if (labTest?.doctor?.ratingValue) {
+              <span class="rpt-star"><i class="fa-solid fa-star"></i> {{ labTest.doctor.ratingValue }}</span>
+              }
+            </div>
+            <p class="rpt-muted">{{ labTest?.doctor?.specialty }}</p>
+          </div>
+          <div class="rpt-patient">
+            <span class="rpt-label">{{ 'reports.patientName' | translate }}</span>
+            <p class="rpt-strong">{{ patients?.name || '—' }}</p>
+            @if (labTest?.meeting?.start) {
+            <p class="rpt-muted">{{ 'doctor.selectDate' | translate }}: {{ labTest.meeting.start | date: 'dd/MM/yyyy' }}</p>
+            }
+          </div>
+        </div>
+
+        <!-- Requested analyses -->
+        <div class="rpt-section">
+          <h4 class="rpt-h"><span class="rpt-bar"></span> {{ 'reports.labTests' | translate }}</h4>
+          <div class="rpt-grid">
+            @for (lab of labTest?.labAnalyses; track lab.id) {
+            <div class="rpt-item">
+              <h5>{{ lab.name }}</h5>
+              @if (lab.notes) { <p>{{ lab.notes }}</p> }
+            </div>
+            } @empty {
+            <p class="rpt-empty">{{ 'doctor.none' | translate }}</p>
+            }
+          </div>
+        </div>
+
+        <!-- Uploaded results -->
+        @if (uploadedLinks(labTest).length > 0) {
+        <div class="rpt-section" style="border-top: 1px solid #eef2f7;">
+          <h4 class="rpt-h"><span class="rpt-bar green"></span> {{ 'reports.sentResults' | translate }}</h4>
+          <div class="rpt-results">
+            @for (link of uploadedLinks(labTest); track link) {
+            @if (isImage(link)) {
+            <div class="rpt-thumb" (click)="openFile(link)">
+              <img [src]="link" loading="lazy" alt="uploaded result" />
+            </div>
+            } @else {
+            <div class="rpt-file" (click)="openFile(link)">
+              <i class="fa-solid fa-file"></i>
+              <span>{{ getFileName(link) }}</span>
+            </div>
+            }
+            }
+          </div>
+        </div>
+        }
+
+      </div>
+
+      <!-- Download -->
+      <button (click)="downloadPDF()" class="ts-btn-primary w-full rpt-download">
+        <i class="fa-solid fa-download"></i>
         {{ 'doctorsList.downloadLabTest' | translate }}
       </button>
     </div>

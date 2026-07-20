@@ -1,76 +1,78 @@
-<div>
-  @if(uniqueDays.length > 0){
-  <div class="flex justify-between my-[20px] ">
-    <h3 class="text-[#1E1E1E]  text-[20px] md:text-[24px] font-bold leading-[100%]">
-      Schedule
-    </h3>
+<div class="fu">
+  @if (uniqueDays.length > 0) {
+
+  <!-- Day picker -->
+  <div class="fu-section-head">
+    <span class="fu-section-icon"><i class="fa-solid fa-calendar-day"></i></span>
+    <h3 class="fu-section-title">Choose a day</h3>
   </div>
 
-  <div class=" mb-[30px] flex gap-3 md:gap-[30px] flex-nowrap overflow-auto no-scrollbar py-[15px] ">
-
-    @for (day of uniqueDays; track $index) {
-
-    <div (click)="selectDay(day.date)" [ngClass]="selectedDate === day.date
-      ? 'bg-[#007BBD] text-white'
-      : 'bg-[#FFFFFF]'"
-      class="cursor-pointer translation duration-300 border border-[#D9D9D933] shadow-[0px_2px_8px_0px_#0000001A] rounded-[20px] p-[10px] ">
-
-      <h3 [ngClass]="selectedDate === day.date ? 'text-white' : 'text-[#007BBD]'"
-        class="text-[14px] md:text-[16px] font-bold leading-[100%] ">
-        {{ getDayName(day.date) }}
-      </h3>
-
-      <p [ngClass]="selectedDate === day.date ? 'text-white' : 'text-[#1F1F1F]'"
-        class="text-[20px] md:text-[28px] font-bold leading-[100%] mt-[30px] ">
-        {{ getDayWithMonth(day.date) }}
-      </p>
-
-    </div>
+  <div class="fu-days">
+    @for (day of uniqueDays; track day.date) {
+    <button type="button" (click)="selectDay(day.date)" [class.is-active]="selectedDate === day.date"
+      class="fu-day">
+      @if (isToday(day.date)) { <span class="fu-day-badge">Today</span> }
+      <span class="fu-day-name">{{ getDayName(day.date) }}</span>
+      <span class="fu-day-date">{{ getDayWithMonth(day.date) }}</span>
+    </button>
     }
-
   </div>
 
-
-  <div class="w-full sm:w-[80%] mx-auto text-left">
-    <h3 class="text-[#1E1E1E] text-[20px] md:text-[24px] font-bold leading-[100%] ">
-      Time
-    </h3>
-
-    <div class=" grid grid-cols-1 md:grid-cols-2 gap-[20px] items-center mt-[20px] ">
-
-      @for (session of getSessionsByDate(); track $index) {
-      <div (click)="selectSession(session.sessionId)" [ngClass]="selectedSessionId === session.sessionId
-      ? 'bg-[#007BBD]'
-      : 'bg-[#ABD3E980]'"
-        class="cursor-pointer translation duration-300 border border-[#D9D9D933] shadow-[0px_2px_8px_0px_#0000001A] rounded-[20px] py-[20px] px-[35px] ">
-
-        <h3 [ngClass]="selectedSessionId === session.sessionId
-        ? 'text-white'
-        : 'text-[#007BBD]'" class="text-[20px] md:text-[24px] font-extrabold leading-[100%] ">
-          {{ formatTime(session.start) }} - {{ formatTime(session.end) }}
-        </h3>
-
-      </div>
-      }
-
-    </div>
-
-
-
+  <!-- Time picker -->
+  <div class="fu-section-head fu-mt">
+    <span class="fu-section-icon"><i class="fa-solid fa-clock"></i></span>
+    <h3 class="fu-section-title">Available times</h3>
   </div>
 
-  <button (click)="bookingSession()"
-    class="btn-header w-full sm:w-[50%] mt-[30px] bg-[#007BBD] text-[#F7F9FE] px-[25px] py-[15px] sm:py-[20px] rounded-full text-[24px] font-bold leading-[100%]">
-    Booking
-  </button>
+  @if (getSessionsByDate().length > 0) {
+  <div class="fu-slots">
+    @for (session of getSessionsByDate(); track session.sessionId) {
+    <button type="button" (click)="selectSession(session.sessionId)"
+      [class.is-active]="selectedSessionId === session.sessionId" [disabled]="session.remaining <= 0"
+      class="fu-slot">
+
+      <span class="fu-slot-time">
+        <i class="fa-solid fa-clock"></i>
+        {{ formatTime(session.start) }}@if (session.end) { <span class="fu-dash">–</span> {{ formatTime(session.end) }}}
+      </span>
+
+      <span class="fu-slot-meta">
+        @if (session.remaining > 0) {
+        <span class="fu-seats"><i class="fa-solid fa-user-group"></i> {{ session.remaining }} left</span>
+        } @else {
+        <span class="fu-seats full"><i class="fa-solid fa-ban"></i> Full</span>
+        }
+      </span>
+
+      <span class="fu-check"><i class="fa-solid fa-check"></i></span>
+    </button>
+    }
+  </div>
+  } @else {
+  <p class="fu-empty-inline">No times available on this day.</p>
   }
 
-  @if( uniqueDays.length === 0){
+  <!-- Confirm -->
+  <button type="button" (click)="bookingSession()" [disabled]="!selectedSessionId || isBooking"
+    class="ts-btn-primary w-full fu-submit">
+    @if (isBooking) {
+    <i class="fa-solid fa-circle-notch fa-spin"></i> Booking…
+    } @else {
+    <i class="fa-solid fa-calendar-check"></i> Confirm follow-up
+    }
+  </button>
 
-  <div class="w-full h-full flex items-center justify-center">
-    <h3 class="text-[#1E1E1E] text-[20px] md:text-[24px] font-bold leading-[100%]">
-      No Schedule
-    </h3>
+  @if (!selectedSessionId) {
+  <p class="fu-hint">Select a time above to continue.</p>
+  }
+
+  } @else {
+
+  <!-- Empty state -->
+  <div class="fu-empty">
+    <span class="fu-empty-icon"><i class="fa-solid fa-calendar-xmark"></i></span>
+    <h3>No available schedule</h3>
+    <p>There are no upcoming sessions to book a follow-up into.</p>
   </div>
 
   }

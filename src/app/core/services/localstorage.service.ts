@@ -217,6 +217,10 @@ export class LocalstorageService {
       case 'patientName': return this._patientName();
       case 'patientId': return this._patientId();
       case 'loggedInPatientId': return this._loggedInPatientId() || '';
+      // patients live in-memory (signal), never in real localStorage. Callers still do
+      // JSON.parse(get('patients')) — returning '' here made JSON.parse throw and crashed
+      // the reports page. Serialize the signal so parsing is always safe.
+      case 'patients': return JSON.stringify(this._patients() ?? []);
       case 'mobile': return this._mobile();
       default: return this._rawGet(key);
     }
@@ -235,6 +239,8 @@ export class LocalstorageService {
       case 'patientName': this._patientName.set(value); break;
       case 'patientId': this._patientId.set(value); break;
       case 'loggedInPatientId': this._loggedInPatientId.set(value || null); break;
+      // Keep 'patients' in the signal (parallel to get('patients')), not real localStorage.
+      case 'patients': { try { this._patients.set(value ? JSON.parse(value) : []); } catch { this._patients.set([]); } break; }
       case 'mobile': this._mobile.set(value); break;
       default: this._rawSet(key, value);
     }

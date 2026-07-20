@@ -9,9 +9,9 @@ import {
 import { ActivatedRoute } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import { DoctorAuthService } from '../../../service/doctor-auth.service';
+import { DoctorsService } from '../../../../../shared/services/doctors.service';
 import { CommonModule } from '@angular/common';
 import { Select } from 'primeng/select';
-import { LocalstorageService } from '../../../../../core/services/localstorage.service';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
@@ -26,10 +26,7 @@ export class AddEditLabtestComponent implements OnInit {
   labTestForm!: FormGroup;
   private readonly labTestSearchSubject$ = new Subject<string>();
   readonly toastr = inject(ToastrService);
-
-  readonly localstorageService = inject(LocalstorageService);
-
-  labTestId!: number;
+  private readonly doctorsService = inject(DoctorsService);
 
   @Output() closeLab = new EventEmitter<void>();
 
@@ -47,30 +44,26 @@ export class AddEditLabtestComponent implements OnInit {
     this.initLabTestForm();
     this.labTestSearchSubject();
 
-    this.labTestId = Number(this.localstorageService.get('labTestId'));
-
-    console.log('labTestId', this.labTestId);
-
-    if (this.labTestId) {
-      this.getLabTestById(this.labTestId);
-    }
+    // طلب التحاليل الحالي بييجي من الميتينج نفسه — مش من id متخزن في localStorage
+    // (المفتاح المتخزن كان بيعيش عبر الميتينجات → تعديل طلب ميتينج قديم = 403).
+    this.prefillFromMeeting();
   }
 
-  getLabTestById(id: number) {
-    this.DoctorAuthService.getLabById(id).subscribe({
+  private prefillFromMeeting(): void {
+    this.doctorsService.getReports(this.meetingId, true).subscribe({
       next: (res: any) => {
-        console.log('etLabTestById', res);
+        const request = res?.labAnalysisRequest;
+        if (!request) return;
 
         this.labTestForm.patchValue({
-          meetingId: res.meetingId,
-          notes: res.notes || '',
+          meetingId: this.meetingId,
+          notes: request.notes || '',
         });
 
         const labArray = this.labTestMedicines;
-
         labArray.clear();
 
-        res.labAnalyses.forEach((lab: any) => {
+        (request.labAnalyses ?? []).forEach((lab: any) => {
           labArray.push(
             this.fb.group({
               id: [lab.id, Validators.required],
@@ -80,8 +73,10 @@ export class AddEditLabtestComponent implements OnInit {
             }),
           );
         });
+
+        if (!labArray.length) labArray.push(this.createLabTest());
       },
-      error: (err) => console.log(err),
+      error: (err) => console.error('Failed to load current lab request:', err),
     });
   }
 
@@ -108,6 +103,9 @@ export class AddEditLabtestComponent implements OnInit {
       notes: [''],
     });
   }
+  /** مؤشر بحث صغير — البحث اللحظي مبقاش يرفع سبينر الصفحة. */
+  isSearching = false;
+
   labTestSearchSubject() {
     this.labTestSearchSubject$
       .pipe(
@@ -115,8 +113,18 @@ export class AddEditLabtestComponent implements OnInit {
         distinctUntilChanged(),
         switchMap((search) => this.DoctorAuthService.getLabTest(search)),
       )
-      .subscribe((res) => {
-        this.labTest = res;
+      .subscribe({
+        next: (res) => {
+          this.isSearching = false;
+          // منسبش الصفوف المختارة بالفعل من غير label بعد ما القائمة تتبدل
+          const selected = (this.labTestMedicines.value ?? []).filter(
+            (m: any) => m?.id != null && !res.some((x: any) => x.id === m.id),
+          );
+          this.labTest = [...res, ...selected];
+        },
+        error: () => {
+          this.isSearching = false;
+        },
       });
   }
 
@@ -140,6 +148,7 @@ export class AddEditLabtestComponent implements OnInit {
   }
 
   onLabTestSearch(event: any): void {
+    this.isSearching = true;
     this.labTestSearchSubject$.next(event.filter);
   }
 
@@ -163,36 +172,19 @@ export class AddEditLabtestComponent implements OnInit {
       return;
     }
 
-    console.log('Final Payload:', this.labTestForm.value);
-
-    this.closeLab.emit();
-
-    if (this.labTestId) {
-      this.DoctorAuthService.updateLab(
-        this.labTestForm.value,
-        this.labTestId,
-      ).subscribe({
-        next: (res) => {
-          console.log(res);
-          this.toastr.success('Lab Test updated successfully');
-        },
-        error: (err) => {
-          console.log(err.error.message);
-          this.toastr.error(err.error.message || 'Error updating lab test');
-        },
-      });
-    } else {
-      this.DoctorAuthService.sendLab(this.labTestForm.value).subscribe({
-        next: (res) => {
-          console.log(res);
-          this.toastr.success('Lab Test submitted successfully');
-          this.localstorageService.set('labTestId', res.id);
-        },
-        error: (err) => {
-          console.log(err);
-          this.toastr.error(err.error.message || 'Error submitting lab test');
-        },
-      });
-    }
+    // POST دايمًا: السيرفر بيعمل upsert على مستوى الميتينج — مفيش اعتماد على ids متخزنة.
+    this.DoctorAuthService.sendLab(this.labTestForm.value).subscribe({
+      next: () => {
+        this.toastr.success('تم حفظ طلب التحاليل بنجاح');
+        this.closeLab.emit();
+      },
+      error: (err) => {
+        const apiError = err?.error;
+        this.toastr.error(
+          apiError?.message ||
+            (typeof apiError === 'string' && apiError ? apiError : 'تعذر حفظ طلب التحاليل'),
+        );
+      },
+    });
   }
 }

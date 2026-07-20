@@ -8,6 +8,7 @@ import {
   Output,
   signal,
 } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
 import { AgoraService } from '../../../doctor/service/agora.service';
 import { LocalstorageService } from '../../../../core/services/localstorage.service';
 
@@ -25,6 +26,7 @@ export class PatientMeetingVideoCallComponent implements OnDestroy {
   private agoraService: AgoraService = inject(AgoraService);
   private localStorageService: LocalstorageService =
     inject(LocalstorageService);
+  private toaster: ToastrService = inject(ToastrService);
   localTracks: any[] | null = null;
   micMuted = false;
   cameraOff = false;
@@ -59,10 +61,20 @@ export class PatientMeetingVideoCallComponent implements OnDestroy {
     if (meetingId) {
       this.agoraService
         .generateToken(meetingId, this.userId)
-        .subscribe((res: any) => {
-          this.agoraDetails.set(res);
-          console.log(this.agoraDetails());
-          this.openAgoraVideo();
+        .subscribe({
+          next: (res: any) => {
+            this.agoraDetails.set(res);
+            this.openAgoraVideo();
+          },
+          error: (err) => {
+            // فشل إصدار التوكن كان بيتبلع والمريض يفضل على "في انتظار المشارك" للأبد.
+            console.error('RTC token failed:', err);
+            const apiError = err?.error;
+            this.toaster.error(
+              apiError?.message ||
+                (typeof apiError === 'string' && apiError ? apiError : 'تعذر الاتصال بالمكالمة، أعد تحميل الصفحة.'),
+            );
+          },
         });
     }
     this.details = stored;
@@ -94,9 +106,15 @@ export class PatientMeetingVideoCallComponent implements OnDestroy {
 
   openAgoraVideo() {
     setTimeout(() => {
-      this.startCall().catch((err) => {
+      this.startCall().catch(async (err) => {
         console.error('Agora start call failed', err);
-        this.endCall();
+        // فشل الكاميرا/الاتصال محلياً ميطلعش المريض على شاشة "انتهت الجلسة" —
+        // بنسيب القناة بس ونعرض رسالة، والجلسة نفسها لسه شغالة عند الطبيب.
+        this.resetCallTimer();
+        await this.agoraService.leaveChannel();
+        this.toaster.error(
+          'تعذر تشغيل الكاميرا أو الاتصال بالمكالمة. تأكد من صلاحيات الكاميرا والمايك ثم أعد تحميل الصفحة.',
+        );
       });
     }, 100);
   }
@@ -179,9 +197,11 @@ export class PatientMeetingVideoCallComponent implements OnDestroy {
       }
       
       if (remaining <= 0) {
+        // انتهاء وقت الـ slot بيوقف العدّاد عند 00:00 بس — مش بيطرد المريض من
+        // المكالمة: الطبيب ممكن يكون لسه بيتكلم والعيادة متأخرة. النهاية الحقيقية
+        // بتوصل من السيرفر عبر meeting_closed (اللي بينادي endCall من صفحة العرض).
         this.callRemainingSeconds.set(0);
         this.clearCallTimerInterval();
-        this.endCall();
       } else {
         this.callRemainingSeconds.set(remaining);
       }

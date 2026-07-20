@@ -104,9 +104,16 @@ export class PatientWaitingInfoSectionComponent implements OnInit {
     localStorage.setItem('meetingId', String(meeting.id));
     localStorage.setItem('channelName', meeting.channelName);
     localStorage.setItem('token', meeting.consumerToken);
+    // The doctor card lives on the SESSION, not on each appointment — reading it off the
+    // appointment stored '' and the rating form ended up sending doctor_id = 0.
     localStorage.setItem(
       'doctorIdOnMeeting',
-      String(data?.doctorCard?.doctorId ?? this.item?.doctorCard?.doctorId ?? ''),
+      String(
+        this.session?.doctorCard?.doctorId ??
+          data?.doctorCard?.doctorId ??
+          this.item?.doctorCard?.doctorId ??
+          '',
+      ),
     );
     localStorage.setItem('patientId', this.patientId ?? '');
     localStorage.setItem('agoraDetailsPatient', JSON.stringify(meeting));

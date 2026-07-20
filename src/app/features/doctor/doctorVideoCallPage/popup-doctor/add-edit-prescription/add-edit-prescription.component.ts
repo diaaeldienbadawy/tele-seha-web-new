@@ -9,9 +9,9 @@ import {
 } from '@angular/forms';
 import { Select } from 'primeng/select';
 import { DoctorAuthService } from '../../../service/doctor-auth.service';
+import { DoctorsService } from '../../../../../shared/services/doctors.service';
 import { debounceTime, distinctUntilChanged, Subject, switchMap } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-import { LocalstorageService } from '../../../../../core/services/localstorage.service';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
@@ -26,8 +26,7 @@ export class AddEditPrescriptionComponent implements OnInit {
   prescriptionForm!: FormGroup;
   private readonly prescriptionSearchSubject$ = new Subject<string>();
   readonly toastr = inject(ToastrService);
-  readonly localstorageService = inject(LocalstorageService);
-  prescriptionId!: number;
+  private readonly doctorsService = inject(DoctorsService);
 
   @Output() closePrescription = new EventEmitter<void>();
 
@@ -39,44 +38,36 @@ export class AddEditPrescriptionComponent implements OnInit {
     this.route.params.subscribe((params) => {
       this.meetingId = +params['meetingId'];
     });
-    console.log(this.meetingId);
 
     // Prescription
     this.loadDrugs();
     this.initPrescriptionForm();
     this.prescriptionSearchSubject();
-
-    this.prescriptionId = Number(
-      this.localstorageService.get('prescriptionId'),
-    );
-
-    // if (this.prescriptionId) {
-    //   this.getPrescriptionById(this.prescriptionId);
-    // }
   }
 
-  getPrescriptionById(prescriptionId: number): void {
-    this.DoctorAuthService.getPrescriptionById(prescriptionId).subscribe({
-      next: (res) => {
-        console.log('etPrescriptionById', res);
-        console.log(res);
+  /**
+   * الروشتة الحالية بتيجي من الميتينج نفسه (من السيرفر) — مش من id متخزن في localStorage:
+   * المفتاح المتخزن كان بيعيش عبر الميتينجات، فالبوب أب كان بيحاول يعدّل روشتة ميتينج
+   * قديم (403 من السيرفر) أو أسوأ: يكتب فوق روشتة مريض تاني.
+   */
+  private prefillFromMeeting(): void {
+    this.doctorsService.getReports(this.meetingId, true).subscribe({
+      next: (res: any) => {
+        const prescription = res?.prescription;
+        if (!prescription) return;
 
-
-        // ✅ patch normal fields
         this.prescriptionForm.patchValue({
-          meetingId: res.meetingId,
-          notes: res.notes || '',
+          meetingId: this.meetingId,
+          notes: prescription.notes || '',
         });
 
-        // ✅ rebuild medicines array
-        const medicinesArray = this.medicines;
-
         // p-select only shows a value if it exists in [options]; merge so every saved id resolves
-        this.ensureDrugsIncludeMedicines(res.medicines ?? []);
+        this.ensureDrugsIncludeMedicines(prescription.medicines ?? []);
 
+        const medicinesArray = this.medicines;
         medicinesArray.clear(); // مهم جدا
 
-        (res.medicines ?? []).forEach((medicine: any) => {
+        (prescription.medicines ?? []).forEach((medicine: any) => {
           medicinesArray.push(
             this.fb.group({
               id: [medicine.id],
@@ -85,8 +76,10 @@ export class AddEditPrescriptionComponent implements OnInit {
             }),
           );
         });
+
+        if (!medicinesArray.length) medicinesArray.push(this.createMedicine());
       },
-      error: (err) => console.log(err),
+      error: (err) => console.error('Failed to load current prescription:', err),
     });
   }
 
@@ -152,7 +145,11 @@ export class AddEditPrescriptionComponent implements OnInit {
     }
   }
 
+  /** مؤشر بحث صغير جنب خانة السيرش — البحث اللحظي متبقاش له سبينر يغطي الصفحة. */
+  isSearchingDrugs = false;
+
   onSearch(event: any): void {
+    this.isSearchingDrugs = true;
     this.prescriptionSearchSubject$.next(event.filter);
   }
 
@@ -163,18 +160,25 @@ export class AddEditPrescriptionComponent implements OnInit {
         distinctUntilChanged(),
         switchMap((search) => this.DoctorAuthService.getDrugs(search)),
       )
-      .subscribe((res) => {
-        this.drugs = res;
+      .subscribe({
+        next: (res) => {
+          this.isSearchingDrugs = false;
+          // استبدال القائمة كان بيمسح عرض الأدوية المختارة بالفعل في باقي الصفوف
+          // (p-select ميعرفش يعرض قيمة مش موجودة في options) — فبنرجّعهم للقائمة.
+          this.drugs = res;
+          this.ensureDrugsIncludeMedicines(this.medicines.value ?? []);
+        },
+        error: () => {
+          this.isSearchingDrugs = false;
+        },
       });
   }
 
   loadDrugs() {
     this.DoctorAuthService.getDrugs().subscribe((res: any) => {
       this.drugs = res;
-
-      if (this.prescriptionId) {
-        this.getPrescriptionById(this.prescriptionId);
-      }
+      // بعد ما القايمة تجهز نسترجع روشتة الميتينج الحالي (لو موجودة) للتعديل.
+      this.prefillFromMeeting();
     });
   }
 
@@ -187,42 +191,22 @@ export class AddEditPrescriptionComponent implements OnInit {
       return;
     }
 
-    console.log('Final Payload:', this.prescriptionForm.value);
-
-    this.closePrescription.emit();
-
-    if (this.prescriptionId) {
-      this.DoctorAuthService.updatePrescription(
-        this.prescriptionForm.value,
-        this.prescriptionId,
-      ).subscribe({
-        next: (res) => {
-          console.log(res);
-          this.toastr.success('Prescription updated successfully');
-        },
-        error: (err) => {
-          console.log(err);
-          this.toastr.error(
-            err.error.message || 'Failed to update prescription',
-          );
-        },
-      });
-    } else {
-      this.DoctorAuthService.sendPrescription(
-        this.prescriptionForm.value,
-      ).subscribe({
-        next: (res) => {
-          console.log(res);
-          this.localstorageService.set('prescriptionId', res.id);
-          this.toastr.success('Prescription submitted successfully');
-        },
-        error: (err) => {
-          console.log(err);
-          this.toastr.error(
-            err.error.message || 'Failed to submit prescription',
-          );
-        },
-      });
-    }
+    // POST دايمًا: السيرفر بيعمل upsert على مستوى الميتينج (لو فيه روشتة قبل كدا
+    // بيستبدل محتواها). كدا مفيش أي اعتماد على ids متخزنة ممكن تبقى لميتينج تاني.
+    this.DoctorAuthService.sendPrescription(
+      this.prescriptionForm.value,
+    ).subscribe({
+      next: () => {
+        this.toastr.success('تم حفظ الروشتة بنجاح');
+        this.closePrescription.emit();
+      },
+      error: (err) => {
+        const apiError = err?.error;
+        this.toastr.error(
+          apiError?.message ||
+            (typeof apiError === 'string' && apiError ? apiError : 'تعذر حفظ الروشتة'),
+        );
+      },
+    });
   }
 }

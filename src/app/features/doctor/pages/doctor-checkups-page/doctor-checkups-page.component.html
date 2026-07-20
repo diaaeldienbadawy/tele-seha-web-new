@@ -1,0 +1,296 @@
+<app-header></app-header>
+
+<div class="pt-[80px] lg:pt-[90px]">
+  <div class="py-8 md:py-12 bg-[#F7F9FE] min-h-screen">
+    <div class="container mx-auto px-4 md:px-6">
+
+      <!-- Title -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <div class="flex items-center gap-3">
+          <div class="w-2.5 h-8 rounded-full bg-[#007BBD]"></div>
+          <div>
+            <h2 class="text-2xl md:text-3xl font-bold text-slate-800">
+              {{ 'doctor.checkupsTitle' | translate }}
+            </h2>
+            <p class="text-slate-400 text-xs md:text-sm mt-0.5">
+              {{ 'doctor.checkupsSubtitle' | translate }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Filter -->
+        <div class="flex gap-2 bg-white border border-slate-100 rounded-2xl p-1.5 w-fit">
+          <button (click)="setFilter('all')"
+                  [ngClass]="filter === 'all' ? 'bg-[#007BBD] text-white shadow-sm' : 'text-slate-500 hover:bg-slate-50'"
+                  class="py-2 px-5 rounded-xl text-xs md:text-sm font-bold transition-colors cursor-pointer">
+            {{ 'doctor.filterAll' | translate }}
+          </button>
+          <button (click)="setFilter('completed')"
+                  [ngClass]="filter === 'completed' ? 'bg-[#007BBD] text-white shadow-sm' : 'text-slate-500 hover:bg-slate-50'"
+                  class="py-2 px-5 rounded-xl text-xs md:text-sm font-bold transition-colors cursor-pointer">
+            {{ 'doctor.filterCompleted' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      @if (isLoading) {
+        <div class="py-16 text-center">
+          <div class="w-10 h-10 border-4 border-[#007BBD]/30 border-t-[#007BBD] rounded-full animate-spin mx-auto mb-4"></div>
+          <p class="text-slate-400 text-sm">{{ 'doctor.loading' | translate }}</p>
+        </div>
+      }
+
+      <!-- Checkups list -->
+      @if (!isLoading && checkups.length > 0) {
+        <div class="grid grid-cols-1 gap-4">
+          @for (checkup of checkups; track checkup.id) {
+            <div class="bg-white border border-slate-100 rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.03)] overflow-hidden">
+
+              <!-- Card header (click to expand) -->
+              <button type="button" (click)="toggle(checkup)"
+                      class="w-full p-5 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between text-start cursor-pointer hover:bg-slate-50/50 transition-colors">
+                <div class="flex items-center gap-4">
+                  <div class="w-12 h-12 rounded-2xl bg-blue-50 text-[#007BBD] flex items-center justify-center font-extrabold flex-shrink-0">
+                    <i class="fa-solid fa-notes-medical"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-lg font-bold text-slate-800">{{ checkup.patient?.name }}</h3>
+                    <div class="flex flex-wrap gap-2 items-center text-xs text-slate-400 font-medium mt-0.5">
+                      <span class="flex items-center gap-1">
+                        <i class="fa-regular fa-calendar text-[#007BBD]"></i>
+                        {{ checkup.start | date: 'dd/MM/yyyy' }}
+                      </span>
+                      <span class="text-slate-300">|</span>
+                      <span>{{ 'doctor.meetingsCount' | translate }}: {{ meetingsCount(checkup) }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                  <span class="px-3 py-1 rounded-full text-xs font-bold"
+                        [ngClass]="checkup.status === 'Completed' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'">
+                    {{ (checkup.status === 'Completed' ? 'doctor.checkupCompleted' : 'doctor.checkupOpened') | translate }}
+                  </span>
+                  <i class="fa-solid text-slate-400 text-sm"
+                     [ngClass]="expandedId === checkup.id ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                </div>
+              </button>
+
+              <!-- Expanded details -->
+              @if (expandedId === checkup.id) {
+                <div class="border-t border-slate-100 p-5 bg-slate-50/30">
+
+                  @if (isLoadingDetails) {
+                    <div class="py-8 text-center">
+                      <div class="w-8 h-8 border-4 border-[#007BBD]/30 border-t-[#007BBD] rounded-full animate-spin mx-auto"></div>
+                    </div>
+                  }
+
+                  @if (details) {
+                    <!-- Chat toggle -->
+                    <div class="flex justify-end mb-4">
+                      <button (click)="toggleChat()"
+                              class="py-2.5 px-5 rounded-xl border border-[#007BBD] text-[#007BBD] bg-white font-bold text-xs md:text-sm hover:bg-[#007BBD]/5 transition-colors flex items-center gap-2 cursor-pointer">
+                        <i class="fa-regular fa-comments"></i>
+                        {{ 'doctor.checkupChat' | translate }}
+                      </button>
+                    </div>
+
+                    <!-- Chat panel -->
+                    @if (showChat) {
+                      <div class="bg-white border border-slate-100 rounded-2xl p-4 mb-5 max-h-80 overflow-y-auto">
+                        @if (isLoadingChat) {
+                          <div class="py-4 text-center">
+                            <div class="w-6 h-6 border-4 border-[#007BBD]/30 border-t-[#007BBD] rounded-full animate-spin mx-auto"></div>
+                          </div>
+                        }
+                        @if (chatMessages && chatMessages.length === 0 && !isLoadingChat) {
+                          <p class="text-slate-400 text-sm text-center py-4">{{ 'doctor.noChatMessages' | translate }}</p>
+                        }
+                        @for (msg of chatMessages; track $index) {
+                          <div class="mb-2 flex" [ngClass]="msg.isFromDoctor ? 'justify-end' : 'justify-start'">
+                            <div class="max-w-[75%] px-3.5 py-2 rounded-2xl text-sm font-medium"
+                                 [ngClass]="msg.isFromDoctor ? 'bg-[#007BBD] text-white' : 'bg-slate-100 text-slate-700'">
+                              @if (isImage(msg.message)) {
+                                <img [src]="msg.message" class="rounded-xl max-h-40 cursor-pointer" (click)="selectedImage = msg.message" alt="chat media" />
+                              } @else {
+                                {{ msg.message }}
+                              }
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    }
+
+                    <!-- Meetings -->
+                    @for (meeting of details.meetings; track meeting.id; let mi = $index) {
+                      <div class="bg-white border border-slate-100 rounded-2xl p-5 mb-4">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-4 border-b border-slate-50 pb-3">
+                          <h4 class="text-slate-800 font-bold text-sm md:text-base flex items-center gap-2">
+                            <span class="w-7 h-7 rounded-lg bg-blue-50 text-[#007BBD] flex items-center justify-center text-xs font-extrabold">{{ mi + 1 }}</span>
+                            {{ (meeting.isFollowUp ? 'doctor.followUp' : 'doctor.newConsultation') | translate }}
+                            <span class="text-slate-400 text-xs font-medium">{{ meeting.start | date: 'dd/MM/yyyy' }}</span>
+                          </h4>
+                          <div class="flex items-center gap-2">
+                            <!-- نسبة التحسن اللي سجّلها المريض داخل المتابعة دي -->
+                            @if (meeting.satisfactionRatio) {
+                              <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-600 flex items-center gap-1">
+                                <i class="fa-solid fa-arrow-trend-up"></i>
+                                {{ 'doctor.improvementRate' | translate }} {{ meeting.satisfactionRatio }}%
+                              </span>
+                            }
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold"
+                                  [ngClass]="meeting.status === 'Ongoing' ? 'bg-indigo-50 text-indigo-600' : 'bg-slate-50 text-slate-500'">
+                              {{ 'statusNames.' + (meeting.status === 'Ongoing' ? 'Started' : 'Completed') | translate }}
+                            </span>
+                          </div>
+                        </div>
+
+                        <!-- Diagnosis — the headline of the visit, so it sits above the reports -->
+                        <div class="bg-amber-50/60 border border-amber-100 rounded-xl p-4 mb-4">
+                          <h5 class="text-amber-600 font-bold text-xs md:text-sm mb-2 flex items-center gap-1.5">
+                            <i class="fa-solid fa-stethoscope"></i> {{ 'doctor.diagnosis' | translate }}
+                          </h5>
+                          @if (meeting.diagnoses?.length) {
+                            <div class="flex flex-wrap gap-2">
+                              @for (diagnosis of meeting.diagnoses; track $index) {
+                                <span class="px-3 py-1 rounded-full bg-white border border-amber-200 text-amber-700 text-xs md:text-sm font-bold">
+                                  {{ diagnosis }}
+                                </span>
+                              }
+                            </div>
+                          } @else {
+                            <p class="text-slate-400 text-xs">{{ 'doctor.noDiagnosis' | translate }}</p>
+                          }
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                          <!-- Prescription -->
+                          <div class="bg-slate-50/60 border border-slate-100 rounded-xl p-4">
+                            <h5 class="text-[#007BBD] font-bold text-xs md:text-sm mb-2 flex items-center gap-1.5">
+                              <i class="fa-solid fa-prescription"></i> {{ 'doctor.prescription' | translate }}
+                            </h5>
+                            @if (meeting.prescription?.medicines?.length) {
+                              @for (med of meeting.prescription.medicines; track $index) {
+                                <div class="text-xs md:text-sm text-slate-600 font-medium mb-1.5">
+                                  <span class="font-bold text-slate-700">{{ med.name }}</span>
+                                  @if (med.instructions) { <span class="text-slate-400"> — {{ med.instructions }}</span> }
+                                </div>
+                              }
+                            } @else {
+                              <p class="text-slate-400 text-xs">{{ 'doctor.none' | translate }}</p>
+                            }
+                          </div>
+
+                          <!-- Lab -->
+                          <div class="bg-slate-50/60 border border-slate-100 rounded-xl p-4">
+                            <h5 class="text-[#007BBD] font-bold text-xs md:text-sm mb-2 flex items-center gap-1.5">
+                              <i class="fa-solid fa-flask-vial"></i> {{ 'doctor.labRequests' | translate }}
+                            </h5>
+                            @if (meeting.labAnalysisRequest?.labAnalyses?.length) {
+                              @for (lab of meeting.labAnalysisRequest.labAnalyses; track $index) {
+                                <div class="text-xs md:text-sm text-slate-600 font-medium mb-1.5">{{ lab.name }}</div>
+                              }
+                              @if (resultLinks(meeting.labAnalysisRequest, 'result').length > 0) {
+                                <div class="mt-2 pt-2 border-t border-slate-100">
+                                  <span class="text-emerald-600 text-[11px] font-bold block mb-1.5">
+                                    <i class="fa-solid fa-circle-check"></i> {{ 'reports.sentResults' | translate }}
+                                  </span>
+                                  <div class="flex flex-wrap gap-2">
+                                    @for (link of resultLinks(meeting.labAnalysisRequest, 'result'); track link) {
+                                      @if (isImage(link)) {
+                                        <img [src]="link" (click)="selectedImage = link"
+                                             class="w-14 h-14 rounded-lg object-cover border border-slate-200 cursor-pointer hover:scale-105 transition" alt="lab result" />
+                                      } @else {
+                                        <button (click)="openFile(link)" class="text-[11px] font-bold text-[#007BBD] bg-blue-50 px-2 py-1 rounded-lg cursor-pointer">
+                                          <i class="fa-solid fa-file"></i> {{ getFileName(link) }}
+                                        </button>
+                                      }
+                                    }
+                                  </div>
+                                </div>
+                              } @else {
+                                <p class="text-slate-400 text-[11px] mt-1">{{ 'doctor.noResultsYet' | translate }}</p>
+                              }
+                            } @else {
+                              <p class="text-slate-400 text-xs">{{ 'doctor.none' | translate }}</p>
+                            }
+                          </div>
+
+                          <!-- Radiology -->
+                          <div class="bg-slate-50/60 border border-slate-100 rounded-xl p-4">
+                            <h5 class="text-[#007BBD] font-bold text-xs md:text-sm mb-2 flex items-center gap-1.5">
+                              <i class="fa-solid fa-x-ray"></i> {{ 'doctor.radiologyRequests' | translate }}
+                            </h5>
+                            @if (meeting.radiologicalExaminationRequest?.radiologicalExaminations?.length) {
+                              @for (rad of meeting.radiologicalExaminationRequest.radiologicalExaminations; track $index) {
+                                <div class="text-xs md:text-sm text-slate-600 font-medium mb-1.5">{{ rad.name }}</div>
+                              }
+                              @if (resultLinks(meeting.radiologicalExaminationRequest, 'radiologicalExaminationResult').length > 0) {
+                                <div class="mt-2 pt-2 border-t border-slate-100">
+                                  <span class="text-emerald-600 text-[11px] font-bold block mb-1.5">
+                                    <i class="fa-solid fa-circle-check"></i> {{ 'reports.sentResults' | translate }}
+                                  </span>
+                                  <div class="flex flex-wrap gap-2">
+                                    @for (link of resultLinks(meeting.radiologicalExaminationRequest, 'radiologicalExaminationResult'); track link) {
+                                      @if (isImage(link)) {
+                                        <img [src]="link" (click)="selectedImage = link"
+                                             class="w-14 h-14 rounded-lg object-cover border border-slate-200 cursor-pointer hover:scale-105 transition" alt="radiology result" />
+                                      } @else {
+                                        <button (click)="openFile(link)" class="text-[11px] font-bold text-[#007BBD] bg-blue-50 px-2 py-1 rounded-lg cursor-pointer">
+                                          <i class="fa-solid fa-file"></i> {{ getFileName(link) }}
+                                        </button>
+                                      }
+                                    }
+                                  </div>
+                                </div>
+                              } @else {
+                                <p class="text-slate-400 text-[11px] mt-1">{{ 'doctor.noResultsYet' | translate }}</p>
+                              }
+                            } @else {
+                              <p class="text-slate-400 text-xs">{{ 'doctor.none' | translate }}</p>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  }
+
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Empty state -->
+      @if (!isLoading && checkups.length === 0) {
+        <div class="bg-white border border-slate-100 rounded-3xl p-10 text-center shadow-[0_10px_30px_rgba(0,0,0,0.01)]">
+          <div class="w-20 h-20 rounded-full bg-slate-50 flex items-center justify-center mx-auto text-3xl text-slate-300 mb-4">
+            <i class="fa-solid fa-folder-open"></i>
+          </div>
+          <h3 class="text-lg font-bold text-slate-700 mb-1">
+            {{ 'doctor.noCheckups' | translate }}
+          </h3>
+          <p class="text-slate-400 text-sm max-w-md mx-auto">
+            {{ 'doctor.noCheckupsSub' | translate }}
+          </p>
+        </div>
+      }
+
+    </div>
+  </div>
+</div>
+
+<!-- Image zoom overlay -->
+@if (selectedImage) {
+  <div class="fixed inset-0 bg-black/90 flex items-center justify-center z-[120]" (click)="selectedImage = null">
+    <img [src]="selectedImage" class="max-w-[90%] max-h-[90%] rounded-2xl shadow-2xl object-contain" alt="preview" />
+    <button (click)="selectedImage = null" class="absolute top-6 right-6 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white cursor-pointer">
+      <i class="fa-solid fa-xmark text-2xl"></i>
+    </button>
+  </div>
+}
+
+<app-footer></app-footer>

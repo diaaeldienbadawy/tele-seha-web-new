@@ -47,36 +47,81 @@ export class PatientProfileComponent implements OnInit {
   ngOnInit(): void {
     this.patientId = this.localStorageService.loggedInPatientId() || null;
     this.initForm();
-    this.loadInfoLists();
-    this.loadPatientDetails();
     this.listenToChanges();
+    this.loadAllData();
   }
 
   dataProfile: any;
 
-  loadPatientDetails() {
-    this.patientService.getPatientProfile(Number(this.patientId)).subscribe({
+  loadAllData() {
+    this.patientAuthService.getInfoLists().subscribe({
       next: (res) => {
-        console.log(res);
-        this.dataProfile = res.patient?.data;
+        this.countries = res.countries || [];
+        this.maritalStatus = res.maritalStatus || [];
+        const rawJobs = res.jobTitles || res.jobTitle || [];
+        this.jobTitles = rawJobs.map((item: any) => {
+          if (typeof item === 'string') return item;
+          return item.titleAr || item.titleEn || item.nameAr || item.nameEn || item.name || item.title || '';
+        }).filter(Boolean);
 
-        this.profileForm.patchValue({
-          Name: this.dataProfile.name,
-          IsMale: this.dataProfile.gender === 'Male',
-          BirthDate: this.dataProfile.birthDate,
-          Country: this.dataProfile.countryId,
-          State: this.dataProfile.stateId,
-          City: this.dataProfile.cityId,
-          MaritalStatus: this.dataProfile.maritalStatus,
-          JobTitle: this.dataProfile.jobTitle,
-          Height: this.dataProfile.height,
-          Weight: this.dataProfile.weight,
-        });
+        this.loadPatientDetails();
       },
       error: () => {
         this.toastr.error('Failed to load info lists');
       },
     });
+  }
+
+  loadPatientDetails() {
+    if (!this.patientId) return;
+    this.patientService.getPatientProfile(Number(this.patientId)).subscribe({
+      next: (res) => {
+        this.dataProfile = res.patient?.data || res.patient || res.data;
+        this.populateForm();
+      },
+      error: () => {
+        this.toastr.error('Failed to load profile details');
+      },
+    });
+  }
+
+  populateForm() {
+    if (!this.dataProfile) return;
+    const data = this.dataProfile;
+
+    // 1. Match Country
+    const matchedCountry = this.countries.find(
+      (c) => c.countryId === data.countryId || c.countryName === data.country || c.countryId === Number(data.country)
+    );
+    const countryId = matchedCountry ? matchedCountry.countryId : (data.countryId || data.country || null);
+    this.states = matchedCountry ? matchedCountry.states : [];
+
+    // 2. Match State
+    const matchedState = this.states.find(
+      (s) => s.stateId === data.stateId || s.stateName === data.state || s.stateId === Number(data.state)
+    );
+    const stateId = matchedState ? matchedState.stateId : (data.stateId || data.state || null);
+    this.cities = matchedState ? matchedState.cities : [];
+
+    // 3. Match City
+    const cityName = data.city || data.cityName || data.cityId || null;
+
+    // Patch form without triggering valueChanges reset handlers
+    this.profileForm.patchValue(
+      {
+        Name: data.name,
+        IsMale: data.gender === 'Male' || data.isMale === true,
+        BirthDate: data.birthDate ? String(data.birthDate).split('T')[0] : '',
+        Country: countryId,
+        State: stateId,
+        City: cityName,
+        MaritalStatus: data.maritalStatus,
+        JobTitle: data.jobTitle,
+        Height: data.height,
+        Weight: data.weight,
+      },
+      { emitEvent: false }
+    );
   }
 
   initForm() {
@@ -95,28 +140,6 @@ export class PatientProfileComponent implements OnInit {
 
     // الفورم مقفولة أول ما تفتح
     this.profileForm.disable();
-  }
-
-  /* =======================
-     LOAD LISTS
-  ======================= */
-  loadInfoLists() {
-    this.patientAuthService.getInfoLists().subscribe({
-      next: (res) => {
-        console.log(res);
-
-        this.countries = res.countries || [];
-        this.maritalStatus = res.maritalStatus || [];
-        const rawJobs = res.jobTitles || res.jobTitle || [];
-        this.jobTitles = rawJobs.map((item: any) => {
-          if (typeof item === 'string') return item;
-          return item.titleAr || item.titleEn || item.nameAr || item.nameEn || item.name || item.title || '';
-        }).filter(Boolean);
-      },
-      error: () => {
-        this.toastr.error('Failed to load info lists');
-      },
-    });
   }
 
   /* =======================

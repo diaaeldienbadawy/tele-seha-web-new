@@ -14,9 +14,11 @@ import {
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
+import { TranslateModule } from '@ngx-translate/core';
+
 @Component({
   selector: 'app-header-profile',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslateModule],
   templateUrl: './headerprofile.component.html',
   styleUrl: './headerprofile.component.css',
 })

@@ -176,4 +176,44 @@ export const patinet: Routes = [
         './pages/patient-settings/patient-settings.component'
       ).then((m) => m.PatientSettingsComponent),
   },
+  {
+    path: 'privacy-policy',
+    canActivate: [patientGuard],
+    loadComponent: () =>
+      import('./pages/patient-privacy-policy-page/patient-privacy-policy-page.component').then(
+        (m) => m.PatientPrivacyPolicyPageComponent
+      ),
+  },
+  {
+    path: 'policies',
+    canActivate: [patientGuard],
+    loadComponent: () =>
+      import('./pages/patient-policies-page/patient-policies-page.component').then(
+        (m) => m.PatientPoliciesPageComponent
+      ),
+  },
+  {
+    path: 'terms',
+    canActivate: [patientGuard],
+    loadComponent: () =>
+      import('./pages/patient-terms-page/patient-terms-page.component').then(
+        (m) => m.PatientTermsPageComponent
+      ),
+  },
+  {
+    path: 'privacy-security',
+    canActivate: [patientGuard],
+    loadComponent: () =>
+      import('./pages/patient-privacy-security-page/patient-privacy-security-page.component').then(
+        (m) => m.PatientPrivacySecurityPageComponent
+      ),
+  },
+  {
+    path: 'support',
+    canActivate: [patientGuard],
+    loadComponent: () =>
+      import('./pages/patient-support-page/patient-support-page.component').then(
+        (m) => m.PatientSupportPageComponent
+      ),
+  },
 ];

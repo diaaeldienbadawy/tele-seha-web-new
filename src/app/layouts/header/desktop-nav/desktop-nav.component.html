@@ -21,6 +21,8 @@
         [routerLinkActiveOptions]="{exact:true}">{{ 'nav.doctors' | translate }}</a></li>
     <li><a routerLink="/doctor/myAppointments" routerLinkActive="active" (click)="scrollTop()"
         [routerLinkActiveOptions]="{exact:true}">{{ 'nav.mySessions' | translate }}</a></li>
+    <li><a routerLink="/doctor/checkups" routerLinkActive="active" (click)="scrollTop()"
+        [routerLinkActiveOptions]="{exact:true}">{{ 'nav.myCheckups' | translate }}</a></li>
   </ul>
   } @else {
     <ul class="flex items-center gap-7 lg:gap-9 text-[19px] font-semibold whitespace-nowrap">

@@ -8,6 +8,8 @@ import {
   Output,
   signal,
 } from '@angular/core';
+import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 import { AgoraService } from '../../service/agora.service';
 import { DoctorsService } from '../../../../shared/services/doctors.service';
 import { LocalstorageService } from '../../../../core/services/localstorage.service';
@@ -22,16 +24,23 @@ const CALL_DURATION_SEC = 15 * 60;
 })
 export class DoctorMeetingVideoCallComponent implements OnDestroy {
   @Output() openWhatsapp = new EventEmitter<void>();
+  // المريض ظهر في القناة. الصفحة الأب بتستغلها عشان تعيد تحميل بيانات الميتينج —
+  // المريض بيسجّل نسبة تحسنه لحظة دخوله، بعد ما الطبيب فتح الصفحة بوقت.
+  @Output() participantJoined = new EventEmitter<void>();
   private agoraService: AgoraService = inject(AgoraService);
   private localStorageService: LocalstorageService =
     inject(LocalstorageService);
   private doctorService: DoctorsService = inject(DoctorsService);
+  private toaster: ToastrService = inject(ToastrService);
+  private router: Router = inject(Router);
   localTracks: any[] | null = null;
   micMuted = false;
   cameraOff = false;
   details: any = null;
   userId: string | number = 0;
   showWaitingForOtherParticipant = signal<boolean>(true);
+  /** إنهاء الكشف بقى فيه رحلة سيرفر — نمنع الضغط المتكرر على زرار الإنهاء أثناءها. */
+  isClosing = false;
 
   meetingId!: number;
   agoraDetails = signal<any>(null);
@@ -70,10 +79,20 @@ export class DoctorMeetingVideoCallComponent implements OnDestroy {
     if (meetingId) {
       this.agoraService
         .generateToken(meetingId, this.userId)
-        .subscribe((res: any) => {
-          this.agoraDetails.set(res);
-          console.log(this.agoraDetails());
-          this.openAgoraVideo();
+        .subscribe({
+          next: (res: any) => {
+            this.agoraDetails.set(res);
+            this.openAgoraVideo();
+          },
+          error: (err) => {
+            // فشل إصدار التوكن كان بيتبلع والطبيب يفضل على "في انتظار المشارك" للأبد.
+            console.error('RTC token failed:', err);
+            const apiError = err?.error;
+            this.toaster.error(
+              apiError?.message ||
+                (typeof apiError === 'string' && apiError ? apiError : 'تعذر الاتصال بالمكالمة، أعد تحميل الصفحة.'),
+            );
+          },
         });
     }
 
@@ -110,7 +129,13 @@ export class DoctorMeetingVideoCallComponent implements OnDestroy {
     setTimeout(() => {
       this.startCall().catch((err) => {
         console.error('Agora start call failed', err);
-        this.endCall();
+        // فشل فتح الكاميرا/الشبكة مش سبب لإنهاء الكشف: endCall كانت بتقفل الاجتماع
+        // على السيرفر (وبالتبعية تقفل الكشف نفسه) لمجرد إن Agora فشل محلياً.
+        // بنسيب القناة بس ونقول للطبيب يحاول تاني — الاجتماع لسه Ongoing.
+        void this.leaveCall();
+        this.toaster.error(
+          'تعذر تشغيل الكاميرا أو الاتصال بالمكالمة. تأكد من صلاحيات الكاميرا والمايك ثم أعد المحاولة.',
+        );
       });
     }, 100);
   }
@@ -139,6 +164,7 @@ export class DoctorMeetingVideoCallComponent implements OnDestroy {
       if (mediaType === 'audio') {
         user.audioTrack?.play();
       }
+      this.participantJoined.emit();
     });
 
     client.on('user-unpublished', (_user: any, mediaType: any) => {
@@ -195,9 +221,12 @@ export class DoctorMeetingVideoCallComponent implements OnDestroy {
       }
       
       if (remaining <= 0) {
+        // انتهاء وقت الـ slot بيوقف العدّاد عند 00:00 بس — مش بينهي المكالمة.
+        // إنهاء الاجتماع انتقال نهائي (بيقفل الكشف لو مفيش متابعة) ومينفعش يتقاد
+        // من ساعة المتصفح: العيادات بتتأخر، والطبيب اللي عدّى مدة الـ slot لازم
+        // يكمّل كلامه ويقفل بنفسه من زرار الإنهاء.
         this.callRemainingSeconds.set(0);
         this.clearCallTimerInterval();
-        this.endCall();
       } else {
         this.callRemainingSeconds.set(remaining);
       }
@@ -235,20 +264,39 @@ export class DoctorMeetingVideoCallComponent implements OnDestroy {
     this.cameraOff = false;
   }
 
-  /** Explicit end (End-call button / auto-timeout): leave the channel AND close the meeting. */
-  async endCall() {
-    await this.leaveCall();
+  /** Explicit end (End-call button): close the meeting on the server, then leave the channel. */
+  endCall() {
     this.closeMeeting();
   }
 
   closeMeeting() {
+    if (this.isClosing) return;
+    this.isClosing = true;
+
+    // نقفل على السيرفر الأول وبعدين نسيب القناة. العكس (اللي كان) معناه إن أي رفض من
+    // السيرفر — زي رفض الإنهاء من غير تشخيص — بيسيب الطبيب في فيو مكالمة ميّتة
+    // والكشف لسه مفتوح، من غير طريق يرجع بيها.
     this.doctorService.closeMeeting(this.meetingId).subscribe({
-      next: (res) => {
-        console.log("res");
-        console.log(res);
+      next: async () => {
+        // الاجتماع اتقفل فعلاً على السيرفر — فشل تنضيف الأجورا مينفعش يمنع الخروج،
+        // وإلا الطبيب هيفضل في صفحة مكالمة لكشف مقفول.
+        try {
+          await this.leaveCall();
+        } catch (e) {
+          console.error('leaveCall failed after the meeting was closed:', e);
+        }
+        this.isClosing = false;
+        this.toaster.success('تم إنهاء الكشف بنجاح');
+        this.router.navigate(['/doctor/home']);
       },
       error: (err) => {
         console.error(err);
+        this.isClosing = false;
+        const apiError = err?.error;
+        this.toaster.error(
+          apiError?.message ||
+            (typeof apiError === 'string' && apiError ? apiError : 'تعذر إنهاء الكشف، حاول مرة أخرى'),
+        );
       },
     });
   }

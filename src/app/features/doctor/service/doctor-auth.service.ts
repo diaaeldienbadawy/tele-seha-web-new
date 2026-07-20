@@ -1,6 +1,7 @@
 import { HttpClient, HttpParams, HttpContext } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { SKIP_GLOBAL_ERROR_HANDLING } from '../../../core/interceptor/global-handler.interceptor';
+import { SKIP_GLOBAL_LOADING } from '../../../core/interceptor/loading.interceptor';
 import { Observable } from 'rxjs';
 import { Environment } from '../../../../environments/environment.development';
 import { INextStep } from '../../../core/models/nextStepEnum';
@@ -218,8 +219,11 @@ export class DoctorAuthService {
       params = params.set('search', search);
     }
 
+    // بحث لحظي أثناء كتابة الروشتة: السبينر العام كان بيغطي الصفحة مع كل حرف
+    // ويطيّر التركيز من خانة البحث — الكومبوننت بيعرض مؤشر صغير بداله.
     return this.http.get<any>(`${Environment.apiUrl}/api/doctor-app/drug`, {
       params,
+      context: new HttpContext().set(SKIP_GLOBAL_LOADING, true),
     });
   }
 
@@ -252,9 +256,10 @@ export class DoctorAuthService {
       params = params.set('search', search ?? '');
     }
 
+    // نفس قاعدة بحث الأدوية: بحث لحظي من غير سبينر يغطي الصفحة.
     return this.http.get<any>(
       `${Environment.apiUrl}/api/doctor-app/radiological-examination`,
-      { params },
+      { params, context: new HttpContext().set(SKIP_GLOBAL_LOADING, true) },
     );
   }
 
@@ -286,9 +291,10 @@ export class DoctorAuthService {
       params = params.set('search', search ?? '');
     }
 
+    // نفس قاعدة بحث الأدوية: بحث لحظي من غير سبينر يغطي الصفحة.
     return this.http.get<any>(
       `${Environment.apiUrl}/api/doctor-app/lab-analysis`,
-      { params },
+      { params, context: new HttpContext().set(SKIP_GLOBAL_LOADING, true) },
     );
   }
 
@@ -308,6 +314,29 @@ export class DoctorAuthService {
   updateLab(data: any, id: number): Observable<any> {
     return this.http.put<any>(
       `${Environment.apiUrl}/api/doctor-app/lab-analysis-request/${id}`,
+      data,
+    );
+  }
+
+  // Get Diagnoses List
+  getDiagnoses(search: string): Observable<any> {
+    let params = new HttpParams();
+
+    if (search && search.trim() !== '') {
+      params = params.set('search', search ?? '');
+    }
+
+    // نفس قاعدة بحث الأدوية: بحث لحظي من غير سبينر يغطي الصفحة.
+    return this.http.get<any>(`${Environment.apiUrl}/api/doctor-app/diagnoses`, {
+      params,
+      context: new HttpContext().set(SKIP_GLOBAL_LOADING, true),
+    });
+  }
+
+  // التشخيص متخزن على الميتينج نفسه كقائمة أسماء — الـ POST بيستبدل القائمة كلها.
+  sendDiagnoses(meetingId: number, data: any): Observable<any> {
+    return this.http.post<any>(
+      `${Environment.apiUrl}/api/doctor-app/diagnoses/${meetingId}`,
       data,
     );
   }

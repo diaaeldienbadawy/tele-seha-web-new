@@ -111,17 +111,23 @@
                     Consultations count: <strong class="text-slate-600 font-semibold">{{ doctor.successfuls || 0 }}</strong>
                   </p>
 
-                  <!-- Tags -->
+                  <!-- Tags: an advantage shows only when more than half of the raters granted it -->
                   <div class="flex flex-wrap gap-2 justify-center sm:justify-start pt-2">
-                    <span class="bg-slate-50 border border-slate-100 text-slate-500 text-xs px-3 py-1 rounded-full font-medium flex items-center gap-1.5">
-                      <i class="fa-regular fa-message text-[#007BBD]"></i> Explains clearly
-                    </span>
-                    <span class="bg-slate-50 border border-slate-100 text-slate-500 text-xs px-3 py-1 rounded-full font-medium flex items-center gap-1.5">
-                      <i class="fa-regular fa-headphones text-[#007BBD]"></i> Good listener
-                    </span>
-                    <span class="bg-slate-50 border border-slate-100 text-slate-500 text-xs px-3 py-1 rounded-full font-medium flex items-center gap-1.5">
-                      <i class="fa-regular fa-face-smile text-[#007BBD]"></i> Friendly
-                    </span>
+                    @if ((doctor.ratingCount || 0) > 0 && (doctor.firstAdvantageCount || 0) * 2 > doctor.ratingCount) {
+                      <span class="bg-slate-50 border border-slate-100 text-slate-500 text-xs px-3 py-1 rounded-full font-medium flex items-center gap-1.5">
+                        <i class="fa-regular fa-message text-[#007BBD]"></i> {{ 'doctorsList.explainsClearly' | translate }}
+                      </span>
+                    }
+                    @if ((doctor.ratingCount || 0) > 0 && (doctor.secondAdvantageCount || 0) * 2 > doctor.ratingCount) {
+                      <span class="bg-slate-50 border border-slate-100 text-slate-500 text-xs px-3 py-1 rounded-full font-medium flex items-center gap-1.5">
+                        <i class="fa-regular fa-headphones text-[#007BBD]"></i> {{ 'doctorsList.goodListener' | translate }}
+                      </span>
+                    }
+                    @if ((doctor.ratingCount || 0) > 0 && (doctor.thirdAdvantageVount || 0) * 2 > doctor.ratingCount) {
+                      <span class="bg-slate-50 border border-slate-100 text-slate-500 text-xs px-3 py-1 rounded-full font-medium flex items-center gap-1.5">
+                        <i class="fa-regular fa-face-smile text-[#007BBD]"></i> {{ 'doctorsList.friendly' | translate }}
+                      </span>
+                    }
                   </div>
 
                 </div>

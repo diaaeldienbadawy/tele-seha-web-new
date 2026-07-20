@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { Environment } from '../../../environments/environment.development';
 import { IDoctorResponse } from '../interface/doctor.interface';
 import { SKIP_GLOBAL_ERROR_HANDLING } from '../../core/interceptor/global-handler.interceptor';
+import { SKIP_GLOBAL_LOADING } from '../../core/interceptor/loading.interceptor';
 
 @Injectable({
   providedIn: 'root',
@@ -198,10 +199,12 @@ export class DoctorsService {
     );
   }
 
-  // Get Reports
-  getReports(id: number): Observable<any> {
+  // Get Reports — withReports=true يضمّ الروشتة والتحاليل والأشعة بنتائجها
+  // (الاعتماد على الـ lazy loading هنا مضمونش لأن الاستعلام AsNoTracking).
+  getReports(id: number, withReports = false): Observable<any> {
+    const query = withReports ? '?withReports=true' : '';
     return this.http.get<any>(
-      `${Environment.apiUrl}/api/doctor-app/meeting/reports/${id}`,
+      `${Environment.apiUrl}/api/doctor-app/meeting/reports/${id}${query}`,
     );
   }
 
@@ -215,6 +218,30 @@ export class DoctorsService {
 
   getEnum(): Observable<any> {
     return this.http.get<any>(`${Environment.apiUrl}/api/enum`);
+  }
+
+  /** سجل كشوفات الطبيب (الأحدث أولاً). completedOnly=true للمكتملة بس. */
+  getDoctorCheckups(doctorId: number, completedOnly = false): Observable<any> {
+    const query = completedOnly ? '?completedOnly=true' : '';
+    return this.http.get<any>(
+      `${Environment.apiUrl}/api/doctor-app/check-up/all/${doctorId}${query}`,
+    );
+  }
+
+  /** تفاصيل كشف واحد: بيانات المريض + كل ميتينج بروشتته وتحاليله وأشعته مع النتائج المرفوعة. */
+  getCheckupDetails(checkupId: number): Observable<any> {
+    return this.http.get<any>(
+      `${Environment.apiUrl}/api/doctor-app/check-up/${checkupId}`,
+      { context: new HttpContext().set(SKIP_GLOBAL_LOADING, true) }
+    );
+  }
+
+  /** رسائل شات الكشف (نفس endpoint المريض — العضوية بتتحقق على السيرفر). */
+  getCheckupChat(checkupId: number, count = 100): Observable<any> {
+    return this.http.get<any>(
+      `${Environment.apiUrl}/api/chat-message/${checkupId}?count=${count}`,
+      { context: new HttpContext().set(SKIP_GLOBAL_LOADING, true) }
+    );
   }
 
 }

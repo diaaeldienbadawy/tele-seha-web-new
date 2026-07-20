@@ -1,6 +1,6 @@
 {
-  "HELLO" : "مرحبا",
-  "WORLD" : "العالم",
+  "HELLO": "مرحبا",
+  "WORLD": "العالم",
   "app": {
     "title": "تيلي سحة"
   },
@@ -19,7 +19,8 @@
     "reports": "التقارير",
     "searchForDoctor": "البحث عن طبيب",
     "forDoctors": "للأطباء",
-    "aboutUs": "من نحن"
+    "aboutUs": "من نحن",
+    "myCheckups": "سجل الكشوفات"
   },
   "settings": {
     "profileSettings": "إعدادات الملف الشخصي",
@@ -60,7 +61,56 @@
     "selectTime": "اختر الوقت",
     "confirmReschedule": "تأكيد الجدولة",
     "noScheduleTitle": "لا يوجد مواعيد متاحة في جدول الطبيب",
-    "noScheduleSub": "لم يتم العثور على فتحات جدول متاحة. يرجى تهيئة جلسات العيادة في الإعدادات."
+    "noScheduleSub": "لم يتم العثور على فتحات جدول متاحة. يرجى تهيئة جلسات العيادة في الإعدادات.",
+    "completedAppointments": "الكشوفات المنتهية",
+    "followUpsSubtitle": "متابعة حالات العيادة وتقارير المرضى.",
+    "viewReports": "عرض التقارير",
+    "noFollowUps": "لا توجد متابعات",
+    "noFollowUpsSub": "لا توجد حالات متابعة مجدولة حالياً.",
+    "reportsTitle": "المستندات والتقارير الطبية",
+    "labReports": "تقارير التحاليل",
+    "radiologyReports": "تقارير الأشعة",
+    "previewImage": "معاينة الصورة",
+    "viewDocument": "عرض المستند",
+    "weeklySubtitle": "راجع وأدر مواعيد كل يوم في هذا الأسبوع.",
+    "totalAppointments": "إجمالي المواعيد:",
+    "firstConsultation": "أول كشف:",
+    "statusLabel": "الحالة:",
+    "viewMore": "عرض المزيد",
+    "noWeekAppointments": "لا توجد مواعيد مجدولة",
+    "noWeekAppointmentsSub": "لا توجد مواعيد مجدولة لهذا الأسبوع.",
+    "mySessionsSubtitle": "عرض الحالات والمتابعات مجمّعة أسبوعياً.",
+    "week": "الأسبوع",
+    "casesCount": "عدد الحالات:",
+    "followUpsCountLabel": "عدد المتابعات:",
+    "highestLoadOn": "أعلى ضغط يوم",
+    "noSessions": "لا توجد جلسات",
+    "noSessionsSub": "لا توجد سجلات جلسات لعيادتك بعد.",
+    "weekSessions": "جلسات الأسبوع",
+    "weekSessionsSubtitle": "قوائم تفصيلية بجلسات هذا الأسبوع.",
+    "noWeekRecords": "لا توجد مواعيد",
+    "noWeekRecordsSub": "لا توجد مواعيد مسجلة لهذا الأسبوع.",
+    "followUpBadge": "متابعة",
+    "improvementRate": "نسبة التحسن",
+    "newBadge": "جديد",
+    "checkupsTitle": "سجل الكشوفات",
+    "checkupsSubtitle": "كل كشوفاتك: المحادثة، الروشتات، التحاليل والأشعة بنتائجها.",
+    "filterAll": "الكل",
+    "filterCompleted": "المكتملة",
+    "meetingsCount": "عدد الجلسات",
+    "checkupCompleted": "مكتمل",
+    "checkupOpened": "مفتوح",
+    "checkupChat": "محادثة الكشف",
+    "noChatMessages": "لا توجد رسائل في هذه المحادثة.",
+    "prescription": "الروشتة",
+    "diagnosis": "التشخيص",
+    "noDiagnosis": "لم يتم تسجيل تشخيص.",
+    "labRequests": "التحاليل المطلوبة",
+    "radiologyRequests": "الأشعة المطلوبة",
+    "none": "لا يوجد",
+    "noResultsYet": "لم يرسل المريض نتائج بعد.",
+    "noCheckups": "لا توجد كشوفات",
+    "noCheckupsSub": "أول ما تبدأ كشوفات مع مرضاك هتلاقيها هنا."
   },
   "doctorStatus": {
     "confirm": "تأكيد الموعد",
@@ -173,7 +223,10 @@
     "sessionDetails": "تفاصيل الجلسة",
     "downloadPrescription": "تحميل الروشتة",
     "downloadRadiology": "تحميل الأشعة",
-    "downloadLabTest": "تحميل التحليل"
+    "downloadLabTest": "تحميل التحليل",
+    "reviews": "آراء المرضى",
+    "noReviews": "لا توجد تقييمات بعد.",
+    "anonymousPatient": "مريض"
   },
   "appointmentStatus": {
     "waitForConfirmation": "بانتظار التأكيد",
@@ -188,6 +241,7 @@
     "recentBookings": "الحجوزات الأخيرة",
     "noBookings": "لا توجد حجوزات حديثة",
     "ratingPrompt": "ما هو مستوى تحسنك بعد الكشف الأخير؟",
+    "skipAndJoin": "تخطي والدخول للجلسة",
     "complainingPrompt": "ما هي الأعراض أو الشكوى التي تشعر بها؟",
     "complaintInputPlaceholder": "اكتب شكواك هنا...",
     "answerInputPlaceholder": "اكتب إجابتك...",
@@ -219,7 +273,8 @@
     "uploadTitle": "رفع مستند طبي",
     "licenseNumber": "رقم ترخيص المزاولة الطبية",
     "patientName": "اسم المريض",
-    "prescriptionTitle": "الروشتة الطبية"
+    "prescriptionTitle": "الروشتة الطبية",
+    "sentResults": "النتائج المرسلة"
   },
   "patientProfile": {
     "title": "معلومات الملف الشخصي",
@@ -317,5 +372,24 @@
     "heightPlaceholder": "ما هو طولك؟",
     "weightPlaceholder": "ما هو وزنك؟",
     "submit": "إرسال"
+  },
+  "days": {
+    "Saturday": "السبت",
+    "Sunday": "الأحد",
+    "Monday": "الإثنين",
+    "Tuesday": "الثلاثاء",
+    "Wednesday": "الأربعاء",
+    "Thursday": "الخميس",
+    "Friday": "الجمعة"
+  },
+  "statusNames": {
+    "Created": "جديد",
+    "Confirmed": "بانتظار الدفع",
+    "CreateComplaint": "بانتظار الشكوى",
+    "Pending": "جاهز للكشف",
+    "Started": "جارٍ الكشف",
+    "Completed": "مكتمل",
+    "Canceled": "ملغي",
+    "Rescheduled": "معاد جدولته"
   }
 }

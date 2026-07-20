@@ -146,6 +146,14 @@ export const doctor: Routes = [
     ],
   },
   {
+    path: 'checkups',
+    canActivate: [doctorGuard],
+    loadComponent: () =>
+      import('./pages/doctor-checkups-page/doctor-checkups-page.component').then(
+        (m) => m.DoctorCheckupsPageComponent,
+      ),
+  },
+  {
     path: 'myAppointments',
     canActivate: [doctorGuard],
     component: DoctorMyAppointmentsPageComponent,
@@ -227,6 +235,22 @@ export const doctor: Routes = [
     loadComponent: () =>
       import('./pages/doctor-support-page/doctor-support-page.component').then(
         (m) => m.DoctorSupportPageComponent,
+      ),
+  },
+  {
+    path: 'policies',
+    canActivate: [doctorGuard],
+    loadComponent: () =>
+      import('./pages/doctor-policies-page/doctor-policies-page.component').then(
+        (m) => m.DoctorPoliciesPageComponent,
+      ),
+  },
+  {
+    path: 'privacy-security',
+    canActivate: [doctorGuard],
+    loadComponent: () =>
+      import('./pages/doctor-privacy-security-page/doctor-privacy-security-page.component').then(
+        (m) => m.DoctorPrivacySecurityPageComponent,
       ),
   },
 ];

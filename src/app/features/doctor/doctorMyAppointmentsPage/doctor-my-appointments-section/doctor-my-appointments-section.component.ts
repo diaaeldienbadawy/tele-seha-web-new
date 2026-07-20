@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 import { DoctorsService } from '../../../../shared/services/doctors.service';
 import { LocalstorageService } from '../../../../core/services/localstorage.service';
@@ -14,6 +15,7 @@ import { NotificationService } from '../../../../features/patient/service/notifi
 })
 export class DoctorMyAppointmentsSectionComponent implements OnInit {
   doctorId: string | null = null;
+  private destroyRef = inject(DestroyRef);
   constructor(
     readonly doctorService: DoctorsService,
     readonly localStorageService: LocalstorageService,
@@ -25,10 +27,12 @@ export class DoctorMyAppointmentsSectionComponent implements OnInit {
     this.doctorId = this.localStorageService.get('doctorId') || null;
     this.getAllAppointments();
 
-    // Real-time appointment updates
-    this.notificationService.appointmentEvents$.subscribe(() => {
-      this.getAllAppointments();
-    });
+    // Real-time appointment updates (auto-unsubscribed on destroy)
+    this.notificationService.appointmentEvents$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.getAllAppointments();
+      });
   }
 
   data: any;

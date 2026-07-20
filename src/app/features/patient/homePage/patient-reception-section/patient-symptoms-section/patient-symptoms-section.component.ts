@@ -54,13 +54,17 @@ export class PatientSymptomsSectionComponent {
     if (this.patientId) {
       this.patientService.receiption(this.patientId, this.text).subscribe({
         next: (res : any) => {
-          console.log(res);
-          this.speciality = res.speciality;
+          this.speciality = res?.speciality;
           this.sendForm = false;
           this.payNow = true;
         },
         error: (err) => {
-          console.log(err);
+          // الخطأ كان بيتبلع في الكونسول والمريض فاكر إن حاجة بتحصل.
+          const apiError = err?.error;
+          this.toastr.error(
+            apiError?.message ||
+              (typeof apiError === 'string' && apiError ? apiError : 'تعذر إرسال الأعراض، حاول مرة أخرى.'),
+          );
         },
       });
     }

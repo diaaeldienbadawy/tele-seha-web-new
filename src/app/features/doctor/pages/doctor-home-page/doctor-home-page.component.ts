@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -29,6 +30,7 @@ import { TranslateServiceService } from '../../../../core/services/translate-ser
 export class DoctorHomePageComponent implements OnInit {
   doctorName = '';
   doctorId: number | null = null;
+  doctorImage: string | null = null;
   
   // Dashboard stats
   todayCount = 0;
@@ -71,6 +73,8 @@ export class DoctorHomePageComponent implements OnInit {
   selectedSessionId: number | null = null;
   appointmentId: number | null = null;
 
+  private destroyRef = inject(DestroyRef);
+
   constructor(
     private notificationService: NotificationService,
     private globalUserStateService: GlobalUserStateService,
@@ -87,20 +91,39 @@ export class DoctorHomePageComponent implements OnInit {
       this.notificationService.startDoctorConnection(doctorId);
     }
 
-    // Subscribe to real-time appointment status changes
-    this.notificationService.appointmentEvents$.subscribe(() => {
-      this.loadDashboardStats();
-      this.loadTodaysAppointments();
-    });
+    // Subscribe to real-time appointment status changes (auto-unsubscribed on destroy —
+    // otherwise every visit to the home page stacked another live subscription).
+    this.notificationService.appointmentEvents$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.loadDashboardStats();
+        this.loadTodaysAppointments();
+      });
 
     // Retrieve Doctor Info
     this.doctorName = this.localStorageService.get('doctorName') || 'Doctor';
     this.doctorId = Number(this.localStorageService.get('doctorId')) || null;
+    this.doctorImage = this.globalUserStateService.doctorImage() || this.localStorageService.get('doctorImage') || null;
 
     if (this.doctorId) {
       this.loadDashboardStats();
       this.loadTodaysAppointments();
+      this.loadDoctorProfileImage();
     }
+  }
+
+  loadDoctorProfileImage() {
+    if (!this.doctorId) return;
+    this.doctorService.getDoctorProfile(this.doctorId).subscribe({
+      next: (res: any) => {
+        const img = res.data?.doctorProfile?.image || res.data?.image || res.doctorProfile?.image;
+        if (img) {
+          this.doctorImage = img;
+          this.localStorageService.set('doctorImage', img);
+        }
+      },
+      error: () => {}
+    });
   }
 
   loadDashboardStats() {
@@ -184,23 +207,25 @@ export class DoctorHomePageComponent implements OnInit {
   openMeeting(appointmentId: number) {
     this.doctorService.openAppointment(appointmentId).subscribe({
       next: (res: any) => {
+        // كل القيم defensive: أي نقص في الرد ميمنعش الدخول للمكالمة —
+        // زرار "بدأ" لازم يدخل الطبيب على طول من غير ما يحتاج يدوس "انضمام" بعدها.
         this.localStorageService.set('meetingId', res.id);
-        this.localStorageService.set('channelName', res.channelName);
-        this.localStorageService.set('checkUpId', res.checkUp.id);
-        this.localStorageService.set('patientId', res.checkUp.patientId);
+        this.localStorageService.set('channelName', res.channelName ?? '');
+        this.localStorageService.set('checkUpId', res.checkUp?.id ?? res.checkUpId);
+        this.localStorageService.set('patientId', res.checkUp?.patientId ?? res.patient?.patientId);
         this.localStorageService.set(
           'medicalHistory',
           JSON.stringify(res.patient?.sections || [])
         );
-        this.localStorageService.set('meetingToken', res.providerToken);
+        this.localStorageService.set('meetingToken', res.providerToken ?? '');
         this.localStorageService.set('agoraDetails', JSON.stringify(res));
-        
+
         // Navigate to meeting/video call room
         this.router.navigate([`/doctor/videoCall/${res.id}`]);
       },
       error: (err) => {
         console.error('Error starting video meeting:', err);
-        this.toaster.error('Failed to start meeting session');
+        this.toaster.error(err?.error?.message || err?.error || 'تعذر بدء الكشف، حاول مرة أخرى');
       }
     });
   }
@@ -214,24 +239,32 @@ export class DoctorHomePageComponent implements OnInit {
       case PatientAppointmentStatus.Pending:
         this.openMeeting(item.id);
         break;
-      case PatientAppointmentStatus.Started:
-        const meeting = item.checkUp?.meetings?.[0];
+      case PatientAppointmentStatus.Started: {
+        // Join the CURRENT (ongoing) meeting, not meetings[0]: with follow-ups the
+        // first meeting is the oldest/closed one and its channel/token would be wrong.
+        const meetings: any[] = item.checkUp?.meetings ?? [];
+        const meeting =
+          meetings.find((m) => m?.status === 'Ongoing') ??
+          meetings[meetings.length - 1];
         if (meeting) {
           this.localStorageService.set('meetingId', meeting.id);
-          this.localStorageService.set('channelName', meeting.channelName);
+          this.localStorageService.set('channelName', meeting.channelName ?? '');
           this.localStorageService.set('checkUpId', meeting.checkUpId ?? item.checkUp?.id);
           this.localStorageService.set('patientId', item.patient?.patientId);
           this.localStorageService.set(
             'medicalHistory',
             JSON.stringify(item.patient?.sections || [])
           );
-          this.localStorageService.set('meetingToken', meeting.providerToken);
+          this.localStorageService.set('meetingToken', meeting.providerToken ?? '');
           this.localStorageService.set('agoraDetails', JSON.stringify(meeting));
           this.router.navigate([`/doctor/videoCall/${meeting.id}`]);
         } else {
+          // Started but no meeting came down with the list — re-open on the server,
+          // which returns (or recreates) the ongoing meeting and navigates.
           this.openMeeting(item.id);
         }
         break;
+      }
     }
   }
 

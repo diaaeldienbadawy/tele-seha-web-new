@@ -58,7 +58,7 @@
       <!-- ===== Patient Menu ===== -->
       @if (patientName()) {
       <div class="lg:absolute top-full mt-2 left-0 sm:right-0 sm:left-auto
-                    w-[220px] max-w-[90vw]
+                    w-[240px] max-w-[90vw]
                     bg-white rounded-[16px] shadow-xl
                     p-4 z-50 border border-gray-100">
 
@@ -88,6 +88,48 @@
 
         <hr class="my-2">
 
+        <button class="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-gray-100 transition"
+          routerLink="/patient/privacy-policy" (click)="closeActions()">
+          <i class="fa-solid fa-user-shield text-[#007BBD]"></i>
+          <span class="text-[15px] font-medium text-[#555]">
+            {{ 'settings.privacyPolicy' | translate }}
+          </span>
+        </button>
+
+        <button class="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-gray-100 transition"
+          routerLink="/patient/policies" (click)="closeActions()">
+          <i class="fa-solid fa-file-contract text-[#007BBD]"></i>
+          <span class="text-[15px] font-medium text-[#555]">
+            {{ 'settings.policies' | translate }}
+          </span>
+        </button>
+
+        <button class="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-gray-100 transition"
+          routerLink="/patient/terms" (click)="closeActions()">
+          <i class="fa-solid fa-scale-balanced text-[#007BBD]"></i>
+          <span class="text-[15px] font-medium text-[#555]">
+            {{ 'settings.terms' | translate }}
+          </span>
+        </button>
+
+        <button class="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-gray-100 transition"
+          routerLink="/patient/privacy-security" (click)="closeActions()">
+          <i class="fa-solid fa-lock text-[#007BBD]"></i>
+          <span class="text-[15px] font-medium text-[#555]">
+            {{ 'settings.privacy' | translate }}
+          </span>
+        </button>
+
+        <button class="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-gray-100 transition"
+          routerLink="/patient/support" (click)="closeActions()">
+          <i class="fa-solid fa-headset text-[#007BBD]"></i>
+          <span class="text-[15px] font-medium text-[#555]">
+            {{ 'settings.support' | translate }}
+          </span>
+        </button>
+
+        <hr class="my-2">
+
         <button class="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-red-50 transition"
           (click)="logout(); closeActions()">
           <i class="fa-solid fa-right-from-bracket rotate-180 text-[#E74C3C]"></i>
@@ -102,25 +144,9 @@
       <!-- ===== Doctor Menu ===== -->
       @if (doctorName()) {
       <div class="lg:absolute top-full mt-2 right-0
-                    w-[230px]
+                    w-[240px]
                     bg-white rounded-[16px] shadow-xl
                     p-4 z-50 border border-gray-100">
-
-        <button class="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-gray-100 transition"
-          routerLink="/doctor/myAppointments" (click)="closeActions()">
-          <i class="fa-regular fa-calendar text-[#007BBD]"></i>
-          <span class="text-[15px] font-medium text-[#555]">
-            My Bookings
-          </span>
-        </button>
-
-        <button class="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-gray-100 transition"
-          routerLink="/doctor/reports" (click)="closeActions()">
-          <i class="fa-regular fa-file text-[#007BBD]"></i>
-          <span class="text-[15px] font-medium text-[#555]">
-            My Reports
-          </span>
-        </button>
 
         <button class="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-gray-100 transition"
           routerLink="/doctor/settings" (click)="closeActions()">
@@ -135,6 +161,48 @@
           <i class="fa-solid fa-users text-[#007BBD]"></i>
           <span class="text-[15px] font-medium text-[#555]">
             Sub-accounts
+          </span>
+        </button>
+
+        <hr class="my-2">
+
+        <button class="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-gray-100 transition"
+          routerLink="/doctor/privacy-policy" (click)="closeActions()">
+          <i class="fa-solid fa-user-shield text-[#007BBD]"></i>
+          <span class="text-[15px] font-medium text-[#555]">
+            {{ 'settings.privacyPolicy' | translate }}
+          </span>
+        </button>
+
+        <button class="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-gray-100 transition"
+          routerLink="/doctor/policies" (click)="closeActions()">
+          <i class="fa-solid fa-file-contract text-[#007BBD]"></i>
+          <span class="text-[15px] font-medium text-[#555]">
+            {{ 'settings.policies' | translate }}
+          </span>
+        </button>
+
+        <button class="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-gray-100 transition"
+          routerLink="/doctor/terms-conditions" (click)="closeActions()">
+          <i class="fa-solid fa-scale-balanced text-[#007BBD]"></i>
+          <span class="text-[15px] font-medium text-[#555]">
+            {{ 'settings.terms' | translate }}
+          </span>
+        </button>
+
+        <button class="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-gray-100 transition"
+          routerLink="/doctor/privacy-security" (click)="closeActions()">
+          <i class="fa-solid fa-lock text-[#007BBD]"></i>
+          <span class="text-[15px] font-medium text-[#555]">
+            {{ 'settings.privacy' | translate }}
+          </span>
+        </button>
+
+        <button class="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-gray-100 transition"
+          routerLink="/doctor/support" (click)="closeActions()">
+          <i class="fa-solid fa-headset text-[#007BBD]"></i>
+          <span class="text-[15px] font-medium text-[#555]">
+            {{ 'settings.support' | translate }}
           </span>
         </button>
 

@@ -6,6 +6,10 @@
     <i class="fa-solid fa-pills text-lg"></i>
     <span>كتابة الروشتة</span>
   </button>
+  <button (click)="openPopupDiagnosis()" class="w-full bg-white border border-slate-200 text-[#007BBD] hover:border-[#007BBD] hover:bg-slate-50 flex items-center justify-center gap-2 py-3 px-2 rounded-xl text-sm font-bold hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 shadow-2xs">
+    <i class="fa-solid fa-stethoscope text-lg"></i>
+    <span>التشخيص</span>
+  </button>
   <button (click)="openPopupLabTests()" class="w-full bg-white border border-slate-200 text-[#007BBD] hover:border-[#007BBD] hover:bg-slate-50 flex items-center justify-center gap-2 py-3 px-2 rounded-xl text-sm font-bold hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 shadow-2xs">
     <i class="fa-solid fa-flask-vial text-lg"></i>
     <span>طلب تحاليل</span>
@@ -71,6 +75,35 @@
     <!-- Body -->
     <div class="ts-modal-body">
       <app-add-edit-radiology (closeRadiology)="closeRadiology()"></app-add-edit-radiology>
+    </div>
+
+  </div>
+</div>
+}
+
+
+<!-- Diagnosis -->
+@if (showPopupDiagnosis) {
+<div class="ts-modal-overlay">
+  <div class="ts-modal-card">
+
+    <!-- Header -->
+    <div class="ts-modal-header">
+      <div class="ts-modal-header-icon diagnosis">
+        <i class="fa-solid fa-stethoscope"></i>
+      </div>
+      <div class="ts-modal-header-text">
+        <h3>Diagnosis</h3>
+        <p>Record the diagnosis for this consultation</p>
+      </div>
+      <button class="ts-modal-close" (click)="closeDiagnosis()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="ts-modal-body">
+      <app-add-edit-diagnosis (closeDiagnosis)="closeDiagnosis()"></app-add-edit-diagnosis>
     </div>
 
   </div>

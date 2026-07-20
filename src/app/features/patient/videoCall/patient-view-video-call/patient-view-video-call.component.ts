@@ -78,7 +78,7 @@ export class PatientViewVideoCallComponent implements OnInit {
       .subscribe((evt: any) => {
         if (evt?.event === 'meeting_closed') {
           void this.meetingChild?.endCall();
-          this.showPopupSessionSuccess = true;
+          this.handleSessionEnded();
         }
       });
 
@@ -135,7 +135,12 @@ export class PatientViewVideoCallComponent implements OnInit {
         this.isValidating = false;
 
         if (this.meetingId) {
-          this.ratingForm.patchValue({ meeting_id: this.meetingId });
+          // doctor_id from the server, not localStorage: a missing 'doctorIdOnMeeting' key
+          // used to send doctor_id = 0 and the rating never reached the doctor's aggregates.
+          this.ratingForm.patchValue({
+            meeting_id: this.meetingId,
+            doctor_id: res?.doctorId ?? this.ratingForm.value.doctor_id ?? 0,
+          });
           this.getMettingDetails();
         }
       },
@@ -235,8 +240,50 @@ export class PatientViewVideoCallComponent implements OnInit {
     this.showPopupPrescription = false;
   }
 
+  /**
+   * نقطة النهاية الموحّدة (زرار الإنهاء أو meeting_closed من السيرفر):
+   * لو المريض قيّم قبل كدا، كارت "شكراً — قيّم الدكتور" نفسه بيتخطى بالكامل
+   * وبنعرض التقارير مباشرة (ممكن تكون اتحدثت أثناء المكالمة).
+   */
+  handleSessionEnded() {
+    if (this.meetingReport?.isRated) {
+      this.refreshReports(true);
+      return;
+    }
+    this.showPopupSessionSuccess = true;
+  }
+
+  /**
+   * تحديث التقارير من غير طرد: getMeetingReportsByCheckup بتودّي المريض للهوم لو
+   * الاجتماع مقفول — دا صح عند الدخول، لكنه غلط في نص فلو الخروج/التقييم.
+   */
+  private refreshReports(openPopup: boolean) {
+    if (!this.sessionId) {
+      if (openPopup) this.showPopupPrescription = true;
+      return;
+    }
+    this.patientVideoCall.getMeetingReportsByCheckup(this.sessionId).subscribe({
+      next: (res) => {
+        this.meetingReport = res;
+        if (openPopup) this.showPopupPrescription = true;
+      },
+      error: () => {
+        // حتى لو التحديث فشل بنعرض آخر نسخة موجودة بدل ما نحبس المريض.
+        if (openPopup) this.showPopupPrescription = true;
+      },
+    });
+  }
+
   openshowPopupRating() {
     this.showPopupSessionSuccess = false;
+
+    // سبق للمريض تقييم الجلسة دي (خرج ورجع تاني): منطلبش تقييم تاني —
+    // نوديه على التقارير مباشرة لأنها ممكن تكون اتحدثت أثناء المكالمة.
+    if (this.meetingReport?.isRated) {
+      this.refreshReports(true);
+      return;
+    }
+
     this.showPopupRating = true;
   }
 
@@ -271,20 +318,27 @@ export class PatientViewVideoCallComponent implements OnInit {
     console.log('Payload sent:', payload);
 
     this.patientService.ratingReviewDoctor(payload).subscribe({
-      next: (res) => {
-        console.log('Success', res);
-        this.toastr.success('Review submitted successfully');
-        if (this.sessionId) {
-          this.getMeetingReportsByCheckup(this.sessionId);
-        }
+      next: () => {
+        this.toastr.success('تم إرسال التقييم بنجاح');
         this.showPopupRating = false;
-        this.showPopupPrescription = true;
+        // تحديث بدون طرد: بيجيب isRated=true وأحدث تقارير ثم يفتح نافذة التقارير.
+        this.refreshReports(true);
       },
       error: (err) => {
         const apiError = err?.error;
 
-        if (apiError?.message) {
-          this.toastr.error(apiError.message);
+        // BadRequest بيرجع نص مباشر مش {message}: من غير الفرع ده الرسالة كانت
+        // بتضيع/تظهر مبتورة. لو الجلسة متقيّمة بالفعل كمّل للتقارير بدل ما نحبس المريض.
+        const message =
+          apiError?.message ??
+          (typeof apiError === 'string' && apiError ? apiError : null);
+
+        if (message) {
+          this.toastr.error(message);
+          if (message.includes('بالفعل')) {
+            this.showPopupRating = false;
+            this.showPopupPrescription = true;
+          }
           return;
         }
 
@@ -296,15 +350,16 @@ export class PatientViewVideoCallComponent implements OnInit {
               });
             },
           );
+          return;
         }
+
+        this.toastr.error('تعذر إرسال التقييم، حاول مرة أخرى.');
       },
     });
   }
 
   onSessionEnded() {
-    console.log("Session ended");
-
-    this.showPopupSessionSuccess = true;
+    this.handleSessionEnded();
   }
 
   ngOnDestroy(): void {

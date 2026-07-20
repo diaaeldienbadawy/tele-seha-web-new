@@ -4,7 +4,7 @@
   <!-- Meeting Layout -->
   <div class="flex justify-between items-center h-full">
     <div class="w-full md:w-[60%] h-[calc(100vh-100px)]">
-      <app-patient-meeting-video-call (sessionEnded)="showPopupSessionSuccess = true"
+      <app-patient-meeting-video-call (sessionEnded)="handleSessionEnded()"
         (openWhatsapp)="showWhatsapp = true">
       </app-patient-meeting-video-call>
 
@@ -48,7 +48,12 @@
 <!-- popup -->
 @if(showPopupSessionSuccess){
 <div class="ts-modal-overlay">
-  <div class="ts-modal-card text-center p-8 max-w-lg" style="animation: ts-modal-slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1);">
+  <div class="ts-modal-card text-center p-8 max-w-lg relative" style="animation: ts-modal-slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1);">
+    <!-- زرار الإغلاق: لو المريض رجع في كلامه يقدر يقفل الكارت من غير ما يكمل -->
+    <button (click)="closePopupSessionSuccess()"
+            class="absolute top-4 right-4 rtl:left-4 rtl:right-auto w-8 h-8 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors cursor-pointer">
+      <i class="fa-solid fa-xmark text-lg"></i>
+    </button>
     <div class="w-40 h-40 mx-auto mb-6 transform scale-110">
       <img class="w-full h-full object-contain" src="../../../../../assets/images/Confetti Selector.png" loading="lazy" alt="Confetti">
     </div>

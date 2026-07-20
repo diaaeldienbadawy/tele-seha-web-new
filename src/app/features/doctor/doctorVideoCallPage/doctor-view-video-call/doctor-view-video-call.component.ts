@@ -6,6 +6,7 @@ import { PopupDoctorComponent } from "../popup-doctor/popup-doctor.component";
 import { Router, ActivatedRoute } from '@angular/router';
 import { DoctorsService } from '../../../../shared/services/doctors.service';
 import { ToastrService } from 'ngx-toastr';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-doctor-view-video-call',
@@ -13,7 +14,8 @@ import { ToastrService } from 'ngx-toastr';
     CommonModule,
     DoctorMeetingVideoCallComponent,
     DoctorChatVideoCallComponent,
-    PopupDoctorComponent
+    PopupDoctorComponent,
+    TranslateModule
 ],
   templateUrl: './doctor-view-video-call.component.html',
   styleUrl: './doctor-view-video-call.component.css',
@@ -23,6 +25,7 @@ export class DoctorViewVideoCallComponent implements OnInit, OnDestroy {
   meetingId!: number;
   isValidating = true;
   isMeetingValid = false;
+  meetingReport: any = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -59,6 +62,7 @@ export class DoctorViewVideoCallComponent implements OnInit, OnDestroy {
           return;
         }
 
+        this.meetingReport = res;
         this.isMeetingValid = true;
         this.isValidating = false;
       },
@@ -70,6 +74,21 @@ export class DoctorViewVideoCallComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * إعادة تحميل بيانات الميتينج لما المريض يدخل القناة — نسبة التحسن بيسجّلها
+   * المريض لحظة دخوله، يعني بعد ما الصفحة دي حمّلت بوقت. تحديث فقط، من غير
+   * منطق الطرد بتاع checkMeetingStatus: دا صح عند الدخول وغلط في نص مكالمة شغّالة.
+   */
+  refreshMeetingReport() {
+    if (!this.meetingId) return;
+    this.doctorService.getReports(this.meetingId).subscribe({
+      next: (res) => (this.meetingReport = res),
+      error: () => {
+        // بنسيب آخر نسخة موجودة — فشل تحديث ماينفعش يقطع المكالمة.
+      },
+    });
+  }
+
   ngOnDestroy(): void {
     localStorage.removeItem('agoraDetails');
     localStorage.removeItem('meetingId');
@@ -77,5 +96,10 @@ export class DoctorViewVideoCallComponent implements OnInit, OnDestroy {
     localStorage.removeItem('checkUpId');
     localStorage.removeItem('patientId');
     localStorage.removeItem('meetingToken');
+    // مفاتيح قديمة كانت بتعيش عبر الميتينجات وتخلي البوب أب يعدّل روشتة/طلب ميتينج
+    // تاني (403). الكود مبقاش يكتبها — بنمسحها من المتصفحات اللي لسه شايلاها.
+    localStorage.removeItem('prescriptionId');
+    localStorage.removeItem('labTestId');
+    localStorage.removeItem('radiologyId');
   }
 }

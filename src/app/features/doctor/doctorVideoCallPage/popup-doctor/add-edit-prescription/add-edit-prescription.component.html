@@ -14,7 +14,7 @@
         </div>
 
         <!-- Select -->
-        <div class="ts-select-wrapper">
+        <div class="ts-select-wrapper relative">
           <p-select
             class="custom-select w-full"
             formControlName="id"
@@ -26,6 +26,12 @@
             (onChange)="onDrugSelect($event, $index)"
             placeholder="Select the drug">
           </p-select>
+          <!-- Small inline search indicator — the drug lookup must not raise the page spinner -->
+          @if (isSearchingDrugs) {
+            <span class="absolute top-1/2 -translate-y-1/2 ltr:right-10 rtl:left-10 text-slate-400 pointer-events-none">
+              <i class="fa-solid fa-circle-notch fa-spin text-sm"></i>
+            </span>
+          }
         </div>
 
         <!-- Remove Button -->

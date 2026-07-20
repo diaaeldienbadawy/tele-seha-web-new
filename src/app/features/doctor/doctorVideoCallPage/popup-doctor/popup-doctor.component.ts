@@ -5,6 +5,7 @@ import { AddEditPrescriptionComponent } from './add-edit-prescription/add-edit-p
 import { AddEditLabtestComponent } from './add-edit-labtest/add-edit-labtest.component';
 import { AddEditRadiologyComponent } from './add-edit-radiology/add-edit-radiology.component';
 import { BookFollowUpComponent } from './book-follow-up/book-follow-up.component';
+import { AddEditDiagnosisComponent } from './add-edit-diagnosis/add-edit-diagnosis.component';
 
 @Component({
   selector: 'app-popup-doctor',
@@ -13,6 +14,7 @@ import { BookFollowUpComponent } from './book-follow-up/book-follow-up.component
     AddEditPrescriptionComponent,
     AddEditLabtestComponent,
     AddEditRadiologyComponent,
+    AddEditDiagnosisComponent,
     BookFollowUpComponent,
   ],
   templateUrl: './popup-doctor.component.html',
@@ -24,6 +26,7 @@ export class PopupDoctorComponent {
   showPopupPrescription: boolean = false;
   showPopupRadiology: boolean = false;
   showPopupLabTests: boolean = false;
+  showPopupDiagnosis: boolean = false;
   bookFollowUp: boolean = false;
 
   // Prescription
@@ -47,6 +50,14 @@ export class PopupDoctorComponent {
   }
   closeLabTest() {
     this.showPopupLabTests = false;
+  }
+
+  // Diagnosis
+  openPopupDiagnosis() {
+    this.showPopupDiagnosis = true;
+  }
+  closeDiagnosis() {
+    this.showPopupDiagnosis = false;
   }
 
   // Book Follow Up

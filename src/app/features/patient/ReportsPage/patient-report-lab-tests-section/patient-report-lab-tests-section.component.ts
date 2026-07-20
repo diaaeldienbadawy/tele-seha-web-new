@@ -79,6 +79,25 @@ export class PatientReportLabTestsSectionComponent implements OnInit {
     this.showPopupPrescription = true;
   }
 
+  /** كل روابط الملفات اللي المريض بعتها على طلب معيّن (النتايج مجمّعة في أكتر من result). */
+  uploadedLinks(item: any): string[] {
+    const results = item?.result ?? [];
+    return results.flatMap((r: any) => r?.links ?? []);
+  }
+
+  isImage(link: string): boolean {
+    const ext = link?.split('.').pop()?.toLowerCase() ?? '';
+    return ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext);
+  }
+
+  getFileName(link: string): string {
+    return link?.split('/').pop() || 'File';
+  }
+
+  openFile(link: string) {
+    window.open(link, '_blank');
+  }
+
   @ViewChild('fileInput') fileInput: any;
 
   selectAndSendFiles() {

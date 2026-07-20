@@ -34,7 +34,7 @@
       <!-- Right Side: Egyptian Doctor Illustration Portrait -->
       <div class="relative w-40 h-40 md:w-52 md:h-52 mt-6 md:mt-0 flex-shrink-0 flex items-center justify-center">
         <div class="absolute inset-0 bg-white/10 rounded-full blur-xl scale-95 animate-pulse"></div>
-        <img src="assets/images/egyptian_doctor.png" alt="Egyptian Doctor" 
+        <img [src]="doctorImage || 'assets/images/egyptian_doctor.png'" alt="Doctor Profile" 
              class="relative z-10 w-full h-full object-cover rounded-full border-4 border-white/30 shadow-2xl transition-transform duration-500 hover:scale-105">
       </div>
     </div>
@@ -105,8 +105,9 @@
         </div>
       </div>
 
-      <!-- Card 4: Completed -->
-      <div routerLink="/doctor/myAppointments" class="ts-card cursor-pointer flex items-center gap-5 hover:-translate-y-1 hover:shadow-lg hover:border-[#007BBD]/20 active:scale-98 transition-all duration-300 relative overflow-hidden group">
+      <!-- Card 4: Completed → the cases history (My Sessions was an active-only summary,
+           so a finished consultation had nowhere to be reviewed and the card led to an empty page) -->
+      <div routerLink="/doctor/checkups" class="ts-card cursor-pointer flex items-center gap-5 hover:-translate-y-1 hover:shadow-lg hover:border-[#007BBD]/20 active:scale-98 transition-all duration-300 relative overflow-hidden group">
         <!-- Background decorative icon -->
         <div class="absolute -right-4 -bottom-4 text-slate-100/40 text-7xl group-hover:scale-110 transition-transform duration-300 pointer-events-none">
           <i class="fa-solid fa-shield-halved"></i>

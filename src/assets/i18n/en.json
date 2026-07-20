@@ -1,6 +1,6 @@
 {
-  "HELLO" : "Hello",
-  "WORLD" : "World",
+  "HELLO": "Hello",
+  "WORLD": "World",
   "app": {
     "title": "TeleSeha"
   },
@@ -19,7 +19,8 @@
     "reports": "Reports",
     "searchForDoctor": "Search for a Doctor",
     "forDoctors": "For Doctors",
-    "aboutUs": "About Us"
+    "aboutUs": "About Us",
+    "myCheckups": "My Cases"
   },
   "settings": {
     "profileSettings": "Profile Settings",
@@ -61,7 +62,55 @@
     "confirmReschedule": "Confirm Reschedule",
     "noScheduleTitle": "No available schedule slots",
     "noScheduleSub": "No available schedule slots found. Please configure clinic sessions in settings.",
-    "completedAppointments": "Completed Consultations"
+    "completedAppointments": "Completed Consultations",
+    "followUpsSubtitle": "View clinic follow-ups and patient reports.",
+    "viewReports": "View Reports",
+    "noFollowUps": "No Follow-ups Found",
+    "noFollowUpsSub": "You have no follow-up cases scheduled at the moment.",
+    "reportsTitle": "Medical Documents & Reports",
+    "labReports": "Lab Analysis Reports",
+    "radiologyReports": "Radiology Reports",
+    "previewImage": "Preview Image",
+    "viewDocument": "View Document",
+    "weeklySubtitle": "Review and manage appointments for each day of this week.",
+    "totalAppointments": "Total Appointments:",
+    "firstConsultation": "First Consultation:",
+    "statusLabel": "Status:",
+    "viewMore": "View More",
+    "noWeekAppointments": "No Appointments Scheduled",
+    "noWeekAppointmentsSub": "There are no appointments scheduled for this week.",
+    "mySessionsSubtitle": "View cases and follow-up stats aggregated weekly.",
+    "week": "Week",
+    "casesCount": "Number of Cases:",
+    "followUpsCountLabel": "Number of Follow-ups:",
+    "highestLoadOn": "Highest load on",
+    "noSessions": "No Sessions Found",
+    "noSessionsSub": "No historical session records found for your clinic profile.",
+    "weekSessions": "Week Sessions",
+    "weekSessionsSubtitle": "Detailed lists of all sessions for this specific week.",
+    "noWeekRecords": "No Appointments",
+    "noWeekRecordsSub": "No appointments recorded for this week.",
+    "followUpBadge": "Follow-up",
+    "improvementRate": "Improvement Rate",
+    "newBadge": "New",
+    "checkupsTitle": "My Cases",
+    "checkupsSubtitle": "All your cases: chat, prescriptions, lab and radiology with their results.",
+    "filterAll": "All",
+    "filterCompleted": "Completed",
+    "meetingsCount": "Meetings",
+    "checkupCompleted": "Completed",
+    "checkupOpened": "Open",
+    "checkupChat": "Case chat",
+    "noChatMessages": "No messages in this chat.",
+    "prescription": "Prescription",
+    "diagnosis": "Diagnosis",
+    "noDiagnosis": "No diagnosis recorded.",
+    "labRequests": "Lab requests",
+    "radiologyRequests": "Radiology requests",
+    "none": "None",
+    "noResultsYet": "No results uploaded yet.",
+    "noCheckups": "No cases found",
+    "noCheckupsSub": "Once you start consultations with patients they will appear here."
   },
   "doctorStatus": {
     "confirm": "Confirm Appointment",
@@ -174,7 +223,10 @@
     "sessionDetails": "Session Details",
     "downloadPrescription": "Download Prescription",
     "downloadRadiology": "Download Radiology",
-    "downloadLabTest": "Download Lab Test"
+    "downloadLabTest": "Download Lab Test",
+    "reviews": "Patient Reviews",
+    "noReviews": "No reviews yet.",
+    "anonymousPatient": "Patient"
   },
   "appointmentStatus": {
     "waitForConfirmation": "Wait for confirmation",
@@ -189,6 +241,7 @@
     "recentBookings": "Recent Bookings",
     "noBookings": "No Recent Bookings",
     "ratingPrompt": "What is your improvement level after the last consultation?",
+    "skipAndJoin": "Skip and join the session",
     "complainingPrompt": "What are you complaining of?",
     "complaintInputPlaceholder": "Write your complaint...",
     "answerInputPlaceholder": "Write your answer...",
@@ -220,7 +273,8 @@
     "uploadTitle": "Upload Document",
     "licenseNumber": "Medical Practice License Number",
     "patientName": "Patient Name",
-    "prescriptionTitle": "Medical Prescription"
+    "prescriptionTitle": "Medical Prescription",
+    "sentResults": "Sent results"
   },
   "patientProfile": {
     "title": "Profile Information",
@@ -318,5 +372,24 @@
     "heightPlaceholder": "What is your height?",
     "weightPlaceholder": "What is your weight?",
     "submit": "Submit"
+  },
+  "days": {
+    "Saturday": "Saturday",
+    "Sunday": "Sunday",
+    "Monday": "Monday",
+    "Tuesday": "Tuesday",
+    "Wednesday": "Wednesday",
+    "Thursday": "Thursday",
+    "Friday": "Friday"
+  },
+  "statusNames": {
+    "Created": "Created",
+    "Confirmed": "Awaiting payment",
+    "CreateComplaint": "Awaiting complaint",
+    "Pending": "Ready",
+    "Started": "In progress",
+    "Completed": "Completed",
+    "Canceled": "Canceled",
+    "Rescheduled": "Rescheduled"
   }
 }

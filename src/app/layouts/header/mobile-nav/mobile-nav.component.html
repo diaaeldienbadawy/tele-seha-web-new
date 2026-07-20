@@ -29,7 +29,10 @@
       {{ 'nav.home' | translate }}
     </a>
   </li>
-  <li><a (click)="scrollTop()" routerLink="/doctor/doctors" routerLinkActive="active">{{ 'nav.doctors' | translate }}</a></li>
-  <li><a (click)="scrollTop()" routerLink="/doctor/sessions" routerLinkActive="active">{{ 'nav.mySessions' | translate }}</a></li>
+  <!-- /doctor/doctors and /doctor/sessions were dead routes (they don't exist in
+       doctor.routes.ts) — the links bounced through the guard back to login. -->
+  <li><a (click)="scrollTop()" routerLink="/doctor/allDoctors" routerLinkActive="active">{{ 'nav.doctors' | translate }}</a></li>
+  <li><a (click)="scrollTop()" routerLink="/doctor/myAppointments" routerLinkActive="active">{{ 'nav.mySessions' | translate }}</a></li>
+  <li><a (click)="scrollTop()" routerLink="/doctor/checkups" routerLinkActive="active">{{ 'nav.myCheckups' | translate }}</a></li>
 </ul>
 }

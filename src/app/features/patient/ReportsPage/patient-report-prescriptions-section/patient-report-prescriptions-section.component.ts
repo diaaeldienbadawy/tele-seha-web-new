@@ -30,9 +30,17 @@ export class PatientReportPrescriptionsSectionComponent implements OnInit {
   patients: any;
 
   ngOnInit(): void {
-    const patients =
-      JSON.parse(this.localStorageServices.get('patients')) || null;
-    this.patients = patients[0];
+    // Guard against a missing/malformed 'patients' entry: JSON.parse(null) and null[0]
+    // both throw and used to abort ngOnInit BEFORE getAllPrescription() ran — so the page
+    // silently showed no prescriptions at all.
+    const raw = this.localStorageServices.get('patients');
+    let parsed: any = null;
+    try {
+      parsed = raw ? JSON.parse(raw) : null;
+    } catch {
+      parsed = null;
+    }
+    this.patients = Array.isArray(parsed) ? parsed[0] : null;
     this.getAllPrescription();
 
     // Refresh live when the doctor issues a new prescription (or any report event).

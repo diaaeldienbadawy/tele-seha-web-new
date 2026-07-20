@@ -9,7 +9,7 @@
           {{ 'doctor.followUps' | translate }}
         </h2>
         <p class="text-slate-400 text-xs md:text-sm mt-0.5">
-          View clinic follow-ups and patient reports.
+          {{ 'doctor.followUpsSubtitle' | translate }}
         </p>
       </div>
     </div>
@@ -72,13 +72,13 @@
                 <!-- Reschedule -->
                 <button *ngIf="!isTerminalOrStarted(appointment.status)" (click)="showModal(appointment)" 
                         class="py-3 px-4 rounded-xl border border-slate-200 text-slate-600 bg-white font-semibold text-xs md:text-sm hover:bg-slate-50 hover:border-slate-300 transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
-                  <i class="fa-regular fa-calendar-plus text-[#007BBD]"></i> Reschedule
+                  <i class="fa-regular fa-calendar-plus text-[#007BBD]"></i> {{ 'doctor.reschedule' | translate }}
                 </button>
 
                 <!-- View Reports -->
-                <button (click)="showReports(appointment.checkUp.meetings[0].id)"
+                <button (click)="showReportsFor(appointment)"
                         class="py-3 px-4 rounded-xl border border-[#007BBD] text-[#007BBD] bg-white font-semibold text-xs md:text-sm hover:bg-[#007BBD]/5 transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
-                  <i class="fa-solid fa-file-pdf"></i> View Reports
+                  <i class="fa-solid fa-file-pdf"></i> {{ 'doctor.viewReports' | translate }}
                 </button>
 
                 <!-- Cancel -->
@@ -101,10 +101,10 @@
           <i class="fa-solid fa-user-clock"></i>
         </div>
         <h3 class="text-lg font-bold text-slate-700 mb-1">
-          No Follow-ups Found
+          {{ 'doctor.noFollowUps' | translate }}
         </h3>
         <p class="text-slate-400 text-sm max-w-md mx-auto">
-          You have no follow-up cases scheduled at the moment.
+          {{ 'doctor.noFollowUpsSub' | translate }}
         </p>
       </div>
     }
@@ -199,7 +199,7 @@
       <!-- Close Button -->
       <div class="flex justify-between items-center mb-6 border-b border-slate-50 pb-4">
         <h3 class="text-xl font-bold text-slate-800">
-          Medical Documents & Reports
+          {{ 'doctor.reportsTitle' | translate }}
         </h3>
         <button (click)="showPopupReports=false" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors">
           <i class="fa-solid fa-xmark text-lg"></i>
@@ -212,7 +212,7 @@
           <div>
             <h4 class="text-base font-bold text-slate-700 mb-4 flex items-center gap-2">
               <i class="fa-solid text-[#007BBD]" [ngClass]="report.type === 'LAB' ? 'fa-flask-vial' : 'fa-x-ray'"></i>
-              <span>{{ report.type === 'LAB' ? 'Lab Analysis Reports' : 'Radiology Reports' }}</span>
+              <span>{{ (report.type === 'LAB' ? 'doctor.labReports' : 'doctor.radiologyReports') | translate }}</span>
             </h4>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -222,7 +222,7 @@
                   <div class="group relative rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-md transition cursor-pointer" (click)="selectedImage = link">
                     <img [src]="link" class="w-full h-40 object-cover group-hover:scale-[1.03] transition duration-300" />
                     <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
-                      <span class="text-white text-xs font-semibold"><i class="fa-solid fa-magnifying-glass-plus mr-1"></i> Preview Image</span>
+                      <span class="text-white text-xs font-semibold"><i class="fa-solid fa-magnifying-glass-plus mr-1"></i> {{ 'doctor.previewImage' | translate }}</span>
                     </div>
                   </div>
                 } @else {
@@ -239,7 +239,7 @@
                     </div>
                     
                     <button class="ts-btn-primary w-full py-2 text-xs h-9 rounded-xl font-bold flex items-center justify-center gap-1.5" (click)="openFile(link)">
-                      <i class="fa-solid fa-eye text-xs"></i> View Document
+                      <i class="fa-solid fa-eye text-xs"></i> {{ 'doctor.viewDocument' | translate }}
                     </button>
                   </div>
                 }

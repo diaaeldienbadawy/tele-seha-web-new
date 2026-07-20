@@ -13,7 +13,8 @@ export class PopupUploadComponent {
 
   @Input() selectedId: number | null = null;
   @Output() close = new EventEmitter<void>();
-  // @Output() sendFiles = new EventEmitter<File[]>();
+  /** بينطلق بعد نجاح الرفع — الأب بيعيد تحميل اللستة عشان "النتائج المرسلة" تظهر فورًا. */
+  @Output() uploaded = new EventEmitter<void>();
 
   uploadedFiles: File[] = [];
 
@@ -123,9 +124,9 @@ export class PopupUploadComponent {
     });
     if (this.title === 'labTest') {
       this.prescriptionServices.sendLabTestForDoctor(formData).subscribe({
-        next: (res: any) => {
-          console.log('Upload success:', res);
-          this.toastr.success('Files uploaded successfully!');
+        next: () => {
+          this.toastr.success('تم رفع الملفات بنجاح.');
+          this.uploaded.emit();
           this.closePopup();
         },
         error: (err) => {
@@ -149,9 +150,9 @@ export class PopupUploadComponent {
       });
     } else {
       this.prescriptionServices.sendRadiologyForDoctor(formData).subscribe({
-        next: (res: any) => {
-          console.log('Upload success:', res);
-          this.toastr.success('Files uploaded successfully!');
+        next: () => {
+          this.toastr.success('تم رفع الملفات بنجاح.');
+          this.uploaded.emit();
           this.closePopup();
         },
         error: (err) => {

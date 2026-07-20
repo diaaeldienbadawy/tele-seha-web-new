@@ -1,10 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 import { LocalstorageService } from '../../../../core/services/localstorage.service';
 import { DoctorsService } from '../../../../shared/services/doctors.service';
 import { PatientAppointmentStatus } from '../../../../core/enum/patientAppointmentStatus';
 import { TranslateModule } from '@ngx-translate/core';
+import { NotificationService } from '../../../patient/service/notification.service';
 
 @Component({
   selector: 'app-doctor-day-appointments',
@@ -24,11 +27,14 @@ export class DoctorDayAppointmentsComponent {
   selectedDate: string | null = null;
   selectedDay: string | null = null;
   weekId: string | null = null;
+  private destroyRef = inject(DestroyRef);
   constructor(
     readonly doctorService: DoctorsService,
     readonly localStorageService: LocalstorageService,
     readonly route: ActivatedRoute,
     readonly router: Router,
+    readonly toaster: ToastrService,
+    readonly notificationService: NotificationService,
   ) {}
 
   ngOnInit() {
@@ -39,11 +45,18 @@ export class DoctorDayAppointmentsComponent {
     this.doctorId = Number(this.localStorageService.get('doctorId')) || null;
     this.selectedDate = this.localStorageService.get('selectedDate') || null;
     this.selectedDay = this.localStorageService.get('selectedDay') || null;
-    console.log(this.doctorId, this.selectedDate, this.selectedDay);
 
     this.selectedMeetingId = this.localStorageService.get('meetingId') || null;
 
     this.getAppointmentsDay();
+
+    // Real-time updates like the other doctor lists (this page had none, so a patient
+    // paying or canceling never showed up until a manual refresh).
+    this.notificationService.appointmentEvents$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.getAppointmentsDay();
+      });
   }
 
   data: any;
@@ -89,12 +102,20 @@ export class DoctorDayAppointmentsComponent {
   cancelAppointment(appointmentId: number) {
     console.log('Canceling appointment with ID:', appointmentId);
 
-    this.doctorService
-      .cancelAppointment(appointmentId)
-      .subscribe((res: any) => {
-        // console.log(res);
+    this.doctorService.cancelAppointment(appointmentId).subscribe({
+      next: () => {
+        this.toaster.success('تم إلغاء الموعد.');
         this.getAppointmentsDay();
-      });
+      },
+      error: (err) => {
+        // رفض الإلغاء كان بيتبلع في صمت والطبيب فاكر إن الموعد اتلغى.
+        const apiError = err?.error;
+        this.toaster.error(
+          apiError?.message ||
+            (typeof apiError === 'string' && apiError ? apiError : 'تعذر إلغاء الموعد.'),
+        );
+      },
+    });
   }
 
   updateAppointment(appointmentId: number, newSessionId: number) {
@@ -108,21 +129,27 @@ export class DoctorDayAppointmentsComponent {
 
   selectedMeetingId: number | null | string = null;
   openMeeting(appointmentId: number) {
-    this.doctorService.openAppointment(appointmentId).subscribe((res: any) => {
-      console.log(res);
-      this.selectedMeetingId = res.id;
-      this.getAppointmentsDay();
-      this.localStorageService.set('meetingId', res.id);
-      this.localStorageService.set('channelName', res.channelName);
-      this.localStorageService.set('checkUpId', res.checkUp.id);
-      this.localStorageService.set('patientId', res.checkUp.patientId);
-      this.localStorageService.set(
-        'medicalHistory',
-        JSON.stringify(res.patient?.sections || []),
-      );
-      this.localStorageService.set('meetingToken', res.providerToken);
-      this.localStorageService.set('agoraDetails', JSON.stringify(res));
-      this.router.navigate([`/doctor/videoCall/${res.id}`]);
+    this.doctorService.openAppointment(appointmentId).subscribe({
+      next: (res: any) => {
+        // كل القيم defensive: أي نقص في الرد ميمنعش الدخول للمكالمة —
+        // زرار "بدأ" لازم يدخل الطبيب على طول من غير ما يحتاج يدوس "انضمام" بعدها.
+        this.selectedMeetingId = res.id;
+        this.localStorageService.set('meetingId', res.id);
+        this.localStorageService.set('channelName', res.channelName ?? '');
+        this.localStorageService.set('checkUpId', res.checkUp?.id ?? res.checkUpId);
+        this.localStorageService.set('patientId', res.checkUp?.patientId ?? res.patient?.patientId);
+        this.localStorageService.set(
+          'medicalHistory',
+          JSON.stringify(res.patient?.sections || []),
+        );
+        this.localStorageService.set('meetingToken', res.providerToken ?? '');
+        this.localStorageService.set('agoraDetails', JSON.stringify(res));
+        this.router.navigate([`/doctor/videoCall/${res.id}`]);
+      },
+      error: (err) => {
+        console.error('Error starting video meeting:', err);
+        this.toaster.error(err?.error?.message || err?.error || 'تعذر بدء الكشف، حاول مرة أخرى');
+      },
     });
   }
 
@@ -291,31 +318,33 @@ export class DoctorDayAppointmentsComponent {
 
         break;
 
-      case PatientAppointmentStatus.Started:
-        this.localStorageService.set('meetingId', item.checkUp.meetings[0].id);
-        this.localStorageService.set(
-          'channelName',
-          item.checkUp.meetings[0].channelName,
-        );
-        this.localStorageService.set('checkUpId', item.checkUp.id);
-        this.localStorageService.set('patientId', item.patient.patientId);
+      case PatientAppointmentStatus.Started: {
+        // Join the CURRENT (ongoing) meeting, not meetings[0]: with follow-ups the
+        // first meeting is the oldest/closed one and its channel/token would be wrong.
+        const meetings: any[] = item?.checkUp?.meetings ?? [];
+        const meeting =
+          meetings.find((m) => m?.status === 'Ongoing') ??
+          meetings[meetings.length - 1];
+        if (!meeting) {
+          // Started but no meeting came down with the list — re-open on the server,
+          // which returns the ongoing meeting and navigates.
+          this.openMeeting(item.id);
+          return;
+        }
+
+        this.localStorageService.set('meetingId', meeting.id);
+        this.localStorageService.set('channelName', meeting.channelName ?? '');
+        this.localStorageService.set('checkUpId', meeting.checkUpId ?? item.checkUp?.id);
+        this.localStorageService.set('patientId', item.patient?.patientId);
         this.localStorageService.set(
           'medicalHistory',
-          JSON.stringify(item.patient.sections),
+          JSON.stringify(item.patient?.sections || []),
         );
-
-        this.localStorageService.set(
-          'meetingToken',
-          item.checkUp.meetings[0].providerToken,
-        );
-        this.localStorageService.set(
-          'agoraDetails',
-          JSON.stringify(item.checkUp.meetings[0]),
-        );
-        this.router.navigate([
-          `/doctor/videoCall/${item.checkUp.meetings[0].id}`,
-        ]);
+        this.localStorageService.set('meetingToken', meeting.providerToken ?? '');
+        this.localStorageService.set('agoraDetails', JSON.stringify(meeting));
+        this.router.navigate([`/doctor/videoCall/${meeting.id}`]);
         break;
+      }
     }
   }
 }

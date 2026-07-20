@@ -74,20 +74,26 @@
                 </span>
               </div>
 
-              <!-- Advantages/Feedback pill tags -->
+              <!-- Advantages: earned only — shown when more than half of the raters granted them -->
               <div class="flex flex-wrap gap-2 pt-2 justify-center sm:justify-start">
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50/30 border border-blue-100/30 rounded-full text-[11px] font-semibold text-blue-500">
-                  <i class="fa-regular fa-message"></i>
-                  {{ 'doctorsList.explainsClearly' | translate }}
-                </span>
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-purple-50/30 border border-purple-100/30 rounded-full text-[11px] font-semibold text-purple-500">
-                  <i class="fa-regular fa-headphones"></i>
-                  {{ 'doctorsList.goodListener' | translate }}
-                </span>
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-teal-50/30 border border-teal-100/30 rounded-full text-[11px] font-semibold text-teal-500">
-                  <i class="fa-regular fa-face-smile"></i>
-                  {{ 'doctorsList.friendly' | translate }}
-                </span>
+                @if ((item.doctorCard?.ratingCount || 0) > 0 && (item.doctorCard?.firstAdvantageCount || 0) * 2 > item.doctorCard?.ratingCount) {
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50/30 border border-blue-100/30 rounded-full text-[11px] font-semibold text-blue-500">
+                    <i class="fa-regular fa-message"></i>
+                    {{ 'doctorsList.explainsClearly' | translate }}
+                  </span>
+                }
+                @if ((item.doctorCard?.ratingCount || 0) > 0 && (item.doctorCard?.secondAdvantageCount || 0) * 2 > item.doctorCard?.ratingCount) {
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-purple-50/30 border border-purple-100/30 rounded-full text-[11px] font-semibold text-purple-500">
+                    <i class="fa-regular fa-headphones"></i>
+                    {{ 'doctorsList.goodListener' | translate }}
+                  </span>
+                }
+                @if ((item.doctorCard?.ratingCount || 0) > 0 && (item.doctorCard?.thirdAdvantageVount || 0) * 2 > item.doctorCard?.ratingCount) {
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-teal-50/30 border border-teal-100/30 rounded-full text-[11px] font-semibold text-teal-500">
+                    <i class="fa-regular fa-face-smile"></i>
+                    {{ 'doctorsList.friendly' | translate }}
+                  </span>
+                }
               </div>
             </div>
           </div>
@@ -98,7 +104,7 @@
               [ngClass]="getButtonColor(item.status)" 
               [disabled]="isDisabled(item.status)"
               (click)="handleButtonClick(item)"
-              class="w-full md:w-48 py-3.5 rounded-full text-sm sm:text-base font-bold shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              class="w-full md:w-auto md:min-w-[12rem] px-6 py-3.5 rounded-full text-sm sm:text-base font-bold shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer whitespace-nowrap"
             >
               {{ getButtonText(item.status) | translate }}
             </button>
@@ -174,13 +180,28 @@
         </div>
 
         <!-- Submit -->
-        <div class="flex justify-center">
-          <button 
-            type="button" 
-            (click)="getMeetingSatisfactionRatio()"
-            class="ts-btn-primary w-full sm:w-64 py-3.5 text-base font-bold shadow-md shadow-blue-500/15 hover:shadow-lg cursor-pointer"
+        <div class="flex flex-col items-center gap-3">
+          <button
+            type="button"
+            [disabled]="!selectedStep || sendingRatio"
+            (click)="sendSatisfactionRatio()"
+            class="ts-btn-primary w-full sm:w-auto sm:min-w-[16rem] px-6 py-3.5 text-base font-bold shadow-md shadow-blue-500/15 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer whitespace-nowrap"
           >
-            {{ 'reception.send' | translate }}
+            @if (sendingRatio) {
+              <i class="fa-solid fa-spinner animate-spin mr-2 rtl:ml-2 rtl:mr-0"></i>
+              {{ 'doctor.loading' | translate }}
+            } @else {
+              {{ 'reception.send' | translate }}
+            }
+          </button>
+
+          <!-- التقييم اختياري: المكالمة الطبية ماتتقفلش وراه -->
+          <button
+            type="button"
+            (click)="closePopupRating()"
+            class="text-slate-400 hover:text-slate-600 text-sm font-semibold transition-colors cursor-pointer"
+          >
+            {{ 'patientBooking.skipAndJoin' | translate }}
           </button>
         </div>
       </form>
@@ -350,7 +371,7 @@
         <button 
           [disabled]="loading" 
           (click)="sendAnswer()" 
-          class="ts-btn-primary w-full sm:w-64 py-3.5 font-bold shadow-md shadow-blue-500/10 hover:shadow-lg disabled:opacity-50 transition-all cursor-pointer"
+          class="ts-btn-primary w-full sm:w-auto sm:min-w-[16rem] px-6 py-3.5 font-bold shadow-md shadow-blue-500/10 hover:shadow-lg disabled:opacity-50 transition-all cursor-pointer whitespace-nowrap"
         >
           <span *ngIf="loading">
             <i class="fa-solid fa-spinner animate-spin mr-2 rtl:ml-2"></i>
