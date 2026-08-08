@@ -226,7 +226,12 @@
     "downloadLabTest": "تحميل التحليل",
     "reviews": "آراء المرضى",
     "noReviews": "لا توجد تقييمات بعد.",
-    "anonymousPatient": "مريض"
+    "anonymousPatient": "مريض",
+    "bookingSuccess": "تم حجز الموعد بنجاح!",
+    "bookingSuccessDesc": "يمكنك إكمال الخطوات التالية الآن أو لاحقاً من صفحة الحجوزات.",
+    "continueLater": "إكمال لاحقاً",
+    "nextStep": "الخطوة التالية",
+    "bookingDetails": "تفاصيل الحجز"
   },
   "appointmentStatus": {
     "waitForConfirmation": "بانتظار التأكيد",

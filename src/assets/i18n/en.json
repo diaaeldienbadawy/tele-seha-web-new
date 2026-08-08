@@ -226,7 +226,12 @@
     "downloadLabTest": "Download Lab Test",
     "reviews": "Patient Reviews",
     "noReviews": "No reviews yet.",
-    "anonymousPatient": "Patient"
+    "anonymousPatient": "Patient",
+    "bookingSuccess": "Appointment booked successfully!",
+    "bookingSuccessDesc": "You can complete the next steps now or later from the bookings page.",
+    "continueLater": "Continue Later",
+    "nextStep": "Next Step",
+    "bookingDetails": "Booking Details"
   },
   "appointmentStatus": {
     "waitForConfirmation": "Wait for confirmation",
