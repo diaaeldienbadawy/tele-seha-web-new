@@ -34,6 +34,12 @@
           }
         </div>
 
+        <!-- Notes for this examination -->
+        <div class="mt-2.5">
+          <input type="text" formControlName="notes" placeholder="Notes for this scan (optional)"
+            class="ts-input text-xs h-9 px-3 py-1 bg-white border border-slate-200 rounded-lg w-full focus:border-[#007BBD] focus:outline-none">
+        </div>
+
         <!-- Remove Button -->
         @if (radiologyMedicines.length > 1) {
         <button type="button" (click)="removeRadiology($index)" class="ts-item-remove">
@@ -56,9 +62,9 @@
     <!-- Notes -->
     <div class="ts-notes-section">
       <label class="ts-notes-label">
-        Notes (optional)
+        General Notes (optional)
       </label>
-      <input type="text" formControlName="notes" placeholder="Enter notes or unlisted radiology"
+      <input type="text" formControlName="notes" placeholder="Enter general notes or unlisted radiology"
         class="ts-input">
     </div>
 

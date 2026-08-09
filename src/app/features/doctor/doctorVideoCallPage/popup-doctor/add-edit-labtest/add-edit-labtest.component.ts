@@ -139,11 +139,14 @@ export class AddEditLabtestComponent implements OnInit {
     const selectedId = event.value;
 
     const selected = this.labTest.find((x) => x.id === selectedId);
+    if (!selected) return;
+
+    const currentNotes = this.labTestMedicines.at(index).get('notes')?.value;
 
     this.labTestMedicines.at(index).patchValue({
-      id: selected?.id,
-      name: selected?.name,
-      notes: selected?.notes,
+      id: selected.id,
+      name: selected.name,
+      notes: currentNotes || selected.notes || '',
     });
   }
 

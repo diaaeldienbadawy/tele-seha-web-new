@@ -296,6 +296,11 @@
                 <p><i class="fa-regular fa-comment-dots mr-1"></i>الملاحظات: {{ lab.notes || 'لا يوجد ملاحظات' }}</p>
               </div>
             </div>
+            @if (meetingReport?.labAnalysisRequest?.notes) {
+              <div class="mt-3 p-3 bg-amber-50/70 border border-amber-200/60 rounded-xl text-xs text-amber-900">
+                <strong><i class="fa-solid fa-note-sticky mr-1 text-amber-600"></i>ملاحظات عامة:</strong> {{ meetingReport.labAnalysisRequest.notes }}
+              </div>
+            }
             <ng-template #labNotFound>
               <p class="rpt-empty">الدكتور لم يكتب شيئاً هنا</p>
             </ng-template>
@@ -314,6 +319,11 @@
                 <p><i class="fa-regular fa-comment-dots mr-1"></i>الملاحظات: {{ rad.notes || rad.position || 'لا يوجد ملاحظات' }}</p>
               </div>
             </div>
+            @if (meetingReport?.radiologicalExaminationRequest?.notes) {
+              <div class="mt-3 p-3 bg-amber-50/70 border border-amber-200/60 rounded-xl text-xs text-amber-900">
+                <strong><i class="fa-solid fa-note-sticky mr-1 text-amber-600"></i>ملاحظات عامة:</strong> {{ meetingReport.radiologicalExaminationRequest.notes }}
+              </div>
+            }
             <ng-template #radiologyNotFound>
               <p class="rpt-empty">الدكتور لم يكتب شيئاً هنا</p>
             </ng-template>
@@ -329,9 +339,14 @@
             <div *ngIf="meetingReport?.prescription?.medicines?.length; else prescriptionNotFound" class="rpt-grid">
               <div *ngFor="let med of meetingReport.prescription.medicines" class="rpt-item">
                 <h5><i class="fa-solid fa-pills text-[#007bbd] mr-1.5"></i>{{ med.name }}</h5>
-                <p><i class="fa-solid fa-clock-rotate-left mr-1"></i>التعليمات: {{ med.instructions }}</p>
+                <p><i class="fa-solid fa-clock-rotate-left mr-1"></i>التعليمات: {{ med.instructions || med.notes || 'لا يوجد ملاحظات' }}</p>
               </div>
             </div>
+            @if (meetingReport?.prescription?.notes) {
+              <div class="mt-3 p-3 bg-amber-50/70 border border-amber-200/60 rounded-xl text-xs text-amber-900">
+                <strong><i class="fa-solid fa-note-sticky mr-1 text-amber-600"></i>ملاحظات عامة:</strong> {{ meetingReport.prescription.notes }}
+              </div>
+            }
             <ng-template #prescriptionNotFound>
               <p class="rpt-empty">الدكتور لم يكتب شيئاً هنا</p>
             </ng-template>

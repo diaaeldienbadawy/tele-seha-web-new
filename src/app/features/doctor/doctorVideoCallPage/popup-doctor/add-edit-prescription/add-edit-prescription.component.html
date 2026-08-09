@@ -34,6 +34,12 @@
           }
         </div>
 
+        <!-- Notes / Dosage for this drug -->
+        <div class="mt-2.5">
+          <input type="text" formControlName="instructions" (input)="onMedicineNoteInput($index)" placeholder="Dosage or notes for this drug (optional)"
+            class="ts-input text-xs h-9 px-3 py-1 bg-white border border-slate-200 rounded-lg w-full focus:border-[#007BBD] focus:outline-none">
+        </div>
+
         <!-- Remove Button -->
         @if (medicines.length > 1) {
         <button type="button" (click)="removeMedicine($index)" class="ts-item-remove">
@@ -56,9 +62,9 @@
     <!-- Notes -->
     <div class="ts-notes-section">
       <label class="ts-notes-label">
-        Notes (optional)
+        General Notes (optional)
       </label>
-      <input type="text" formControlName="notes" placeholder="Enter notes or additional instructions"
+      <input type="text" formControlName="notes" placeholder="Enter general notes or additional instructions"
         class="ts-input">
     </div>
 

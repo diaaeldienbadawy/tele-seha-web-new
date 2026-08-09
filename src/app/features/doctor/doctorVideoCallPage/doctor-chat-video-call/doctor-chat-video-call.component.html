@@ -63,29 +63,49 @@
                   <p class="text-sm font-medium leading-relaxed">{{ msg.message }}</p>
                 </div>
               } @else if (msg.messageType === 'Image' || msg.messageType === 'SpecialImage') {
-                <div class="ts-chat-bubble-doctor p-1 overflow-hidden">
+                <div class="ts-chat-bubble-doctor p-1 overflow-hidden relative">
                   <img class="rounded-[10px] max-h-56 max-w-full object-cover cursor-pointer hover:opacity-95 transition-opacity"
+                    [class.opacity-70]="msg.pending"
                     [src]="msg.message" loading="lazy" alt="Doctor Attachment">
+                  @if (msg.pending) {
+                    <div class="absolute inset-0 flex items-center justify-center bg-black/20 rounded-[10px]">
+                      <i class="fa-solid fa-circle-notch fa-spin text-white text-xl"></i>
+                    </div>
+                  }
                 </div>
               } @else if (msg.messageType === 'File' || msg.messageType === 'Pdf') {
                 <div class="ts-chat-bubble-doctor">
-                  <a [href]="msg.message" target="_blank" rel="noopener noreferrer"
-                    class="inline-flex items-center gap-2 text-white underline text-sm break-all font-semibold">
-                    <i class="fa-solid fa-file-pdf text-xl shrink-0 text-sky-200"></i>
-                    <span>Open file</span>
-                  </a>
+                  @if (msg.pending) {
+                    <div class="inline-flex items-center gap-2 text-white text-sm font-semibold">
+                      <i class="fa-solid fa-circle-notch fa-spin text-base shrink-0"></i>
+                      <span class="break-all">{{ msg.message }}</span>
+                    </div>
+                  } @else {
+                    <a [href]="msg.message" target="_blank" rel="noopener noreferrer"
+                      class="inline-flex items-center gap-2 text-white underline text-sm break-all font-semibold">
+                      <i class="fa-solid fa-file-pdf text-xl shrink-0 text-sky-200"></i>
+                      <span>Open file</span>
+                    </a>
+                  }
                 </div>
               } @else {
-                <div class="ts-chat-bubble-doctor p-1 overflow-hidden">
+                <div class="ts-chat-bubble-doctor p-1 overflow-hidden relative">
                   <img class="rounded-[10px] max-h-56 max-w-full object-cover"
+                    [class.opacity-70]="msg.pending"
                     [src]="msg.message" loading="lazy" alt="Doctor Attachment">
+                  @if (msg.pending) {
+                    <div class="absolute inset-0 flex items-center justify-center bg-black/20 rounded-[10px]">
+                      <i class="fa-solid fa-circle-notch fa-spin text-white text-xl"></i>
+                    </div>
+                  }
                 </div>
               }
               
               <div class="flex items-center gap-1.5 mt-0.5 pr-1 text-[10px] font-bold"
                 [class]="msg.failed ? 'text-rose-500' : 'text-slate-400'">
                 @if (msg.pending) {
-                  <i class="fa-regular fa-clock"></i><span>جاري الإرسال…</span>
+                  <i class="fa-solid fa-circle-notch fa-spin text-xs text-[#007BBD]"></i>
+                  <span class="text-[#007BBD]">جاري الإرسال…</span>
                 } @else if (msg.failed) {
                   <i class="fa-solid fa-triangle-exclamation"></i><span>لم تُرسل</span>
                 } @else {

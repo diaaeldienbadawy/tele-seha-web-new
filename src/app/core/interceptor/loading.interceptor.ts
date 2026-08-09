@@ -18,6 +18,7 @@ const SKIP_URLS = [
   '/send',              // SignalR send
   'signalr',            // أي endpoint فيه كلمة signalr
   'hub',                // notification hubs
+  'chat-message',       // جميع طلبات المحادثة (رفع ملفات، جلب رسائل)
 ];
 
 function shouldSkip(url: string): boolean {

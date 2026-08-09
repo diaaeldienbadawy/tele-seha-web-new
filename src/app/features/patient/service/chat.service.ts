@@ -1,11 +1,12 @@
 import { inject, Injectable, OnDestroy, PLATFORM_ID, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { catchError, map, Observable, throwError } from 'rxjs';
 import * as signalR from '@microsoft/signalr';
 import { Environment } from '../../../../environments/environment.development';
 import { GlobalUserStateService } from '../../../core/services/state/global-user-state.service';
 import { HubTokenService } from '../../../shared/services/hub-token.service';
+import { SKIP_GLOBAL_LOADING } from '../../../core/interceptor/loading.interceptor';
 
 export type ChatMediaUploadErrorKind =
   | 'unauthorized'
@@ -116,11 +117,12 @@ export class ChatService implements OnDestroy {
     return this.userState.accessToken() ?? '';
   }
 
-  private _chatAuthHeaders(): { headers: { Authorization: string } } | undefined {
-    if (!isPlatformBrowser(this.platformId)) return undefined;
+  private _chatAuthHeaders(): { headers?: { Authorization: string }; context: HttpContext } {
+    const context = new HttpContext().set(SKIP_GLOBAL_LOADING, true);
+    if (!isPlatformBrowser(this.platformId)) return { context };
     const token = this._accessToken();
-    if (!token) return undefined;
-    return { headers: { Authorization: `Bearer ${token}` } };
+    if (!token) return { context };
+    return { headers: { Authorization: `Bearer ${token}` }, context };
   }
 
 
@@ -721,6 +723,13 @@ export class ChatService implements OnDestroy {
           m.id === tempId ? { ...m, failed: true, pending: false } : m
         )
       );
+
+    const MAX_CHAT_FILE_SIZE_BYTES = 24 * 1024 * 1024; // 24MB
+    if (file.size > MAX_CHAT_FILE_SIZE_BYTES) {
+      console.error(`[ChatService] File size (${file.size} bytes) exceeds maximum limit of 24MB.`);
+      markUploadFailed();
+      return;
+    }
 
     this.uploadChatMedia(checkupId, file, { isDoctor }).subscribe({
       next: res => {

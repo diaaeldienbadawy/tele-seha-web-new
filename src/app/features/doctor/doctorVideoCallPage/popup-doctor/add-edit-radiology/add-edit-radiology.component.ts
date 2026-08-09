@@ -139,10 +139,13 @@ export class AddEditRadiologyComponent implements OnInit {
   onRadiologySelect(event: any, index: number): void {
     const selectedId = event.value;
     const selected = this.radiology.find((x) => x.id === selectedId);
+    if (!selected) return;
+
+    const currentNotes = this.radiologyMedicines.at(index).get('notes')?.value;
     this.radiologyMedicines.at(index).patchValue({
-      id: selected?.id,
-      name: selected?.name,
-      notes: selected?.notes,
+      id: selected.id,
+      name: selected.name,
+      notes: currentNotes || selected.notes || '',
     });
   }
 

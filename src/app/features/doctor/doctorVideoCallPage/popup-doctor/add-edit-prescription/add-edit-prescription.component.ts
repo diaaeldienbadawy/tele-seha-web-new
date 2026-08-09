@@ -68,11 +68,13 @@ export class AddEditPrescriptionComponent implements OnInit {
         medicinesArray.clear(); // مهم جدا
 
         (prescription.medicines ?? []).forEach((medicine: any) => {
+          const itemNote = medicine.instructions || medicine.notes || '';
           medicinesArray.push(
             this.fb.group({
-              id: [medicine.id],
+              id: [medicine.id, Validators.required],
               name: [medicine.name],
-              instructions: [medicine.instructions],
+              instructions: [itemNote],
+              notes: [itemNote],
             }),
           );
         });
@@ -96,7 +98,7 @@ export class AddEditPrescriptionComponent implements OnInit {
   }
 
   private ensureDrugsIncludeMedicines(
-    medicines: Array<{ id: number; name: string; instructions?: string }>,
+    medicines: Array<{ id: number; name: string; instructions?: string; notes?: string }>,
   ): void {
     if (!medicines?.length) return;
     const existing = new Set(this.drugs.map((d) => d.id));
@@ -105,7 +107,8 @@ export class AddEditPrescriptionComponent implements OnInit {
       .map((m) => ({
         id: m.id,
         name: m.name,
-        instructions: m.instructions,
+        instructions: m.instructions || m.notes,
+        notes: m.notes || m.instructions,
       }));
     if (extra.length) {
       this.drugs = [...this.drugs, ...extra];
@@ -121,7 +124,13 @@ export class AddEditPrescriptionComponent implements OnInit {
       id: [null, Validators.required],
       name: [''],
       instructions: [''],
+      notes: [''],
     });
+  }
+
+  onMedicineNoteInput(index: number): void {
+    const val = this.medicines.at(index).get('instructions')?.value;
+    this.medicines.at(index).patchValue({ notes: val }, { emitEvent: false });
   }
 
   onDrugSelect(event: any, index: number): void {
@@ -131,10 +140,14 @@ export class AddEditPrescriptionComponent implements OnInit {
 
     if (!selectedDrug) return;
 
+    const currentInst = this.medicines.at(index).get('instructions')?.value;
+    const defaultInst = selectedDrug.instructions || selectedDrug.description || '';
+
     this.medicines.at(index).patchValue({
       id: selectedDrug.id,
       name: selectedDrug.name,
-      instructions: selectedDrug.instructions || selectedDrug.description,
+      instructions: currentInst || defaultInst,
+      notes: currentInst || defaultInst,
     });
   }
 
