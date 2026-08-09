@@ -55,11 +55,17 @@
           title="Toggle mic">
           <i [class]="micMuted ? 'fa-solid fa-microphone-slash' : 'fa-solid fa-microphone'"></i>
         </button>
-        <button type="button" (click)="endCall()" [disabled]="isClosing"
-          class="ts-video-btn-control end-call"
-          title="End call">
-          <i [class]="isClosing ? 'fa-solid fa-circle-notch fa-spin' : 'fa-solid fa-phone-slash'"></i>
-        </button>
+        <span class="ts-gate" [class.is-blocked]="!hasDiagnosis()"
+          [attr.data-tip]="hasDiagnosis() ? null : blockedReason()">
+          <button type="button" (click)="endCall()" [disabled]="isClosing || !hasDiagnosis()"
+            [attr.aria-disabled]="isClosing || !hasDiagnosis()"
+            class="ts-video-btn-control end-call"
+            [attr.title]="hasDiagnosis() ? 'End call' : blockedReason()">
+            <i [class]="isClosing
+              ? 'fa-solid fa-circle-notch fa-spin'
+              : (hasDiagnosis() ? 'fa-solid fa-phone-slash' : 'fa-solid fa-lock')"></i>
+          </button>
+        </span>
         <button type="button" (click)="toggleCamera()"
           [class]="cameraOff ? 'ts-video-btn-control muted' : 'ts-video-btn-control active'"
           title="Toggle camera">

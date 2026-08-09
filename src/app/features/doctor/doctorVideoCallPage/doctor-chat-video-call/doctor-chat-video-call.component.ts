@@ -2,10 +2,13 @@ import {
   AfterViewChecked,
   Component,
   ElementRef,
-  inject,
+  Input,
+  OnChanges,
   OnDestroy,
   OnInit,
+  SimpleChanges,
   ViewChild,
+  inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ChatService } from '../../../patient/service/chat.service';
@@ -17,38 +20,74 @@ import { LocalstorageService } from '../../../../core/services/localstorage.serv
   templateUrl: './doctor-chat-video-call.component.html',
   styleUrl: './doctor-chat-video-call.component.css',
 })
-export class DoctorChatVideoCallComponent implements OnInit, AfterViewChecked, OnDestroy {
+export class DoctorChatVideoCallComponent
+  implements OnInit, OnChanges, AfterViewChecked, OnDestroy
+{
   @ViewChild('chatContainer') chatContainer!: ElementRef<HTMLElement>;
   @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;
+
+  /**
+   * معرّف الكشف الجاي من السيرفر (`meetingReport.checkUpId`) — دا المصدر الموثوق.
+   * قبل كده الشات كان بيقراه من `agoraDetails` في localStorage بس: أي مسار دخول
+   * مكتبش المفتاح (أو كتب نسخة قديمة) كان بيخلي الشات يشتغل على غرفة غلط أو
+   * ميشتغلش خالص — وطبعًا الرسايل ماتوصلش.
+   */
+  @Input() checkUpIdInput?: number | string | null;
 
   private chatService = inject(ChatService);
   private localStorageService = inject(LocalstorageService);
   messages = this.chatService.messages;
+  connectionState = this.chatService.connectionState;
   checkUpId = '';
 
   private _lastMessageCount = 0;
 
   ngOnInit(): void {
-    // let checkUpId = this.localStorageService.get('checkUpId');
-    let checkUpId = JSON.parse(localStorage.getItem('agoraDetails') || '{}')?.checkUpId;
-    console.log('checkUpId', checkUpId);
+    this.connect();
+  }
 
-    if (!checkUpId) {
-      const raw = localStorage.getItem('agoraDetails') || '{}';
-      const stored = JSON.parse(raw);
-      checkUpId = stored?.checkUpId;
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['checkUpIdInput'] && !changes['checkUpIdInput'].firstChange) {
+      this.connect();
     }
+  }
+
+  private connect(): void {
+    const checkUpId = this.resolveCheckUpId();
     if (!checkUpId) {
-      console.error('No checkUpId found for doctor chat');
+      console.error('[DoctorChat] No checkUpId available for this meeting');
       return;
     }
+    if (checkUpId === this.checkUpId) return;
 
-    this.checkUpId = String(checkUpId);
-    const userId = this.localStorageService.get('doctorId');
-    if (userId) {
-      this.chatService.startConnection(userId);
-    }
+    this.checkUpId = checkUpId;
+    // الـ userId مجرد معلومة في الـ query — السيرفر بيتعرف على المستخدم من التوكن،
+    // فالاتصال مبقاش متوقف على وجود مفتاح doctorId في الميموري.
+    this.chatService.startConnection(this.localStorageService.get('doctorId'));
     this.chatService.loadRoomMessages(this.checkUpId);
+  }
+
+  /** الـ Input أولًا، وبعدين مفاتيح الميتينج المخزّنة كـ fallback. */
+  private resolveCheckUpId(): string {
+    if (this.checkUpIdInput != null && String(this.checkUpIdInput).trim() !== '') {
+      return String(this.checkUpIdInput);
+    }
+
+    const stored = this.parseStored(localStorage.getItem('agoraDetails'));
+    const fromAgora = stored?.checkUpId ?? stored?.checkUp?.id;
+    if (fromAgora) return String(fromAgora);
+
+    const raw = localStorage.getItem('checkUpId');
+    return raw ? String(raw) : '';
+  }
+
+  private parseStored(raw: string | null): any {
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
   }
 
   ngAfterViewChecked(): void {

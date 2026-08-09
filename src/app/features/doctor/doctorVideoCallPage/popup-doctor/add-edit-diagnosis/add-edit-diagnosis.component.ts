@@ -13,6 +13,7 @@ import { DoctorsService } from '../../../../../shared/services/doctors.service';
 import { CommonModule } from '@angular/common';
 import { Select } from 'primeng/select';
 import { ToastrService } from 'ngx-toastr';
+import { MeetingDiagnosisStateService } from '../../../service/meeting-diagnosis-state.service';
 
 /**
  * تشخيص الكشف: الطبيب بيختار من كتالوج التشخيصات (نفس فكرة الأدوية والتحاليل والأشعة)،
@@ -38,6 +39,7 @@ export class AddEditDiagnosisComponent implements OnInit {
   meetingId!: number;
   private readonly fb = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
+  private readonly diagnosisState = inject(MeetingDiagnosisStateService);
 
   ngOnInit(): void {
     this.route.params.subscribe((params) => {
@@ -56,6 +58,8 @@ export class AddEditDiagnosisComponent implements OnInit {
     this.doctorsService.getReports(this.meetingId, true).subscribe({
       next: (res: any) => {
         const saved: string[] = res?.diagnoses ?? [];
+        // نفس مصدر السيرفر بيحدّد كمان هل باقي أزرار الكشف مفتوحة ولا لأ.
+        this.diagnosisState.setFromMeetingReport(this.meetingId, saved);
         if (!saved.length) return;
 
         const rows = this.diagnosisRows;
@@ -178,6 +182,8 @@ export class AddEditDiagnosisComponent implements OnInit {
     this.DoctorAuthService.sendDiagnoses(this.meetingId, { diagnosesList }).subscribe({
       next: () => {
         this.toastr.success('تم حفظ التشخيص بنجاح');
+        // بيفتح أزرار الروشتة/التحاليل/الأشعة وإنهاء الكشف فورًا.
+        this.diagnosisState.markDiagnosisRecorded();
         this.closeDiagnosis.emit();
       },
       error: (err) => {

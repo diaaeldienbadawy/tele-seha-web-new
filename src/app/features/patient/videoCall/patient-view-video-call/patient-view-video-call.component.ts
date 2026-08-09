@@ -49,6 +49,8 @@ export class PatientViewVideoCallComponent implements OnInit {
   private meetingChild?: PatientMeetingVideoCallComponent;
 
   private destroyRef = inject(DestroyRef);
+  /** بيمنع الضغط المتكرر أثناء توليد الـ PDF (بياخد لحظة على الأجهزة البطيئة). */
+  isDownloading = false;
 
   constructor(
     @Inject(PLATFORM_ID) readonly platformId: Object,
@@ -184,43 +186,6 @@ export class PatientViewVideoCallComponent implements OnInit {
     await exportReportToPdf('videoCallReportContent', filename);
   }
 
-  generatePrescriptionText(): string {
-    let text = '--- Prescription ---\n\n';
-    text += `Patient: ${this.agoraDetailsPatient?.patientName || 'Not Found'}\n`;
-    text += `Doctor: ${this.agoraDetailsPatient?.doctor?.name || 'Not Found'}\n\n`;
-
-    // Lab Analyses
-    text += 'Lab Analyses:\n';
-    if (this.meetingReport?.labAnalysisRequest?.labAnalyses?.length) {
-      this.meetingReport.labAnalysisRequest.labAnalyses.forEach((lab: any) => {
-        text += `- ${lab.name} (${lab.notes || 'No Notes'})\n`;
-      });
-    } else text += 'Not Found\n';
-
-    // Radiology
-    text += '\nRadiological Examinations:\n';
-    if (
-      this.meetingReport?.radiologicalExaminationRequest
-        ?.radiologicalExaminations?.length
-    ) {
-      this.meetingReport.radiologicalExaminationRequest.radiologicalExaminations.forEach(
-        (rad: any) => {
-          text += `- ${rad.name} (${rad.notes || 'No Notes'})\n`;
-        },
-      );
-    } else text += 'Not Found\n';
-
-    // Prescription
-    text += '\nMedicines:\n';
-    if (this.meetingReport?.prescription?.medicines?.length) {
-      this.meetingReport.prescription.medicines.forEach((med: any) => {
-        text += `- ${med.name}: ${med.instructions}\n`;
-      });
-    } else text += 'Not Found\n';
-
-    return text;
-  }
-
   showPopupSessionSuccess: boolean = false;
   showPopupRating: boolean = false;
   showPopupPrescription: boolean = false;
@@ -265,17 +230,19 @@ export class PatientViewVideoCallComponent implements OnInit {
    */
   private refreshReports(openPopup: boolean) {
     if (!this.sessionId) {
-      if (openPopup) this.showPopupPrescription = true;
+      if (openPopup) this.openPopupPrescription();
       return;
     }
     this.patientVideoCall.getMeetingReportsByCheckup(this.sessionId).subscribe({
       next: (res) => {
         this.meetingReport = res;
-        if (openPopup) this.showPopupPrescription = true;
+        if (openPopup) {
+          this.showPopupPrescription = true;
+        }
       },
       error: () => {
         // حتى لو التحديث فشل بنعرض آخر نسخة موجودة بدل ما نحبس المريض.
-        if (openPopup) this.showPopupPrescription = true;
+        if (openPopup) this.openPopupPrescription();
       },
     });
   }
@@ -343,7 +310,7 @@ export class PatientViewVideoCallComponent implements OnInit {
           this.toastr.error(message);
           if (message.includes('بالفعل')) {
             this.showPopupRating = false;
-            this.showPopupPrescription = true;
+            this.openPopupPrescription();
           }
           return;
         }

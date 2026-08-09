@@ -60,6 +60,26 @@ export class DoctorCheckupsPageComponent implements OnInit {
     this.notificationService.reportEvents$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.reloadOpenDetails());
+
+    // حالة الحجز بتتغير من بره الصفحة دي كمان (بدء كشف، إلغاء، اكتمال) — واللستة
+    // هنا بتعرض الكشوفات وحالتها، فلازم تتحدّث لحظياً زي باقي اللستات.
+    this.notificationService.appointmentEvents$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.reload();
+        this.reloadOpenDetails();
+      });
+  }
+
+  /** Silent list refresh (no spinner, keeps the expanded case open). */
+  private reload(): void {
+    if (!this.doctorId) return;
+    this.doctorService
+      .getDoctorCheckups(this.doctorId, this.filter === 'completed')
+      .subscribe({
+        next: (res: any[]) => (this.checkups = res || []),
+        error: () => {},
+      });
   }
 
   /** Silently re-fetch the expanded case's details (no spinner, no collapse). */

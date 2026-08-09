@@ -5,8 +5,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { LocalstorageService } from '../../../../core/services/localstorage.service';
 import { PatientReportsService } from '../../service/patient-reports.service';
 import { NotificationService } from '../../service/notification.service';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
 import { TranslateModule } from '@ngx-translate/core';
 import { exportReportToPdf } from '../../../../shared/utils/pdf-exporter';
 
@@ -29,6 +27,7 @@ export class PatientReportRadiologySectionComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
 
   selectedId: number | null = null;
+  isDownloading = false;
 
   data: any[] = [];
 

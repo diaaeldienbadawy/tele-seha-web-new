@@ -2,10 +2,13 @@ import {
   AfterViewChecked,
   Component,
   ElementRef,
-  inject,
+  Input,
+  OnChanges,
   OnDestroy,
   OnInit,
+  SimpleChanges,
   ViewChild,
+  inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ChatService } from '../../service/chat.service';
@@ -17,32 +20,74 @@ import { LocalstorageService } from '../../../../core/services/localstorage.serv
   templateUrl: './patient-chat-video-call.component.html',
   styleUrl: './patient-chat-video-call.component.css',
 })
-export class PatientChatVideoCallComponent implements OnInit, AfterViewChecked, OnDestroy {
+export class PatientChatVideoCallComponent
+  implements OnInit, OnChanges, AfterViewChecked, OnDestroy
+{
   @ViewChild('chatContainer') chatContainer!: ElementRef<HTMLElement>;
   @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;
+
+  /**
+   * معرّف الكشف من الصفحة الأب (الراوت `videoCall/:sessionId` هو أصلًا checkUp.id،
+   * ونفس القيمة بترجع من `meetingReport.checkUpId`). كان بيتقرا من localStorage
+   * وبيبص على مفتاح الطبيب `agoraDetails` الأول — مصدر غلط في متصفح شغّال عليه
+   * الحسابين، وفاضي في مسارات دخول تانية، فالشات كان بيقع من غير غرفة.
+   */
+  @Input() checkUpIdInput?: number | string | null;
 
   private chatService = inject(ChatService);
   private localStorageService = inject(LocalstorageService);
   messages = this.chatService.messages;
+  connectionState = this.chatService.connectionState;
   checkUpId = '';
 
   private _lastMessageCount = 0;
 
   ngOnInit(): void {
-    const raw = localStorage.getItem('agoraDetails') || localStorage.getItem('agoraDetailsPatient') || '{}';
-    const stored = JSON.parse(raw);
-    const checkUpId = stored?.checkUpId;
+    this.connect();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['checkUpIdInput'] && !changes['checkUpIdInput'].firstChange) {
+      this.connect();
+    }
+  }
+
+  private connect(): void {
+    const checkUpId = this.resolveCheckUpId();
     if (!checkUpId) {
-      console.error('No checkUpId found in agoraDetails / agoraDetailsPatient');
+      console.error('[PatientChat] No checkUpId available for this meeting');
       return;
     }
+    if (checkUpId === this.checkUpId) return;
 
-    this.checkUpId = String(checkUpId);
-    const userId = this.localStorageService.get('patientId');
-    if (userId) {
-      this.chatService.startConnection(userId);
-    }
+    this.checkUpId = checkUpId;
+    this.chatService.startConnection(this.localStorageService.get('patientId'));
     this.chatService.loadRoomMessages(this.checkUpId);
+  }
+
+  private resolveCheckUpId(): string {
+    if (this.checkUpIdInput != null && String(this.checkUpIdInput).trim() !== '') {
+      return String(this.checkUpIdInput);
+    }
+
+    // مفتاح المريض قبل مفتاح الطبيب — العكس كان بيقرأ غرفة الطبيب.
+    const stored =
+      this.parseStored(localStorage.getItem('agoraDetailsPatient')) ??
+      this.parseStored(localStorage.getItem('agoraDetails'));
+    const fromAgora = stored?.checkUpId ?? stored?.checkUp?.id;
+    if (fromAgora) return String(fromAgora);
+
+    const raw = localStorage.getItem('checkUpId');
+    return raw ? String(raw) : '';
+  }
+
+  private parseStored(raw: string | null): any {
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
   }
 
   onSend(inputEl: HTMLInputElement): void {

@@ -1,23 +1,47 @@
 
 
 
+<!--
+  الروشتة/التحاليل/الأشعة مقفولة لحد ما الطبيب يسجّل التشخيص (نفس القاعدة اللي
+  السيرفر بيطبّقها على إنهاء الكشف). الزرار المقفول ملفوف في .ts-gate عشان الـ
+  tooltip يظهر: الماوس مبيوصلش لزرار disabled فالـ title عليه مكانش هيبان أصلًا.
+-->
 <div class="grid grid-cols-2 gap-3 md:flex md:justify-between md:gap-4 items-center mb-6">
-  <button (click)="openPopupPrescription()" class="w-full ts-btn-primary flex items-center justify-center gap-2 py-3 px-2 rounded-xl shadow-xs text-sm font-bold hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200">
-    <i class="fa-solid fa-pills text-lg"></i>
-    <span>كتابة الروشتة</span>
-  </button>
-  <button (click)="openPopupDiagnosis()" class="w-full bg-white border border-slate-200 text-[#007BBD] hover:border-[#007BBD] hover:bg-slate-50 flex items-center justify-center gap-2 py-3 px-2 rounded-xl text-sm font-bold hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 shadow-2xs">
+  <span class="ts-gate w-full" [class.is-blocked]="!hasDiagnosis()" [attr.data-tip]="hasDiagnosis() ? null : blockedReason()">
+    <button (click)="openPopupPrescription()" [disabled]="!hasDiagnosis()" [attr.aria-disabled]="!hasDiagnosis()"
+      class="w-full ts-btn-primary flex items-center justify-center gap-2 py-3 px-2 rounded-xl shadow-xs text-sm font-bold hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200">
+      <i class="fa-solid fa-pills text-lg"></i>
+      <span>كتابة الروشتة</span>
+      @if (!hasDiagnosis()) { <i class="fa-solid fa-lock text-xs opacity-80"></i> }
+    </button>
+  </span>
+
+  <button (click)="openPopupDiagnosis()" class="w-full bg-white border flex items-center justify-center gap-2 py-3 px-2 rounded-xl text-sm font-bold hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 shadow-2xs"
+    [class]="hasDiagnosis()
+      ? 'border-slate-200 text-[#007BBD] hover:border-[#007BBD] hover:bg-slate-50'
+      : 'border-[#007BBD] text-[#007BBD] ring-2 ring-[#007BBD]/15 hover:bg-slate-50'">
     <i class="fa-solid fa-stethoscope text-lg"></i>
     <span>التشخيص</span>
   </button>
-  <button (click)="openPopupLabTests()" class="w-full bg-white border border-slate-200 text-[#007BBD] hover:border-[#007BBD] hover:bg-slate-50 flex items-center justify-center gap-2 py-3 px-2 rounded-xl text-sm font-bold hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 shadow-2xs">
-    <i class="fa-solid fa-flask-vial text-lg"></i>
-    <span>طلب تحاليل</span>
-  </button>
-  <button (click)="openPopupRadiology()" class="w-full bg-white border border-slate-200 text-[#007BBD] hover:border-[#007BBD] hover:bg-slate-50 flex items-center justify-center gap-2 py-3 px-2 rounded-xl text-sm font-bold hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 shadow-2xs">
-    <i class="fa-solid fa-x-ray text-lg"></i>
-    <span>طلب أشعة</span>
-  </button>
+
+  <span class="ts-gate w-full" [class.is-blocked]="!hasDiagnosis()" [attr.data-tip]="hasDiagnosis() ? null : blockedReason()">
+    <button (click)="openPopupLabTests()" [disabled]="!hasDiagnosis()" [attr.aria-disabled]="!hasDiagnosis()"
+      class="w-full bg-white border border-slate-200 text-[#007BBD] hover:border-[#007BBD] hover:bg-slate-50 flex items-center justify-center gap-2 py-3 px-2 rounded-xl text-sm font-bold hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 shadow-2xs">
+      <i class="fa-solid fa-flask-vial text-lg"></i>
+      <span>طلب تحاليل</span>
+      @if (!hasDiagnosis()) { <i class="fa-solid fa-lock text-xs opacity-70"></i> }
+    </button>
+  </span>
+
+  <span class="ts-gate w-full" [class.is-blocked]="!hasDiagnosis()" [attr.data-tip]="hasDiagnosis() ? null : blockedReason()">
+    <button (click)="openPopupRadiology()" [disabled]="!hasDiagnosis()" [attr.aria-disabled]="!hasDiagnosis()"
+      class="w-full bg-white border border-slate-200 text-[#007BBD] hover:border-[#007BBD] hover:bg-slate-50 flex items-center justify-center gap-2 py-3 px-2 rounded-xl text-sm font-bold hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 shadow-2xs">
+      <i class="fa-solid fa-x-ray text-lg"></i>
+      <span>طلب أشعة</span>
+      @if (!hasDiagnosis()) { <i class="fa-solid fa-lock text-xs opacity-70"></i> }
+    </button>
+  </span>
+
   <button (click)="openPopupBookFollowUp()" class="w-full bg-white border border-slate-200 text-[#007BBD] hover:border-[#007BBD] hover:bg-slate-50 flex items-center justify-center gap-2 py-3 px-2 rounded-xl text-sm font-bold hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 shadow-2xs">
     <i class="fa-solid fa-calendar-check text-lg"></i>
     <span>حجز متابعة</span>

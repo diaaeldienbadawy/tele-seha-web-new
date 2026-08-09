@@ -1,5 +1,5 @@
 import { isPlatformBrowser } from '@angular/common';
-import { ChangeDetectorRef, Component, inject, Inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, Inject, Input, OnInit, PLATFORM_ID } from '@angular/core';
 import { Carousel } from 'primeng/carousel';
 import { ButtonModule } from 'primeng/button';
 import { PatientVideoCallService } from '../../service/patient-video-call.service';
@@ -15,6 +15,8 @@ import { Environment } from '../../../../../environments/environment.development
 export class PatientSendPictureVideoCallComponent implements OnInit {
   checkUpId = '';
   id = 0;
+  /** نفس مصدر الشات: معرّف الكشف من السيرفر، مش تخمين من localStorage. */
+  @Input() checkUpIdInput?: number | string | null;
   constructor(
     readonly patientVideoCall: PatientVideoCallService,
     private readonly chatService: ChatService,
@@ -23,17 +25,26 @@ export class PatientSendPictureVideoCallComponent implements OnInit {
 
   ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;
+
+    if (this.checkUpIdInput != null && String(this.checkUpIdInput).trim() !== '') {
+      this.checkUpId = String(this.checkUpIdInput);
+    }
+
+    // مفتاح المريض قبل مفتاح الطبيب.
     const raw =
-      localStorage.getItem('agoraDetails') || localStorage.getItem('agoraDetailsPatient') || '{}';
+      localStorage.getItem('agoraDetailsPatient') || localStorage.getItem('agoraDetails') || '{}';
 
     try {
       const stored = JSON.parse(raw) as { checkUpId?: unknown; checkupId?: unknown; id?: unknown };
-      console.log(stored.id);
       this.id = Number(stored.id);
       this.getImages();
 
-      const id = stored?.checkUpId ?? stored?.checkupId ?? stored?.id;
-      if (id != null && id !== '') this.checkUpId = String(id);
+      if (!this.checkUpId) {
+        // ملحوظة: من غير fallback على `stored.id` — دا الـ meetingId مش الـ checkUpId،
+        // وكان بيبعت صور الشات على غرفة مالهاش وجود فتضيع من غير أي رسالة خطأ.
+        const id = stored?.checkUpId ?? stored?.checkupId;
+        if (id != null && id !== '') this.checkUpId = String(id);
+      }
     } catch {
     }
   }

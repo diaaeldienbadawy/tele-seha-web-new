@@ -4,8 +4,6 @@ import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PatientReportsService } from '../../service/patient-reports.service';
 import { NotificationService } from '../../service/notification.service';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
 import { TranslateModule } from '@ngx-translate/core';
 import { exportReportToPdf } from '../../../../shared/utils/pdf-exporter';
 
@@ -25,6 +23,8 @@ export class PatientReportPrescriptionsSectionComponent implements OnInit {
     inject(LocalstorageService);
   private readonly notificationService = inject(NotificationService);
   private readonly destroyRef = inject(DestroyRef);
+
+  isDownloading = false;
 
   data: any;
 

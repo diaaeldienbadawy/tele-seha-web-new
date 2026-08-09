@@ -82,8 +82,18 @@
                 </div>
               }
               
-              <div class="flex items-center gap-1.5 mt-0.5 pr-1 text-[10px] text-slate-400 font-bold">
-                <span>{{ msg.createdAt | date:'HH:mm' }}</span>
+              <div class="flex items-center gap-1.5 mt-0.5 pr-1 text-[10px] font-bold"
+                [class]="msg.failed ? 'text-rose-500' : 'text-slate-400'">
+                @if (msg.pending) {
+                  <i class="fa-regular fa-clock"></i><span>جاري الإرسال…</span>
+                } @else if (msg.failed) {
+                  <i class="fa-solid fa-triangle-exclamation"></i><span>لم تُرسل</span>
+                } @else {
+                  <span class="text-[#007BBD]">
+                    <i class="fa-solid fa-check"></i>
+                    <i class="fa-solid fa-check -ml-1"></i>
+                  </span>
+                }
               </div>
             </div>
             
@@ -97,6 +107,24 @@
 
   <!-- Chat Input Bar -->
   <div class="my-5 w-full flex-shrink-0">
+
+    <!-- حالة الاتصال: فشل الاتصال كان بيفضل في الـ console بس والطبيب يفتكر إن الشات شغال -->
+    @if (connectionState() !== 'connected') {
+      <div class="mb-2 flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold"
+        [class]="connectionState() === 'error'
+          ? 'bg-rose-50 border border-rose-100 text-rose-600'
+          : 'bg-amber-50 border border-amber-100 text-amber-700'">
+        <i [class]="connectionState() === 'error'
+          ? 'fa-solid fa-triangle-exclamation'
+          : 'fa-solid fa-circle-notch fa-spin'"></i>
+        <span>
+          {{ connectionState() === 'error'
+            ? 'انقطع الاتصال بالمحادثة — جاري إعادة المحاولة. رسائلك محفوظة وهتتبعت أول ما يرجع.'
+            : 'جاري الاتصال بالمحادثة…' }}
+        </span>
+      </div>
+    }
+
     <div class="ts-chat-input-container">
       
       <input #fileInput type="file" class="hidden" tabindex="-1"

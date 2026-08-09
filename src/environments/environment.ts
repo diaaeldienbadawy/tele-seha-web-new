@@ -12,15 +12,14 @@ export class Environment {
   // NOTE: The Agora app certificate is a SECRET and must never be shipped to the client.
   // RTC tokens are issued by the backend at GET /api/meeting/rtc-token/{checkUpId}.
 
-  // public static readonly patientnotificationHubUrl =
-  //   'https://teleseha5-001-site1.ftempurl.com/hubs/patient_notification';
-  public static readonly patientnotificationHubUrl = 'http://localhost:5159/hubs/patient_notification';
+  /** نفس قاعدة environment.development: الـ hubs بتتولد من apiUrl عشان ماتفترقش عنه. */
+  private static readonly hubsOrigin = Environment.apiUrl
+    .replace(/\/+$/, '')
+    .replace(/\/v\d+$/i, '');
 
-  // public static readonly doctornotificationHubUrl =
-  //   'https://teleseha5-001-site1.ftempurl.com/hubs/doctor_notification';
-  public static readonly doctornotificationHubUrl = 'http://localhost:5159/hubs/doctor_notification';
+  public static readonly patientnotificationHubUrl = `${Environment.hubsOrigin}/hubs/patient_notification`;
 
-  // public static readonly chatHubUrl =
-  //   'https://teleseha5-001-site1.ftempurl.com/hubs/chat';
-  public static readonly chatHubUrl = 'http://localhost:5159/hubs/chat';
+  public static readonly doctornotificationHubUrl = `${Environment.hubsOrigin}/hubs/doctor_notification`;
+
+  public static readonly chatHubUrl = `${Environment.hubsOrigin}/hubs/chat`;
 }

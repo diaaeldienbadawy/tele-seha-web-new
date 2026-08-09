@@ -5,8 +5,6 @@ import { LocalstorageService } from '../../../../core/services/localstorage.serv
 import { PatientReportsService } from '../../service/patient-reports.service';
 import { NotificationService } from '../../service/notification.service';
 import { PopupUploadComponent } from '../popup-upload/popup-upload.component';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
 import { TranslateModule } from '@ngx-translate/core';
 import { exportReportToPdf } from '../../../../shared/utils/pdf-exporter';
 
@@ -29,6 +27,7 @@ export class PatientReportLabTestsSectionComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
 
   selectedId: number | null = null;
+  isDownloading = false;
 
   data: any;
 

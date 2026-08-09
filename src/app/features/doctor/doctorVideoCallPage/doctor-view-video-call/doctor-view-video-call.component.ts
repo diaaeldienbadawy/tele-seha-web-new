@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { DoctorMeetingVideoCallComponent } from '../doctor-meeting-video-call/doctor-meeting-video-call.component';
 import { DoctorChatVideoCallComponent } from '../doctor-chat-video-call/doctor-chat-video-call.component';
 import { CommonModule } from '@angular/common';
@@ -7,6 +7,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { DoctorsService } from '../../../../shared/services/doctors.service';
 import { ToastrService } from 'ngx-toastr';
 import { TranslateModule } from '@ngx-translate/core';
+import { MeetingDiagnosisStateService } from '../../service/meeting-diagnosis-state.service';
 
 @Component({
   selector: 'app-doctor-view-video-call',
@@ -27,6 +28,8 @@ export class DoctorViewVideoCallComponent implements OnInit, OnDestroy {
   isMeetingValid = false;
   meetingReport: any = null;
 
+  private readonly diagnosisState = inject(MeetingDiagnosisStateService);
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -37,6 +40,9 @@ export class DoctorViewVideoCallComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.route.params.subscribe((params) => {
       this.meetingId = Number(params['meetingId']);
+      // ميتينج جديد يبدأ بحالة تشخيص فاضية لحد ما السيرفر يقول العكس، عشان
+      // ماينفعش تشخيص كشف سابق يفضل مفعّل الأزرار في كشف جديد.
+      this.diagnosisState.reset();
       if (this.meetingId) {
         this.checkMeetingStatus();
       } else {
@@ -63,6 +69,7 @@ export class DoctorViewVideoCallComponent implements OnInit, OnDestroy {
         }
 
         this.meetingReport = res;
+        this.diagnosisState.setFromMeetingReport(this.meetingId, res?.diagnoses);
         this.isMeetingValid = true;
         this.isValidating = false;
       },
@@ -82,7 +89,10 @@ export class DoctorViewVideoCallComponent implements OnInit, OnDestroy {
   refreshMeetingReport() {
     if (!this.meetingId) return;
     this.doctorService.getReports(this.meetingId).subscribe({
-      next: (res) => (this.meetingReport = res),
+      next: (res) => {
+        this.meetingReport = res;
+        this.diagnosisState.setFromMeetingReport(this.meetingId, res?.diagnoses);
+      },
       error: () => {
         // بنسيب آخر نسخة موجودة — فشل تحديث ماينفعش يقطع المكالمة.
       },
@@ -90,6 +100,7 @@ export class DoctorViewVideoCallComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.diagnosisState.reset();
     localStorage.removeItem('agoraDetails');
     localStorage.removeItem('meetingId');
     localStorage.removeItem('channelName');

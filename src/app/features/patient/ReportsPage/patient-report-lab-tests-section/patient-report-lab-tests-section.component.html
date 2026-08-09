@@ -232,9 +232,9 @@
       </div>
 
       <!-- Download -->
-      <button (click)="downloadPDF()" class="ts-btn-primary w-full rpt-download">
-        <i class="fa-solid fa-download"></i>
-        {{ 'doctorsList.downloadLabTest' | translate }}
+      <button (click)="downloadPDF()" [disabled]="isDownloading" class="ts-btn-primary w-full rpt-download">
+        <i [class]="isDownloading ? 'fa-solid fa-circle-notch fa-spin' : 'fa-solid fa-file-pdf'"></i>
+        {{ isDownloading ? 'جاري تجهيز الملف…' : ('doctorsList.downloadLabTest' | translate) }}
       </button>
     </div>
 

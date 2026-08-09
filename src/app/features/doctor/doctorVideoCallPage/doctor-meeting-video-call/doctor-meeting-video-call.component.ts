@@ -13,6 +13,7 @@ import { ToastrService } from 'ngx-toastr';
 import { AgoraService } from '../../service/agora.service';
 import { DoctorsService } from '../../../../shared/services/doctors.service';
 import { LocalstorageService } from '../../../../core/services/localstorage.service';
+import { MeetingDiagnosisStateService } from '../../service/meeting-diagnosis-state.service';
 
 const CALL_DURATION_SEC = 15 * 60;
 
@@ -33,6 +34,14 @@ export class DoctorMeetingVideoCallComponent implements OnDestroy {
   private doctorService: DoctorsService = inject(DoctorsService);
   private toaster: ToastrService = inject(ToastrService);
   private router: Router = inject(Router);
+  private diagnosisState = inject(MeetingDiagnosisStateService);
+  /**
+   * إنهاء الكشف من غير تشخيص السيرفر بيرفضه (400 "لا يمكن إنهاء الكشف قبل تسجيل
+   * التشخيص")، فكان الطبيب بيدوس إنهاء ويستقبل رسالة خطأ بدل ما الزرار يقوله
+   * الشرط من الأول. بنقفل الزرار ونوضّح السبب في tooltip.
+   */
+  readonly hasDiagnosis = this.diagnosisState.hasDiagnosis;
+  readonly blockedReason = this.diagnosisState.blockedReason;
   localTracks: any[] | null = null;
   micMuted = false;
   cameraOff = false;
@@ -266,6 +275,10 @@ export class DoctorMeetingVideoCallComponent implements OnDestroy {
 
   /** Explicit end (End-call button): close the meeting on the server, then leave the channel. */
   endCall() {
+    if (!this.hasDiagnosis()) {
+      this.toaster.info(this.blockedReason());
+      return;
+    }
     this.closeMeeting();
   }
 

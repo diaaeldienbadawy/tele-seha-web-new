@@ -1,5 +1,7 @@
 import { DoctorAuthService } from './../../service/doctor-auth.service';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
+import { MeetingDiagnosisStateService } from '../../service/meeting-diagnosis-state.service';
 import { CommonModule } from '@angular/common';
 import { AddEditPrescriptionComponent } from './add-edit-prescription/add-edit-prescription.component';
 import { AddEditLabtestComponent } from './add-edit-labtest/add-edit-labtest.component';
@@ -23,14 +25,32 @@ import { AddEditDiagnosisComponent } from './add-edit-diagnosis/add-edit-diagnos
 export class PopupDoctorComponent {
   constructor(readonly DoctorAuthService: DoctorAuthService) {}
 
+  private readonly diagnosisState = inject(MeetingDiagnosisStateService);
+  private readonly toastr = inject(ToastrService);
+
+  /**
+   * الروشتة والتحاليل والأشعة كلها مبنية على التشخيص — مالهاش معنى قبله، والسيرفر
+   * كمان بيرفض إنهاء الكشف من غير تشخيص. فبنقفلها لحد ما الطبيب يسجّل التشخيص.
+   */
+  readonly hasDiagnosis = this.diagnosisState.hasDiagnosis;
+  readonly blockedReason = this.diagnosisState.blockedReason;
+
   showPopupPrescription: boolean = false;
   showPopupRadiology: boolean = false;
   showPopupLabTests: boolean = false;
   showPopupDiagnosis: boolean = false;
   bookFollowUp: boolean = false;
 
+  /** حماية إضافية لو الزرار اتفعّل بأي طريقة (keyboard / DOM). */
+  private requireDiagnosis(): boolean {
+    if (this.hasDiagnosis()) return true;
+    this.toastr.info(this.blockedReason());
+    return false;
+  }
+
   // Prescription
   openPopupPrescription() {
+    if (!this.requireDiagnosis()) return;
     this.showPopupPrescription = true;
   }
   closePrescription() {
@@ -39,6 +59,7 @@ export class PopupDoctorComponent {
 
   // Radiology
   openPopupRadiology() {
+    if (!this.requireDiagnosis()) return;
     this.showPopupRadiology = true;
   }
   closeRadiology() {
@@ -46,6 +67,7 @@ export class PopupDoctorComponent {
   }
   // Lab Tests
   openPopupLabTests() {
+    if (!this.requireDiagnosis()) return;
     this.showPopupLabTests = true;
   }
   closeLabTest() {
