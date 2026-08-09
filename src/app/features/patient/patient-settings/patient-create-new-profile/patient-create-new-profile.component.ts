@@ -268,9 +268,20 @@ export class PatientCreateNewProfileComponent implements OnInit {
       City: ['', Validators.required],
       MaritalStatus: ['', Validators.required],
       JobTitle: ['', Validators.required],
-      Height: ['', Validators.required],
-      Weight: ['', Validators.required],
+      Height: ['', [Validators.required, Validators.min(1), Validators.max(300)]],
+      Weight: ['', [Validators.required, Validators.min(1), Validators.max(300)]],
     });
+  }
+
+  enforceMax(event: Event, max: number = 300): void {
+    const input = event.target as HTMLInputElement;
+    if (input.value && Number(input.value) > max) {
+      input.value = String(max);
+      const controlName = input.getAttribute('formControlName');
+      if (controlName && this.InfoForm?.get(controlName)) {
+        this.InfoForm.get(controlName)?.setValue(max);
+      }
+    }
   }
 
   loadInfoLists() {
@@ -311,6 +322,19 @@ export class PatientCreateNewProfileComponent implements OnInit {
       this.InfoForm.patchValue({
         City: '',
       });
+    });
+
+    // Height & Weight limits
+    this.InfoForm.get('Height')?.valueChanges.subscribe((val) => {
+      if (val !== null && val !== undefined && val !== '' && Number(val) > 300) {
+        this.InfoForm.get('Height')?.setValue(300, { emitEvent: false });
+      }
+    });
+
+    this.InfoForm.get('Weight')?.valueChanges.subscribe((val) => {
+      if (val !== null && val !== undefined && val !== '' && Number(val) > 300) {
+        this.InfoForm.get('Weight')?.setValue(300, { emitEvent: false });
+      }
     });
   }
 

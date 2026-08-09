@@ -116,7 +116,7 @@
         <!-- Question -->
         <div class="space-y-4">
           <h4 class="text-slate-700 text-base sm:text-lg font-bold leading-relaxed">
-            {{ currentSection.question }}
+            {{ currentSection.question || currentSection.sectionName }}
           </h4>
 
           <!-- Yes / No Options -->
@@ -292,6 +292,9 @@
               </label>
               <input 
                 type="number" 
+                min="1" 
+                max="300" 
+                (input)="enforceMax($event, 300)" 
                 formControlName="Height" 
                 placeholder="{{ 'patientProfile.heightPlaceholder' | translate }}"
                 class="ts-input h-12"
@@ -305,6 +308,9 @@
               </label>
               <input 
                 type="number" 
+                min="1" 
+                max="300" 
+                (input)="enforceMax($event, 300)" 
                 formControlName="Weight" 
                 placeholder="{{ 'patientProfile.weightPlaceholder' | translate }}"
                 class="ts-input h-12"

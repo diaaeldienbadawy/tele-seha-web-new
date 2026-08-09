@@ -367,8 +367,8 @@
     "selectMaritalStatus": "اختر الحالة الاجتماعية",
     "jobTitle": "المسمى الوظيفي",
     "selectJobTitle": "اختر المسمى الوظيفي",
-    "height": "الطول",
-    "weight": "الوزن",
+    "height": "الطول (سم)",
+    "weight": "الوزن (كجم)",
     "heightPlaceholder": "ما هو طولك؟",
     "weightPlaceholder": "ما هو وزنك؟",
     "submit": "إرسال"

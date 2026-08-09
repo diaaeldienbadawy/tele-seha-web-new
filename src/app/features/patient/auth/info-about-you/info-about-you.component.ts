@@ -116,9 +116,26 @@ export class InfoAboutYouComponent implements OnInit {
       City: ['', Validators.required], // city name
       MaritalStatus: ['', Validators.required],
       JobTitle: ['', Validators.required],
-      Height: ['', Validators.required],
-      Weight: ['', Validators.required],
+      Height: [
+        '',
+        [Validators.required, Validators.min(1), Validators.max(300)],
+      ],
+      Weight: [
+        '',
+        [Validators.required, Validators.min(1), Validators.max(300)],
+      ],
     });
+  }
+
+  enforceMax(event: Event, max: number = 300): void {
+    const input = event.target as HTMLInputElement;
+    if (input.value && Number(input.value) > max) {
+      input.value = String(max);
+      const controlName = input.getAttribute('formControlName');
+      if (controlName && this.basicInfoForm?.get(controlName)) {
+        this.basicInfoForm.get(controlName)?.setValue(max);
+      }
+    }
   }
 
   /* =======================
@@ -150,6 +167,19 @@ export class InfoAboutYouComponent implements OnInit {
       this.basicInfoForm.patchValue({
         City: '',
       });
+    });
+
+    // Height & Weight limits
+    this.basicInfoForm.get('Height')?.valueChanges.subscribe((val) => {
+      if (val !== null && val !== undefined && val !== '' && Number(val) > 300) {
+        this.basicInfoForm.get('Height')?.setValue(300, { emitEvent: false });
+      }
+    });
+
+    this.basicInfoForm.get('Weight')?.valueChanges.subscribe((val) => {
+      if (val !== null && val !== undefined && val !== '' && Number(val) > 300) {
+        this.basicInfoForm.get('Weight')?.setValue(300, { emitEvent: false });
+      }
     });
   }
 

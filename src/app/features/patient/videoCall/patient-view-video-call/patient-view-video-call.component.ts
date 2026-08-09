@@ -12,6 +12,8 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { PatientVideoCallService } from '../../service/patient-video-call.service';
 import { LocalstorageService } from '../../../../core/services/localstorage.service';
 import { ToastrService } from 'ngx-toastr';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 @Component({
   selector: 'app-patient-view-video-call',
@@ -169,13 +171,30 @@ export class PatientViewVideoCallComponent implements OnInit {
   }
 
   downloadPrescription() {
-    const element = document.createElement('a');
-    const content = this.generatePrescriptionText();
-    const blob = new Blob([content], { type: 'text/plain' });
-    element.href = URL.createObjectURL(blob);
-    element.download = `Prescription_RX-${this.meetingReport?.prescription?.id || 'NotFound'}.txt`;
-    element.click();
-    URL.revokeObjectURL(element.href);
+    const DATA = document.getElementById('videoCallReportContent');
+    if (!DATA) return;
+
+    html2canvas(DATA, {
+      scale: 2,
+      useCORS: true,
+    }).then((canvas) => {
+      const imgWidth = 210;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const contentDataURL = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      pdf.addImage(contentDataURL, 'PNG', 0, 0, imgWidth, imgHeight);
+
+      let filename = 'teleSEHA_Report.pdf';
+      if (this.currentSection === 0) {
+        filename = `LabTest_LAB-${this.meetingReport?.labAnalysisRequest?.id || 'Request'}.pdf`;
+      } else if (this.currentSection === 1) {
+        filename = `Radiology_RAD-${this.meetingReport?.radiologicalExaminationRequest?.id || 'Request'}.pdf`;
+      } else if (this.currentSection === 2) {
+        filename = `Prescription_RX-${this.meetingReport?.prescription?.id || 'Rx'}.pdf`;
+      }
+
+      pdf.save(filename);
+    });
   }
 
   generatePrescriptionText(): string {

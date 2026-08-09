@@ -120,13 +120,30 @@ export class DoctorRecurringAppointmentsComponent implements OnInit {
       this.form.patchValue({ Capacity: capacity }, { emitEvent: false });
     });
   }
+  enforceMax(event: Event, max: number = 100): void {
+    const input = event.target as HTMLInputElement;
+    if (input.value && Number(input.value) > max) {
+      input.value = String(max);
+      const controlName = input.getAttribute('formControlName');
+      if (controlName && this.form?.get(controlName)) {
+        this.form.get(controlName)?.setValue(max);
+      }
+    }
+  }
+
   initForm() {
     this.form = this.fb.group({
       Day: ['', Validators.required],
       StartTime: ['', Validators.required],
       EndTime: ['', Validators.required],
-      Capacity: [null, [Validators.required, Validators.min(1)]],
+      Capacity: [null, [Validators.required, Validators.min(1), Validators.max(100)]],
       DoctorId: [this.doctorId],
+    });
+
+    this.form.get('Capacity')?.valueChanges.subscribe((val) => {
+      if (val !== null && val !== undefined && val !== '' && Number(val) > 100) {
+        this.form.get('Capacity')?.setValue(100, { emitEvent: false });
+      }
     });
   }
 

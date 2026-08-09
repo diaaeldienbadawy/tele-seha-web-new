@@ -181,7 +181,7 @@
                 </label>
 
                 <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out" dir="ltr">
-                  <input type="number" formControlName="Price" placeholder="Enter the consultation fee in EGP"
+                  <input type="number" min="0" max="50000" (input)="enforceMax($event, 50000)" formControlName="Price" placeholder="Enter the consultation fee in EGP"
                     class="text-slate-800 text-[14px] font-normal bg-transparent w-full outline-none h-[44px] order-last">
                   <i class="fa-solid fa-money-bill-wave text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
                 </div>
@@ -192,6 +192,8 @@
                      <i class="fa-solid fa-circle-exclamation"></i>
                      @if (basicInfoForm.get('Price')?.errors?.['required']) {
                      Consultation Fee is required
+                     } @else if (basicInfoForm.get('Price')?.errors?.['max']) {
+                     Consultation Fee cannot exceed 50,000 EGP
                      }
                    </div>
                    }
@@ -205,7 +207,7 @@
                  </label>
 
                  <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out" dir="ltr">
-                   <input type="number" formControlName="FollowUpPrice" placeholder="Enter the follow-up fee in EGP"
+                   <input type="number" min="0" max="50000" (input)="enforceMax($event, 50000)" formControlName="FollowUpPrice" placeholder="Enter the follow-up fee in EGP"
                      class="text-slate-800 text-[14px] font-normal bg-transparent w-full outline-none h-[44px] order-last">
                    <i class="fa-solid fa-coins text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
                  </div>

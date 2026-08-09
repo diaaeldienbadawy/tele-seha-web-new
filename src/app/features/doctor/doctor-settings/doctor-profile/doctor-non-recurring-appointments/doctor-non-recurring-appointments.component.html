@@ -99,12 +99,12 @@
         <!-- Number of possible cases -->
         <div class="w-full col-span-1 md:col-span-2">
           <label class="block text-slate-700 text-[14px] font-semibold mb-[10px]">
-            Number of Possible Cases
+            Number of Possible Cases (Max 100)
           </label>
           
           <div class="border border-slate-200 bg-slate-50/40 rounded-full px-[18px] py-[4px] flex items-center w-full focus-within:border-(--primary-color) focus-within:ring-4 focus-within:ring-(--primary-color)/15 focus-within:bg-white transition-all duration-300 ease-in-out">
             <i class="fa-solid fa-user-group text-[#899CC9]/80 text-[18px] shrink-0 mr-2"></i>
-            <input formControlName="Capacity" type="number" min="1" placeholder="Enter capacity"
+            <input formControlName="Capacity" type="number" min="1" max="100" (input)="enforceMax($event, 100)" placeholder="Enter capacity (max 100)"
               class="text-slate-800 text-[14px] font-normal bg-transparent w-full outline-none h-[44px]">
           </div>
 
@@ -112,7 +112,11 @@
             @if(form.get('Capacity')?.touched && form.get('Capacity')?.invalid){
             <span class="text-red-500 text-[12px] font-medium flex items-center gap-1">
               <i class="fa-solid fa-circle-exclamation"></i>
-              Capacity is required
+              @if(form.get('Capacity')?.errors?.['max']) {
+                Capacity cannot exceed 100 cases
+              } @else {
+                Capacity is required
+              }
             </span>
             }
           </div>

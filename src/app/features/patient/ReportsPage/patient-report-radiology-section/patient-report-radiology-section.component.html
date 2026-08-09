@@ -129,34 +129,55 @@
     <div class="ts-modal-body">
       <div id="radiologyContent" class="rpt-doc">
 
+        <!-- PDF Platform Branding Header -->
+        <div class="rpt-pdf-header">
+          <div class="rpt-pdf-brand">
+            <img src="assets/images/Group 76373.svg" class="rpt-pdf-logo" alt="teleSEHA Logo" />
+            <div class="rpt-pdf-brand-text">
+              <h2 class="rpt-pdf-brand-title">منصة تلي صحة الطبية</h2>
+              <span class="rpt-pdf-brand-sub">teleSEHA Telemedicine Platform</span>
+            </div>
+          </div>
+          <div class="rpt-pdf-meta">
+            <span class="rpt-pdf-badge"><i class="fa-solid fa-x-ray"></i> طلب أشعة تشخيصية معتمد</span>
+            <p class="rpt-pdf-id">RAD-{{ radiology?.id || '—' }}</p>
+            @if (radiology?.meeting?.start) {
+            <span class="rpt-pdf-date">{{ radiology.meeting.start | date: 'dd/MM/yyyy - hh:mm a' }}</span>
+            }
+          </div>
+        </div>
+
+        <div class="rpt-pdf-divider"></div>
+
         <!-- Doctor & patient -->
         <div class="rpt-parties">
           <div>
+            <span class="rpt-label">الطبيب المعالج / Doctor</span>
             <div class="rpt-doc-name">
               <span>{{ radiology?.doctor?.name || '—' }}</span>
               @if (radiology?.doctor?.ratingValue) {
               <span class="rpt-star"><i class="fa-solid fa-star"></i> {{ radiology.doctor.ratingValue }}</span>
               }
             </div>
-            <p class="rpt-muted">{{ radiology?.doctor?.specialty }}</p>
+            <p class="rpt-muted">{{ radiology?.doctor?.specialty || 'تخصص عام' }}</p>
           </div>
           <div class="rpt-patient">
-            <span class="rpt-label">{{ 'reports.patientName' | translate }}</span>
-            <p class="rpt-strong">{{ patients?.name || '—' }}</p>
+            <span class="rpt-label">{{ 'reports.patientName' | translate }} / Patient</span>
+            <p class="rpt-strong">{{ patients?.name || 'اسم المريض غير متاح' }}</p>
             @if (radiology?.meeting?.start) {
-            <p class="rpt-muted">{{ 'doctor.selectDate' | translate }}: {{ radiology.meeting.start | date: 'dd/MM/yyyy' }}</p>
+            <p class="rpt-muted">تاريخ الطلب: {{ radiology.meeting.start | date: 'dd/MM/yyyy' }}</p>
             }
           </div>
         </div>
 
         <!-- Requested scans -->
         <div class="rpt-section">
-          <h4 class="rpt-h"><span class="rpt-bar"></span> {{ 'reports.radiology' | translate }}</h4>
+          <h4 class="rpt-h"><span class="rpt-bar"></span> {{ 'reports.radiology' | translate }} / Required Scans</h4>
           <div class="rpt-grid">
             @for (rad of radiology?.radiologicalExaminations; track rad.id) {
             <div class="rpt-item">
-              <h5>{{ rad.name }}</h5>
-              @if (rad.position) { <p><i class="fa-solid fa-arrows-up-down-left-right"></i> {{ rad.position }}</p> }
+              <h5><i class="fa-solid fa-x-ray text-[#007bbd] mr-1.5"></i>{{ rad.name }}</h5>
+              @if (rad.position) { <p><i class="fa-solid fa-arrows-up-down-left-right mr-1"></i>الوضعية/الملاحظات: {{ rad.position }}</p> }
             </div>
             } @empty {
             <p class="rpt-empty">{{ 'doctor.none' | translate }}</p>
@@ -184,6 +205,29 @@
           </div>
         </div>
         }
+
+        <!-- PDF Official Footer & Verification -->
+        <div class="rpt-pdf-footer">
+          <div class="rpt-pdf-footer-content">
+            <div class="rpt-pdf-qr-box">
+              <img src="assets/images/2048px-QR_Code_Model_1_Example 1.png" class="rpt-pdf-qr-img" alt="QR Verification" />
+              <div>
+                <p class="text-xs font-bold text-slate-700 m-0">رمز التوثيق الإلكتروني</p>
+                <p class="text-[10px] text-slate-400 m-0">امسح الكود للتحقق من صحة طلب الأشعة</p>
+              </div>
+            </div>
+            <div class="rpt-pdf-stamp">
+              <i class="fa-solid fa-circle-check"></i>
+              <div class="rpt-pdf-stamp-text">
+                <span class="rpt-pdf-stamp-title">وثيقة معتمدة وموثقة</span>
+                <span class="rpt-pdf-stamp-sub">صادرة من منصة تلي صحة</span>
+              </div>
+            </div>
+          </div>
+          <p class="rpt-pdf-legal">
+            تعتبر هذه الوثيقة طازجة ومعتمدة صادرة إلكترونياً من منصة تلي صحة لخدمات الرعاية الصحية عن بُعد لإجراء الفحوصات والأشعة المطلوبة. www.teleseha.com
+          </p>
+        </div>
 
       </div>
 

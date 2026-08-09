@@ -134,12 +134,23 @@ export class PatientProfileComponent implements OnInit {
       City: [null, Validators.required],
       MaritalStatus: [null, Validators.required],
       JobTitle: [null, Validators.required],
-      Height: [null, Validators.required],
-      Weight: [null, Validators.required],
+      Height: [null, [Validators.required, Validators.min(1), Validators.max(300)]],
+      Weight: [null, [Validators.required, Validators.min(1), Validators.max(300)]],
     });
 
     // الفورم مقفولة أول ما تفتح
     this.profileForm.disable();
+  }
+
+  enforceMax(event: Event, max: number = 300): void {
+    const input = event.target as HTMLInputElement;
+    if (input.value && Number(input.value) > max) {
+      input.value = String(max);
+      const controlName = input.getAttribute('formControlName');
+      if (controlName && this.profileForm?.get(controlName)) {
+        this.profileForm.get(controlName)?.setValue(max);
+      }
+    }
   }
 
   /* =======================
@@ -166,6 +177,19 @@ export class PatientProfileComponent implements OnInit {
       this.profileForm.patchValue({
         City: '',
       });
+    });
+
+    // Height & Weight limits
+    this.profileForm.get('Height')?.valueChanges.subscribe((val) => {
+      if (val !== null && val !== undefined && val !== '' && Number(val) > 300) {
+        this.profileForm.get('Height')?.setValue(300, { emitEvent: false });
+      }
+    });
+
+    this.profileForm.get('Weight')?.valueChanges.subscribe((val) => {
+      if (val !== null && val !== undefined && val !== '' && Number(val) > 300) {
+        this.profileForm.get('Weight')?.setValue(300, { emitEvent: false });
+      }
     });
   }
 

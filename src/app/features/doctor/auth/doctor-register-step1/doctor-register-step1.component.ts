@@ -116,6 +116,17 @@ export class DoctorRegisterStep1Component implements OnInit {
     });
   }
 
+  enforceMax(event: Event, max: number = 50000): void {
+    const input = event.target as HTMLInputElement;
+    if (input.value && Number(input.value) > max) {
+      input.value = String(max);
+      const controlName = input.getAttribute('formControlName');
+      if (controlName && this.basicInfoForm?.get(controlName)) {
+        this.basicInfoForm.get(controlName)?.setValue(max);
+      }
+    }
+  }
+
   initForm() {
     this.basicInfoForm = this.fb.group({
       Name: ['', [Validators.required]],
@@ -124,9 +135,21 @@ export class DoctorRegisterStep1Component implements OnInit {
       JobTitle: ['', [Validators.required]],
       University: [''],
       ScientificDegree: ['', [Validators.required]],
-      Price: ['', [Validators.required]],
-      FollowUpPrice: [''],
+      Price: ['', [Validators.required, Validators.min(0), Validators.max(50000)]],
+      FollowUpPrice: ['', [Validators.min(0), Validators.max(50000)]],
       SpecialtyId: ['', [Validators.required]],
+    });
+
+    this.basicInfoForm.get('Price')?.valueChanges.subscribe((val) => {
+      if (val !== null && val !== undefined && val !== '' && Number(val) > 50000) {
+        this.basicInfoForm.get('Price')?.setValue(50000, { emitEvent: false });
+      }
+    });
+
+    this.basicInfoForm.get('FollowUpPrice')?.valueChanges.subscribe((val) => {
+      if (val !== null && val !== undefined && val !== '' && Number(val) > 50000) {
+        this.basicInfoForm.get('FollowUpPrice')?.setValue(50000, { emitEvent: false });
+      }
     });
   }
 

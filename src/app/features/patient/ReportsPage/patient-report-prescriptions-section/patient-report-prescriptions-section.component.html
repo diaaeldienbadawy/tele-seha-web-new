@@ -97,22 +97,43 @@
     <div class="ts-modal-body">
       <div id="prescriptionContent" class="rpt-doc">
 
+        <!-- PDF Platform Branding Header -->
+        <div class="rpt-pdf-header">
+          <div class="rpt-pdf-brand">
+            <img src="assets/images/Group 76373.svg" class="rpt-pdf-logo" alt="teleSEHA Logo" />
+            <div class="rpt-pdf-brand-text">
+              <h2 class="rpt-pdf-brand-title">منصة تلي صحة الطبية</h2>
+              <span class="rpt-pdf-brand-sub">teleSEHA Telemedicine Platform</span>
+            </div>
+          </div>
+          <div class="rpt-pdf-meta">
+            <span class="rpt-pdf-badge"><i class="fa-solid fa-prescription"></i> روشتة طبية إلكترونية</span>
+            <p class="rpt-pdf-id">RX-{{ medicines?.id || '—' }}</p>
+            @if (medicines?.meeting?.start) {
+            <span class="rpt-pdf-date">{{ medicines.meeting.start | date: 'dd/MM/yyyy - hh:mm a' }}</span>
+            }
+          </div>
+        </div>
+
+        <div class="rpt-pdf-divider"></div>
+
         <!-- Doctor & patient -->
         <div class="rpt-parties">
           <div>
+            <span class="rpt-label">الطبيب المعالج / Doctor</span>
             <div class="rpt-doc-name">
               <span>{{ medicines?.doctor?.name || '—' }}</span>
               @if (medicines?.doctor?.ratingValue) {
               <span class="rpt-star"><i class="fa-solid fa-star"></i> {{ medicines.doctor.ratingValue }}</span>
               }
             </div>
-            <p class="rpt-muted">{{ medicines?.doctor?.specialty }}</p>
+            <p class="rpt-muted">{{ medicines?.doctor?.specialty || 'تخصص عام' }}</p>
           </div>
           <div class="rpt-patient">
-            <span class="rpt-label">{{ 'reports.patientName' | translate }}</span>
-            <p class="rpt-strong">{{ patients?.name || '—' }}</p>
+            <span class="rpt-label">{{ 'reports.patientName' | translate }} / Patient</span>
+            <p class="rpt-strong">{{ patients?.name || 'اسم المريض غير متاح' }}</p>
             @if (medicines?.meeting?.start) {
-            <p class="rpt-muted">{{ 'doctor.selectDate' | translate }}: {{ medicines.meeting.start | date: 'dd/MM/yyyy' }}</p>
+            <p class="rpt-muted">تاريخ الكشف: {{ medicines.meeting.start | date: 'dd/MM/yyyy' }}</p>
             }
           </div>
         </div>
@@ -123,13 +144,36 @@
           <div class="rpt-grid">
             @for (med of medicines?.medicines; track med.id) {
             <div class="rpt-item">
-              <h5>{{ med.name }}</h5>
-              @if (med.instructions) { <p>{{ med.instructions }}</p> }
+              <h5><i class="fa-solid fa-pills text-[#007bbd] mr-1.5"></i>{{ med.name }}</h5>
+              @if (med.instructions) { <p><i class="fa-solid fa-clock-rotate-left mr-1"></i>التعليمات: {{ med.instructions }}</p> }
             </div>
             } @empty {
             <p class="rpt-empty">{{ 'doctor.none' | translate }}</p>
             }
           </div>
+        </div>
+
+        <!-- PDF Official Footer & Verification -->
+        <div class="rpt-pdf-footer">
+          <div class="rpt-pdf-footer-content">
+            <div class="rpt-pdf-qr-box">
+              <img src="assets/images/2048px-QR_Code_Model_1_Example 1.png" class="rpt-pdf-qr-img" alt="QR Verification" />
+              <div>
+                <p class="text-xs font-bold text-slate-700 m-0">رمز التوثيق الإلكتروني</p>
+                <p class="text-[10px] text-slate-400 m-0">امسح الكود للتحقق من صحة الروشتة</p>
+              </div>
+            </div>
+            <div class="rpt-pdf-stamp">
+              <i class="fa-solid fa-circle-check"></i>
+              <div class="rpt-pdf-stamp-text">
+                <span class="rpt-pdf-stamp-title">وثيقة معتمدة وموثقة</span>
+                <span class="rpt-pdf-stamp-sub">صادرة من منصة تلي صحة</span>
+              </div>
+            </div>
+          </div>
+          <p class="rpt-pdf-legal">
+            تعتبر هذه الروشتة وثيقة طازجة ومعتمدة صادرة إلكترونياً من منصة تلي صحة للخدمات الطبية والرعاية الصحية عن بُعد ولا تتطلب توقيعاً يدوياً. www.teleseha.com
+          </p>
         </div>
 
       </div>

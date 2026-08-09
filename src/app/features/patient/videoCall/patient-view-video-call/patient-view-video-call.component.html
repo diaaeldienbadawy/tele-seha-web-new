@@ -229,93 +229,142 @@
     <!-- Body -->
     <div class="ts-modal-body">
       
-      <!-- Doctor Info & QR Code Panel -->
-      <div class="flex flex-col sm:flex-row gap-5 p-4 bg-slate-50 border border-slate-100 rounded-2xl mb-6 items-center text-left">
-        <!-- QR Code -->
-        <div class="w-24 h-24 p-1.5 bg-white border border-slate-200 rounded-xl flex-shrink-0">
-          <img class="w-full h-full object-contain" src="../../../../../assets/images/2048px-QR_Code_Model_1_Example 1.png" loading="lazy" alt="QR Code">
-        </div>
-        
-        <!-- Doctor Details -->
-        <div class="flex-1 text-center sm:text-left">
-          <div class="flex items-center justify-center sm:justify-start gap-2 mb-1">
-            <h4 class="text-slate-800 font-bold text-sm">{{ agoraDetailsPatient?.doctor?.name || 'غير متاح' }}</h4>
-            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-600 gap-0.5">
-              {{ agoraDetailsPatient?.doctor?.rating || 0 }} <i class="fa-solid fa-star text-[8px]"></i>
-            </span>
+      <div id="videoCallReportContent" class="rpt-doc">
+        <!-- PDF Platform Branding Header -->
+        <div class="rpt-pdf-header">
+          <div class="rpt-pdf-brand">
+            <img src="assets/images/Group 76373.svg" class="rpt-pdf-logo" alt="teleSEHA Logo" />
+            <div class="rpt-pdf-brand-text">
+              <h2 class="rpt-pdf-brand-title">منصة تلي صحة الطبية</h2>
+              <span class="rpt-pdf-brand-sub">teleSEHA Telemedicine Platform</span>
+            </div>
           </div>
-          <p class="text-slate-500 text-xs font-semibold mb-1.5">{{ agoraDetailsPatient?.doctor?.speciality || 'غير متاح' }}</p>
-          <p class="text-slate-400 text-[10px] font-medium mb-2">(Number of Consultations: {{ agoraDetailsPatient?.doctor?.consultations || 0 }})</p>
-          <p class="text-slate-600 text-xs font-semibold">
-            Medical Practice License Number: <span class="text-[#007BBD] font-bold">{{ agoraDetailsPatient?.doctor?.licenseNumber || 'غير متاح' }}</span>
+          <div class="rpt-pdf-meta">
+            <span class="rpt-pdf-badge">
+              @if(currentSection === 0){ <i class="fa-solid fa-flask-vial"></i> طلب تحاليل معتمد }
+              @if(currentSection === 1){ <i class="fa-solid fa-x-ray"></i> طلب أشعة معتمد }
+              @if(currentSection === 2){ <i class="fa-solid fa-prescription"></i> روشتة طبية معتمدة }
+            </span>
+            <p class="rpt-pdf-id">
+              @if(currentSection === 0){ LAB-{{ meetingReport?.labAnalysisRequest?.id || '—' }} }
+              @if(currentSection === 1){ RAD-{{ meetingReport?.radiologicalExaminationRequest?.id || '—' }} }
+              @if(currentSection === 2){ RX-{{ meetingReport?.prescription?.id || '—' }} }
+            </p>
+          </div>
+        </div>
+
+        <div class="rpt-pdf-divider"></div>
+
+        <!-- Doctor & Patient Info Panel -->
+        <div class="rpt-parties mb-4">
+          <div>
+            <span class="rpt-label">الطبيب المعالج / Doctor</span>
+            <div class="rpt-doc-name">
+              <span>{{ agoraDetailsPatient?.doctor?.name || 'غير متاح' }}</span>
+              @if (agoraDetailsPatient?.doctor?.rating) {
+              <span class="rpt-star"><i class="fa-solid fa-star"></i> {{ agoraDetailsPatient.doctor.rating }}</span>
+              }
+            </div>
+            <p class="rpt-muted">{{ agoraDetailsPatient?.doctor?.speciality || 'تخصص عام' }}</p>
+            @if (agoraDetailsPatient?.doctor?.licenseNumber) {
+            <p class="text-[11px] text-slate-500 font-semibold mt-1">ترخيص: <span class="text-[#007BBD] font-bold">{{ agoraDetailsPatient.doctor.licenseNumber }}</span></p>
+            }
+          </div>
+          <div class="rpt-patient">
+            <span class="rpt-label">المريض / Patient</span>
+            <p class="rpt-strong">{{ agoraDetailsPatient?.patientName || 'اسم المريض غير متاح' }}</p>
+          </div>
+        </div>
+
+        <!-- Section Content Requests Card -->
+        <div class="mb-4 text-left">
+          @if(currentSection === 0){
+          <!-- Lab Analyses -->
+          <div>
+            <h4 class="text-[#0068A1] text-sm font-bold mb-3 flex items-center gap-2">
+              <i class="fa-solid fa-flask-vial"></i> Lab Analysis Requests
+            </h4>
+            <div *ngIf="meetingReport?.labAnalysisRequest?.labAnalyses?.length; else labNotFound" class="space-y-2">
+              <div *ngFor="let lab of meetingReport.labAnalysisRequest.labAnalyses" class="p-3 bg-slate-50 border border-slate-100 rounded-xl">
+                <p class="text-slate-800 font-bold text-sm mb-1">{{ lab.name }}</p>
+                <p class="text-slate-400 text-xs font-medium"><i class="fa-regular fa-comment-dots text-slate-300 mr-1"></i>{{ lab.notes || 'No Notes' }}</p>
+              </div>
+            </div>
+            <ng-template #labNotFound>
+              <div class="ts-empty-state">
+                <i class="fa-solid fa-flask-vial"></i>
+                <p>الدكتور لم يكتب شيئاً هنا</p>
+              </div>
+            </ng-template>
+          </div>
+          }
+
+          @if(currentSection === 1){
+          <!-- Radiological Examinations -->
+          <div>
+            <h4 class="text-[#0068A1] text-sm font-bold mb-3 flex items-center gap-2">
+              <i class="fa-solid fa-x-ray"></i> Radiological Examinations
+            </h4>
+            <div *ngIf="meetingReport?.radiologicalExaminationRequest?.radiologicalExaminations?.length; else radiologyNotFound" class="space-y-2">
+              <div *ngFor="let rad of meetingReport.radiologicalExaminationRequest.radiologicalExaminations" class="p-3 bg-slate-50 border border-slate-100 rounded-xl">
+                <p class="text-slate-800 font-bold text-sm mb-1">{{ rad.name }}</p>
+                <p class="text-slate-400 text-xs font-medium"><i class="fa-regular fa-comment-dots text-slate-300 mr-1"></i>{{ rad.notes || 'No Notes' }}</p>
+              </div>
+            </div>
+            <ng-template #radiologyNotFound>
+              <div class="ts-empty-state">
+                <i class="fa-solid fa-x-ray"></i>
+                <p>الدكتور لم يكتب شيئاً هنا</p>
+              </div>
+            </ng-template>
+          </div>
+          }
+
+          @if(currentSection === 2){
+          <!-- Prescription Medicines -->
+          <div>
+            <h4 class="text-[#0068A1] text-sm font-bold mb-3 flex items-center gap-2">
+              <i class="fa-solid fa-pills"></i> Prescription
+            </h4>
+            <div *ngIf="meetingReport?.prescription?.medicines?.length; else prescriptionNotFound" class="space-y-2">
+              <div *ngFor="let med of meetingReport.prescription.medicines" class="p-3 bg-slate-50 border border-slate-100 rounded-xl">
+                <p class="text-slate-800 font-bold text-sm mb-1">{{ med.name }}</p>
+                <p class="text-slate-400 text-xs font-medium"><i class="fa-solid fa-hand-holding-medical text-slate-300 mr-1"></i>Instructions: {{ med.instructions }}</p>
+              </div>
+            </div>
+            <ng-template #prescriptionNotFound>
+              <div class="ts-empty-state">
+                <i class="fa-solid fa-pills"></i>
+                <p>الدكتور لم يكتب شيئاً هنا</p>
+              </div>
+            </ng-template>
+          </div>
+          }
+        </div>
+
+        <!-- PDF Official Footer & Verification -->
+        <div class="rpt-pdf-footer">
+          <div class="rpt-pdf-footer-content">
+            <div class="rpt-pdf-qr-box">
+              <img src="assets/images/2048px-QR_Code_Model_1_Example 1.png" class="rpt-pdf-qr-img" alt="QR Verification" />
+              <div>
+                <p class="text-xs font-bold text-slate-700 m-0">رمز التوثيق الإلكتروني</p>
+                <p class="text-[10px] text-slate-400 m-0">امسح الكود للتحقق من التقرير</p>
+              </div>
+            </div>
+            <div class="rpt-pdf-stamp">
+              <i class="fa-solid fa-circle-check"></i>
+              <div class="rpt-pdf-stamp-text">
+                <span class="rpt-pdf-stamp-title">وثيقة معتمدة وموثقة</span>
+                <span class="rpt-pdf-stamp-sub">صادرة من منصة تلي صحة</span>
+              </div>
+            </div>
+          </div>
+          <p class="rpt-pdf-legal">
+            تعتبر هذه الوثيقة طازجة ومعتمدة صادرة إلكترونياً من منصة تلي صحة لخدمات الرعاية الصحية عن بُعد ولا تتطلب توقيعاً يدوياً. www.teleseha.com
           </p>
         </div>
-      </div>
 
-      <!-- Section Content Requests Card -->
-      <div class="mb-6 text-left">
-        @if(currentSection === 0){
-        <!-- Lab Analyses -->
-        <div>
-          <h4 class="text-[#0068A1] text-sm font-bold mb-3 flex items-center gap-2">
-            <i class="fa-solid fa-flask-vial"></i> Lab Analysis Requests
-          </h4>
-          <div *ngIf="meetingReport?.labAnalysisRequest?.labAnalyses?.length; else labNotFound" class="space-y-2">
-            <div *ngFor="let lab of meetingReport.labAnalysisRequest.labAnalyses" class="p-3 bg-slate-50 border border-slate-100 rounded-xl">
-              <p class="text-slate-800 font-bold text-sm mb-1">{{ lab.name }}</p>
-              <p class="text-slate-400 text-xs font-medium"><i class="fa-regular fa-comment-dots text-slate-300 mr-1"></i>{{ lab.notes || 'No Notes' }}</p>
-            </div>
-          </div>
-          <ng-template #labNotFound>
-            <div class="ts-empty-state">
-              <i class="fa-solid fa-flask-vial"></i>
-              <p>الدكتور لم يكتب شيئاً هنا</p>
-            </div>
-          </ng-template>
-        </div>
-        }
-
-        @if(currentSection === 1){
-        <!-- Radiological Examinations -->
-        <div>
-          <h4 class="text-[#0068A1] text-sm font-bold mb-3 flex items-center gap-2">
-            <i class="fa-solid fa-x-ray"></i> Radiological Examinations
-          </h4>
-          <div *ngIf="meetingReport?.radiologicalExaminationRequest?.radiologicalExaminations?.length; else radiologyNotFound" class="space-y-2">
-            <div *ngFor="let rad of meetingReport.radiologicalExaminationRequest.radiologicalExaminations" class="p-3 bg-slate-50 border border-slate-100 rounded-xl">
-              <p class="text-slate-800 font-bold text-sm mb-1">{{ rad.name }}</p>
-              <p class="text-slate-400 text-xs font-medium"><i class="fa-regular fa-comment-dots text-slate-300 mr-1"></i>{{ rad.notes || 'No Notes' }}</p>
-            </div>
-          </div>
-          <ng-template #radiologyNotFound>
-            <div class="ts-empty-state">
-              <i class="fa-solid fa-x-ray"></i>
-              <p>الدكتور لم يكتب شيئاً هنا</p>
-            </div>
-          </ng-template>
-        </div>
-        }
-
-        @if(currentSection === 2){
-        <!-- Prescription Medicines -->
-        <div>
-          <h4 class="text-[#0068A1] text-sm font-bold mb-3 flex items-center gap-2">
-            <i class="fa-solid fa-pills"></i> Prescription
-          </h4>
-          <div *ngIf="meetingReport?.prescription?.medicines?.length; else prescriptionNotFound" class="space-y-2">
-            <div *ngFor="let med of meetingReport.prescription.medicines" class="p-3 bg-slate-50 border border-slate-100 rounded-xl">
-              <p class="text-slate-800 font-bold text-sm mb-1">{{ med.name }}</p>
-              <p class="text-slate-400 text-xs font-medium"><i class="fa-solid fa-hand-holding-medical text-slate-300 mr-1"></i>Instructions: {{ med.instructions }}</p>
-            </div>
-          </div>
-          <ng-template #prescriptionNotFound>
-            <div class="ts-empty-state">
-              <i class="fa-solid fa-pills"></i>
-              <p>الدكتور لم يكتب شيئاً هنا</p>
-            </div>
-          </ng-template>
-        </div>
-        }
       </div>
 
       <!-- Buttons Panel -->

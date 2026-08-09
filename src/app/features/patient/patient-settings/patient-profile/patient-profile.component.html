@@ -203,6 +203,9 @@
             </label>
             <input 
               type="number" 
+              min="1" 
+              max="300" 
+              (input)="enforceMax($event, 300)" 
               formControlName="Height" 
               placeholder="{{ 'patientProfile.heightPlaceholder' | translate }}"
               class="ts-input h-12"
@@ -221,6 +224,9 @@
             </label>
             <input 
               type="number" 
+              min="1" 
+              max="300" 
+              (input)="enforceMax($event, 300)" 
               formControlName="Weight" 
               placeholder="{{ 'patientProfile.weightPlaceholder' | translate }}"
               class="ts-input h-12"
