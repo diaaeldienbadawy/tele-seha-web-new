@@ -5,9 +5,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { LocalstorageService } from '../../../../core/services/localstorage.service';
 import { PatientReportsService } from '../../service/patient-reports.service';
 import { NotificationService } from '../../service/notification.service';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
 import { TranslateModule } from '@ngx-translate/core';
+import { ToastrService } from 'ngx-toastr';
+import { ReportPdfService } from '../../../../shared/services/report-pdf.service';
 
 @Component({
   selector: 'app-patient-report-radiology-section',
@@ -26,8 +26,11 @@ export class PatientReportRadiologySectionComponent implements OnInit {
     inject(LocalstorageService);
   private readonly notificationService = inject(NotificationService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly reportPdf = inject(ReportPdfService);
+  private readonly toastr = inject(ToastrService);
 
   selectedId: number | null = null;
+  isDownloading = false;
 
   data: any[] = [];
 
@@ -149,28 +152,29 @@ export class PatientReportRadiologySectionComponent implements OnInit {
     });
   }
 
-  downloadPDF() {
-    const DATA = document.getElementById('radiologyContent');
-
-    if (!DATA) return;
-
-    html2canvas(DATA, {
-      scale: 2,
-      useCORS: true,
-    }).then((canvas) => {
-      const imgWidth = 210;
-      const pageHeight = 295;
-
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-      const contentDataURL = canvas.toDataURL('image/png');
-
-      const pdf = new jsPDF('p', 'mm', 'a4');
-
-      pdf.addImage(contentDataURL, 'PNG', 0, 0, imgWidth, imgHeight);
-
-      pdf.save('Radiology.pdf');
-    });
+  /** نفس سبب التغيير في قسم التحاليل: html2canvas على ماركب Tailwind v4 (oklch) بيفشل. */
+  async downloadPDF() {
+    if (this.isDownloading) return;
+    this.isDownloading = true;
+    try {
+      await this.reportPdf.download({
+        kind: 'radiology',
+        reference: this.radiology?.id ?? null,
+        patientName: this.patients?.name || this.localStorageServices.get('patientName'),
+        doctorName: this.radiology?.doctor?.name,
+        doctorSpecialty: this.radiology?.doctor?.specialty,
+        issuedAt: this.radiology?.meeting?.start ?? null,
+        items: (this.radiology?.radiologicalExaminations ?? []).map((rad: any) => ({
+          name: rad?.name,
+          details: rad?.notes,
+        })),
+      });
+    } catch (err) {
+      console.error('[Reports] Radiology PDF generation failed:', err);
+      this.toastr.error('تعذر تجهيز ملف الـ PDF، حاول مرة أخرى.');
+    } finally {
+      this.isDownloading = false;
+    }
   }
 
   showPopupUpload(id: number) {

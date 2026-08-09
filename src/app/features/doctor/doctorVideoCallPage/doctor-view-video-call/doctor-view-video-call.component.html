@@ -22,7 +22,7 @@
       }
 
       <div class="h-[70vh]">
-        <app-doctor-chat-video-call></app-doctor-chat-video-call>
+        <app-doctor-chat-video-call [checkUpIdInput]="meetingReport?.checkUpId"></app-doctor-chat-video-call>
       </div>
 
       <app-popup-doctor></app-popup-doctor>
@@ -42,7 +42,7 @@
   </button>
 
   <div class="w-full h-[80vh] ">
-    <app-doctor-chat-video-call></app-doctor-chat-video-call>
+    <app-doctor-chat-video-call [checkUpIdInput]="meetingReport?.checkUpId"></app-doctor-chat-video-call>
 
   </div>
   <div>

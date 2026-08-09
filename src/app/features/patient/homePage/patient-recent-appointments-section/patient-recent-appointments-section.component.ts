@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { LocalstorageService } from '../../../../core/services/localstorage.service';
 import { RecentAppointmentsService } from '../../../../shared/services/recent-appointments.service';
@@ -23,13 +24,24 @@ export class PatientRecentAppointmentsSectionComponent implements OnInit {
     this.patientId = this.localStorageService.loggedInPatientId() || null;
   }
 
+  private readonly destroyRef = inject(DestroyRef);
+
   ngOnInit(): void {
     this.loadAppointmentComming();
 
-    // Real-time appointment updates
-    this.notificationService.appointmentEvents$.subscribe(() => {
-      this.loadAppointmentComming();
-    });
+    // الاتصال بيتفتح من الهيدر على كل صفحة، بس بنطلبه هنا كمان (idempotent) عشان
+    // فتح الصفحة مباشرة/refresh يفضل عليه realtime.
+    if (this.patientId) {
+      this.notificationService.startPatientConnection(this.patientId);
+    }
+
+    // Real-time appointment updates. takeUntilDestroyed: من غيره الاشتراك كان
+    // بيتراكم مع كل دخول للصفحة فكل حدث بيعمل نفس الطلب كذا مرة.
+    this.notificationService.appointmentEvents$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.loadAppointmentComming();
+      });
   }
 
   data: any;

@@ -12,6 +12,12 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { PatientVideoCallService } from '../../service/patient-video-call.service';
 import { LocalstorageService } from '../../../../core/services/localstorage.service';
 import { ToastrService } from 'ngx-toastr';
+import {
+  ReportPdfData,
+  ReportPdfItem,
+  ReportPdfKind,
+  ReportPdfService,
+} from '../../../../shared/services/report-pdf.service';
 
 @Component({
   selector: 'app-patient-view-video-call',
@@ -46,6 +52,9 @@ export class PatientViewVideoCallComponent implements OnInit {
   private meetingChild?: PatientMeetingVideoCallComponent;
 
   private destroyRef = inject(DestroyRef);
+  private reportPdf = inject(ReportPdfService);
+  /** بيمنع الضغط المتكرر أثناء توليد الـ PDF (بياخد لحظة على الأجهزة البطيئة). */
+  isDownloading = false;
 
   constructor(
     @Inject(PLATFORM_ID) readonly platformId: Object,
@@ -158,61 +167,103 @@ export class PatientViewVideoCallComponent implements OnInit {
     } else {
       this.currentSection = 0;
     }
+    this.refreshQr();
   }
 
   setSection(index: number) {
     this.currentSection = index;
+    this.refreshQr();
+  }
+
+  /** QR حقيقي للمستند المعروض — كان صورة placeholder ثابتة. */
+  qrDataUrl: string | null = null;
+
+  private refreshQr(): void {
+    const kind = this.currentPdfKind();
+    const data = this.buildPdfData(kind);
+    this.reportPdf
+      .qrForReport({ kind, reference: data.reference })
+      .then((url) => (this.qrDataUrl = url))
+      .catch(() => (this.qrDataUrl = null));
   }
 
   exitMeeting() {
     this.router.navigate(['/patient/home']);
   }
 
-  downloadPrescription() {
-    const element = document.createElement('a');
-    const content = this.generatePrescriptionText();
-    const blob = new Blob([content], { type: 'text/plain' });
-    element.href = URL.createObjectURL(blob);
-    element.download = `Prescription_RX-${this.meetingReport?.prescription?.id || 'NotFound'}.txt`;
-    element.click();
-    URL.revokeObjectURL(element.href);
+  /**
+   * تنزيل المستند اللي المريض واقف عليه (تحاليل / أشعة / روشتة) كـ PDF منسّق
+   * بهوية المنصة و QR بيفتح المستند. قبل كده الزرار كان بينزّل ملف `.txt` فيه
+   * الأقسام الثلاثة مع بعض من غير أي تنسيق.
+   */
+  async downloadPrescription() {
+    if (this.isDownloading) return;
+    this.isDownloading = true;
+    try {
+      await this.reportPdf.download(this.buildPdfData(this.currentPdfKind()));
+    } catch (err) {
+      console.error('[VideoCall] PDF generation failed:', err);
+      this.toastr.error('تعذر تجهيز ملف الـ PDF، حاول مرة أخرى.');
+    } finally {
+      this.isDownloading = false;
+    }
   }
 
-  generatePrescriptionText(): string {
-    let text = '--- Prescription ---\n\n';
-    text += `Patient: ${this.agoraDetailsPatient?.patientName || 'Not Found'}\n`;
-    text += `Doctor: ${this.agoraDetailsPatient?.doctor?.name || 'Not Found'}\n\n`;
+  /** 0: تحاليل، 1: أشعة، 2: روشتة — نفس ترتيب الـ tabs في الواجهة. */
+  private currentPdfKind(): ReportPdfKind {
+    if (this.currentSection === 0) return 'lab';
+    if (this.currentSection === 1) return 'radiology';
+    return 'prescription';
+  }
 
-    // Lab Analyses
-    text += 'Lab Analyses:\n';
-    if (this.meetingReport?.labAnalysisRequest?.labAnalyses?.length) {
-      this.meetingReport.labAnalysisRequest.labAnalyses.forEach((lab: any) => {
-        text += `- ${lab.name} (${lab.notes || 'No Notes'})\n`;
-      });
-    } else text += 'Not Found\n';
+  private buildPdfData(kind: ReportPdfKind): ReportPdfData {
+    const report = this.meetingReport ?? {};
+    const stored = this.agoraDetailsPatient ?? {};
 
-    // Radiology
-    text += '\nRadiological Examinations:\n';
-    if (
-      this.meetingReport?.radiologicalExaminationRequest
-        ?.radiologicalExaminations?.length
-    ) {
-      this.meetingReport.radiologicalExaminationRequest.radiologicalExaminations.forEach(
-        (rad: any) => {
-          text += `- ${rad.name} (${rad.notes || 'No Notes'})\n`;
-        },
-      );
-    } else text += 'Not Found\n';
+    let items: ReportPdfItem[] = [];
+    let reference: string | number | null = null;
 
-    // Prescription
-    text += '\nMedicines:\n';
-    if (this.meetingReport?.prescription?.medicines?.length) {
-      this.meetingReport.prescription.medicines.forEach((med: any) => {
-        text += `- ${med.name}: ${med.instructions}\n`;
-      });
-    } else text += 'Not Found\n';
+    if (kind === 'lab') {
+      reference = report?.labAnalysisRequest?.id ?? null;
+      items = (report?.labAnalysisRequest?.labAnalyses ?? []).map((lab: any) => ({
+        name: lab?.name,
+        details: lab?.notes,
+      }));
+    } else if (kind === 'radiology') {
+      reference = report?.radiologicalExaminationRequest?.id ?? null;
+      items = (
+        report?.radiologicalExaminationRequest?.radiologicalExaminations ?? []
+      ).map((rad: any) => ({ name: rad?.name, details: rad?.notes }));
+    } else {
+      reference = report?.prescription?.id ?? null;
+      items = (report?.prescription?.medicines ?? []).map((med: any) => ({
+        name: med?.name,
+        details: med?.instructions,
+      }));
+    }
 
-    return text;
+    // الأسماء بتيجي من السيرفر أولًا (MeetingReportsDto)؛ الباقي fallback عشان
+    // الواجهة تفضل شغالة حتى لو الـ API لسه على نسخة أقدم.
+    return {
+      kind,
+      reference,
+      items,
+      patientName:
+        report?.patientName ||
+        stored?.patient?.name ||
+        stored?.patientName ||
+        this.localstorageService.get('patientName') ||
+        '',
+      doctorName: report?.doctorName || stored?.doctor?.name || '',
+      doctorSpecialty:
+        report?.doctorSpecialty ||
+        stored?.doctor?.speciality ||
+        stored?.doctor?.subspecialty ||
+        stored?.doctor?.jobTitleAr ||
+        '',
+      doctorLicense: stored?.doctor?.licenseNumber || '',
+      issuedAt: report?.start ?? null,
+    };
   }
 
   showPopupSessionSuccess: boolean = false;
@@ -235,6 +286,7 @@ export class PatientViewVideoCallComponent implements OnInit {
 
   openPopupPrescription() {
     this.showPopupPrescription = true;
+    this.refreshQr();
   }
   closePopupPrescription() {
     this.showPopupPrescription = false;
@@ -259,17 +311,20 @@ export class PatientViewVideoCallComponent implements OnInit {
    */
   private refreshReports(openPopup: boolean) {
     if (!this.sessionId) {
-      if (openPopup) this.showPopupPrescription = true;
+      if (openPopup) this.openPopupPrescription();
       return;
     }
     this.patientVideoCall.getMeetingReportsByCheckup(this.sessionId).subscribe({
       next: (res) => {
         this.meetingReport = res;
-        if (openPopup) this.showPopupPrescription = true;
+        if (openPopup) {
+          this.showPopupPrescription = true;
+          this.refreshQr();
+        }
       },
       error: () => {
         // حتى لو التحديث فشل بنعرض آخر نسخة موجودة بدل ما نحبس المريض.
-        if (openPopup) this.showPopupPrescription = true;
+        if (openPopup) this.openPopupPrescription();
       },
     });
   }
@@ -337,7 +392,7 @@ export class PatientViewVideoCallComponent implements OnInit {
           this.toastr.error(message);
           if (message.includes('بالفعل')) {
             this.showPopupRating = false;
-            this.showPopupPrescription = true;
+            this.openPopupPrescription();
           }
           return;
         }

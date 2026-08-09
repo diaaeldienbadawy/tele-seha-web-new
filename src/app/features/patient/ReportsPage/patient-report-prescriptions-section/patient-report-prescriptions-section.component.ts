@@ -4,9 +4,9 @@ import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PatientReportsService } from '../../service/patient-reports.service';
 import { NotificationService } from '../../service/notification.service';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
 import { TranslateModule } from '@ngx-translate/core';
+import { ToastrService } from 'ngx-toastr';
+import { ReportPdfService } from '../../../../shared/services/report-pdf.service';
 
 @Component({
   selector: 'app-patient-report-prescriptions-section',
@@ -24,6 +24,10 @@ export class PatientReportPrescriptionsSectionComponent implements OnInit {
     inject(LocalstorageService);
   private readonly notificationService = inject(NotificationService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly reportPdf = inject(ReportPdfService);
+  private readonly toastr = inject(ToastrService);
+
+  isDownloading = false;
 
   data: any;
 
@@ -78,28 +82,29 @@ export class PatientReportPrescriptionsSectionComponent implements OnInit {
     this.showPopupPrescription = true;
   }
 
-  downloadPDF() {
-    const DATA = document.getElementById('prescriptionContent');
-
-    if (!DATA) return;
-
-    html2canvas(DATA, {
-      scale: 2,
-      useCORS: true,
-    }).then((canvas) => {
-      const imgWidth = 210;
-      const pageHeight = 295;
-
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-      const contentDataURL = canvas.toDataURL('image/png');
-
-      const pdf = new jsPDF('p', 'mm', 'a4');
-
-      pdf.addImage(contentDataURL, 'PNG', 0, 0, imgWidth, imgHeight);
-
-      pdf.save('Prescription.pdf');
-    });
+  /** نفس سبب التغيير في قسمي التحاليل والأشعة: html2canvas بيفشل على ألوان Tailwind v4 (oklch). */
+  async downloadPDF() {
+    if (this.isDownloading) return;
+    this.isDownloading = true;
+    try {
+      await this.reportPdf.download({
+        kind: 'prescription',
+        reference: this.medicines?.id ?? null,
+        patientName: this.patients?.name || this.localStorageServices.get('patientName'),
+        doctorName: this.medicines?.doctor?.name,
+        doctorSpecialty: this.medicines?.doctor?.specialty,
+        issuedAt: this.medicines?.meeting?.start ?? null,
+        items: (this.medicines?.medicines ?? []).map((med: any) => ({
+          name: med?.name,
+          details: med?.instructions,
+        })),
+      });
+    } catch (err) {
+      console.error('[Reports] Prescription PDF generation failed:', err);
+      this.toastr.error('تعذر تجهيز ملف الـ PDF، حاول مرة أخرى.');
+    } finally {
+      this.isDownloading = false;
+    }
   }
 
   closePopupPrescription() {

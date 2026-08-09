@@ -5,7 +5,17 @@ import { HttpClient } from '@angular/common/http';
 import * as signalR from '@microsoft/signalr';
 import { Environment } from '../../../../environments/environment.development';
 import { LocalstorageService } from '../../../core/services/localstorage.service';
+import { HubTokenService } from '../../../shared/services/hub-token.service';
 import type { TeleSehaNotificationListItem } from '../models/notification.models';
+
+/**
+ * نفس سبب FOREVER_RETRY في الشات: `withAutomaticReconnect()` بيستسلم بعد 4
+ * محاولات (~42 ثانية)، وبعدها اللستات بتفضل واقفة على آخر حالة من غير ما حد يعرف.
+ */
+const FOREVER_RETRY: signalR.IRetryPolicy = {
+  nextRetryDelayInMilliseconds: (ctx) =>
+    Math.min(1000 * Math.pow(2, Math.min(ctx.previousRetryCount, 5)), 30000),
+};
 
 @Injectable({
   providedIn: 'root',
@@ -25,7 +35,10 @@ export class NotificationService implements OnDestroy {
   private activeHubKey: string | null = null;
   private activeKind: 'patient' | 'doctor' | null = null;
   private activeId: string | null = null;
+  private startRetryTimer: ReturnType<typeof setTimeout> | null = null;
+  private startAttempts = 0;
   private localStorageService = inject(LocalstorageService);
+  private hubToken = inject(HubTokenService);
 
   constructor(private http: HttpClient) {}
 
@@ -210,24 +223,59 @@ export class NotificationService implements OnDestroy {
 
     this.hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(url, {
-        accessTokenFactory: () => this.localStorageService.accessToken(),
+        // توكن متجدد: من غيره كل الـ realtime بيموت بعد 10 دقايق — راجع HubTokenService.
+        accessTokenFactory: () => this.hubToken.getFreshToken(),
         withCredentials: false,
         transport: signalR.HttpTransportType.LongPolling,
       })
-      .withAutomaticReconnect()
+      .withAutomaticReconnect(FOREVER_RETRY)
       .configureLogging(signalR.LogLevel.Warning)
       .build();
 
-    this.hubConnection
+    // الـ handlers لازم تتسجّل قبل الـ start مش بعده: السيرفر بيدخّل الاتصال جروبه
+    // في OnConnectedAsync، فأي إشعار بيتبعت في اللحظة دي كان بيوصل قبل ما نسجّل
+    // `ReceiveNotification` ويضيع من غير أثر.
+    this._registerEvents();
+    this._startHub();
+  }
+
+  /**
+   * `withAutomaticReconnect` بيشتغل بعد اتصال ناجح بس. لو أول `start()` فشل
+   * (توكن لسه بيتجدد / الشبكة) كان الـ realtime بيموت لحد ما المستخدم يفتح صفحة
+   * تانية — وده بالظبط شكل "التحديث اللحظي مش شغال في اللستات".
+   */
+  private _startHub(): void {
+    const hub = this.hubConnection;
+    if (!hub) return;
+
+    hub
       .start()
       .then(() => {
-        this._registerEvents();
+        this.startAttempts = 0;
       })
       .catch((err) => {
         console.error('[NotificationService] SignalR connection error:', err);
-        this.hubConnection = null;
-        this.activeHubKey = null;
+        this._scheduleStartRetry();
       });
+  }
+
+  private _scheduleStartRetry(): void {
+    if (this.startRetryTimer !== null) return;
+    this.startAttempts++;
+    if (this.startAttempts > 8) {
+      // بعد محاولات كتير بنسيب الاتصال — أي تنقل بين الصفحات بيبدأ من الأول.
+      this.hubConnection = null;
+      this.activeHubKey = null;
+      this.startAttempts = 0;
+      return;
+    }
+    const delay = Math.min(2000 * this.startAttempts, 15000);
+    this.startRetryTimer = setTimeout(() => {
+      this.startRetryTimer = null;
+      if (!this.hubConnection) return;
+      if (this.hubConnection.state !== signalR.HubConnectionState.Disconnected) return;
+      this._startHub();
+    }, delay);
   }
 
   private _registerEvents(): void {
@@ -326,6 +374,11 @@ export class NotificationService implements OnDestroy {
   }
 
   stopConnection(): void {
+    if (this.startRetryTimer !== null) {
+      clearTimeout(this.startRetryTimer);
+      this.startRetryTimer = null;
+    }
+    this.startAttempts = 0;
     this.hubConnection
       ?.stop()
       .catch((err) => console.error('[NotificationService] Error stopping SignalR:', err));

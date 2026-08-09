@@ -5,9 +5,9 @@ import { LocalstorageService } from '../../../../core/services/localstorage.serv
 import { PatientReportsService } from '../../service/patient-reports.service';
 import { NotificationService } from '../../service/notification.service';
 import { PopupUploadComponent } from '../popup-upload/popup-upload.component';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
 import { TranslateModule } from '@ngx-translate/core';
+import { ToastrService } from 'ngx-toastr';
+import { ReportPdfService } from '../../../../shared/services/report-pdf.service';
 
 @Component({
   selector: 'app-patient-report-lab-tests-section',
@@ -26,8 +26,11 @@ export class PatientReportLabTestsSectionComponent implements OnInit {
     inject(LocalstorageService);
   private readonly notificationService = inject(NotificationService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly reportPdf = inject(ReportPdfService);
+  private readonly toastr = inject(ToastrService);
 
   selectedId: number | null = null;
+  isDownloading = false;
 
   data: any;
 
@@ -157,28 +160,34 @@ export class PatientReportLabTestsSectionComponent implements OnInit {
     // this.service.uploadFiles(formData).subscribe(...)
   }
 
-  downloadPDF() {
-    const DATA = document.getElementById('labTestContent');
-
-    if (!DATA) return;
-
-    html2canvas(DATA, {
-      scale: 2,
-      useCORS: true,
-    }).then((canvas) => {
-      const imgWidth = 210;
-      const pageHeight = 295;
-
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-      const contentDataURL = canvas.toDataURL('image/png');
-
-      const pdf = new jsPDF('p', 'mm', 'a4');
-
-      pdf.addImage(contentDataURL, 'PNG', 0, 0, imgWidth, imgHeight);
-
-      pdf.save('LabTest.pdf');
-    });
+  /**
+   * كان بيصوّر الـ modal نفسه بـ html2canvas. ماركب الـ modal بيستخدم Tailwind v4،
+   * وألوانه بتتحسب `oklch()` — دالة لون html2canvas 1.4 مش عارفاها فبترمي
+   * exception، والـ promise مكانش ليها `catch` فالضغط على الزرار كان مبيعملش حاجة.
+   * دلوقتي بنولّد مستند PDF مستقل بهوية المنصة (نفس السيرفس بتاع شاشة الكشف).
+   */
+  async downloadPDF() {
+    if (this.isDownloading) return;
+    this.isDownloading = true;
+    try {
+      await this.reportPdf.download({
+        kind: 'lab',
+        reference: this.labTest?.id ?? null,
+        patientName: this.patients?.name || this.localStorageServices.get('patientName'),
+        doctorName: this.labTest?.doctor?.name,
+        doctorSpecialty: this.labTest?.doctor?.specialty,
+        issuedAt: this.labTest?.meeting?.start ?? null,
+        items: (this.labTest?.labAnalyses ?? []).map((lab: any) => ({
+          name: lab?.name,
+          details: lab?.notes,
+        })),
+      });
+    } catch (err) {
+      console.error('[Reports] Lab PDF generation failed:', err);
+      this.toastr.error('تعذر تجهيز ملف الـ PDF، حاول مرة أخرى.');
+    } finally {
+      this.isDownloading = false;
+    }
   }
 
   showPopupUpload(id: number) {

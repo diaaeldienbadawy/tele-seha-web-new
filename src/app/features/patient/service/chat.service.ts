@@ -5,6 +5,7 @@ import { catchError, map, Observable, throwError } from 'rxjs';
 import * as signalR from '@microsoft/signalr';
 import { Environment } from '../../../../environments/environment.development';
 import { GlobalUserStateService } from '../../../core/services/state/global-user-state.service';
+import { HubTokenService } from '../../../shared/services/hub-token.service';
 
 export type ChatMediaUploadErrorKind =
   | 'unauthorized'
@@ -58,6 +59,27 @@ export function classifyChatMediaUploadHttpError(err: HttpErrorResponse): ChatMe
   return { kind, status, message };
 }
 
+/**
+ * إعادة اتصال بلا نهاية. الافتراضي في `withAutomaticReconnect()` أربع محاولات
+ * (0/2/10/30 ثانية) وبعدها بيستسلم للأبد — والكشف نفسه أطول من كده بكتير، فأي
+ * قطع شبكة لحظي كان بينهي الشات لآخر الجلسة.
+ */
+const FOREVER_RETRY: signalR.IRetryPolicy = {
+  nextRetryDelayInMilliseconds: (ctx) =>
+    Math.min(1000 * Math.pow(2, Math.min(ctx.previousRetryCount, 5)), 30000),
+};
+
+/** رسالة مستنية الاتصال — بتتبعت أول ما الـ hub يوصل. */
+interface QueuedChatMessage {
+  tempId: string;
+  dto: {
+    checkUpId: string;
+    message: string;
+    messageType: number;
+    isFromDoctor: boolean;
+  };
+}
+
 @Injectable({ providedIn: 'root' })
 export class ChatService implements OnDestroy {
 
@@ -66,14 +88,22 @@ export class ChatService implements OnDestroy {
   roomDetails = signal<any>(null);
   isConnected = signal<boolean>(false);
   unseenMessagesCount = signal<number>(0);
+  /** الحالة اللي الواجهة بتعرضها للمستخدم بدل ما فشل الاتصال يفضل في الـ console بس. */
+  connectionState = signal<'idle' | 'connecting' | 'connected' | 'error'>('idle');
 
   private http = inject(HttpClient);
   private platformId = inject(PLATFORM_ID);
   private userState = inject(GlobalUserStateService);
+  private hubToken = inject(HubTokenService);
   private hubConnection: signalR.HubConnection | null = null;
   private currentRoomId: string | number | null = null;
   private joinedSignalRGroup: string | null = null;
   private pendingRoomId: string | number | null = null;
+  /** رسايل اتكتبت قبل ما الاتصال يجهز — بتتبعت بالترتيب بعد الاتصال بدل ما تتعلّم "فشل". */
+  private outbox: QueuedChatMessage[] = [];
+  private startRetryTimer: ReturnType<typeof setTimeout> | null = null;
+  private startAttempts = 0;
+  private lastUserId = '';
 
   constructor() {}
 
@@ -211,64 +241,110 @@ export class ChatService implements OnDestroy {
     console.error(`[ChatService] ${action} failed — hub error:`, text, err);
   }
 
-  startConnection(userId: string): void {
+  /**
+   * فتح اتصال الشات. الـ userId اختياري ومجرد معلومة في الـ query — السيرفر بيحدد
+   * صاحب الاتصال من الـ JWT (`ChatHub.TryGetUserId`)، فمكانش صح إن الاتصال كله
+   * يتوقف لو مفتاح doctorId/patientId في الميموري فاضي: كان بيخلي الشات ميت
+   * تمامًا والرسايل تتعلّم "فشل" من غير ما حد يحاول يبعتها أصلًا.
+   */
+  startConnection(userId?: string | null): void {
     if (!isPlatformBrowser(this.platformId)) return;
+    this.lastUserId = userId ? String(userId) : this.lastUserId;
     if (this.hubConnection) {
       this._flushPendingRoomJoin();
       return;
     }
 
+    const query = this.lastUserId ? `?userId=${encodeURIComponent(this.lastUserId)}` : '';
+
+    this.connectionState.set('connecting');
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl(`${Environment.chatHubUrl}?userId=${userId}`, {
-        accessTokenFactory: () => this._accessToken(),
+      .withUrl(`${Environment.chatHubUrl}${query}`, {
+        // توكن متجدد: العمر 10 دقايق والمكالمة أطول من كده — راجع HubTokenService.
+        accessTokenFactory: () => this.hubToken.getFreshToken(),
         withCredentials: false,
         transport: signalR.HttpTransportType.LongPolling
       })
-      .withAutomaticReconnect()
+      .withAutomaticReconnect(FOREVER_RETRY)
       .configureLogging(signalR.LogLevel.Warning)
       .build();
 
-    this.hubConnection
-      .start()
-      .then(() => {
-        this.isConnected.set(true);
-        console.log('[ChatService] SignalR connected ✅');
-        this._registerEvents();
-        this._flushPendingRoomJoin();
-      })
-      .catch(err => {
-        console.error('[ChatService] SignalR connection error:', err);
-        this.isConnected.set(false);
-      });
+    // لازم تتسجّل قبل الـ start: لو الرد وصل قبل ما نسجّل الـ handler الرسالة بتضيع.
+    this._registerEvents();
+
+    this._startHub();
 
     this.hubConnection.onreconnecting(() => {
       this.isConnected.set(false);
+      this.connectionState.set('connecting');
       this.joinedSignalRGroup = null;
     });
     this.hubConnection.onreconnected(() => {
       this.isConnected.set(true);
+      this.connectionState.set('connected');
       this.joinedSignalRGroup = null;
       if (this.currentRoomId != null) {
-        void this._joinSignalRGroupForCheckup(String(this.currentRoomId)).catch(e =>
-          this._logHubError('Re-JoinGroup', e)
-        );
+        void this._joinSignalRGroupForCheckup(String(this.currentRoomId))
+          .then(() => this._flushOutbox())
+          .catch(e => this._logHubError('Re-JoinGroup', e));
       } else {
         this._flushPendingRoomJoin();
+        this._flushOutbox();
       }
     });
     this.hubConnection.onclose(() => {
       this.isConnected.set(false);
+      this.connectionState.set('error');
       this.joinedSignalRGroup = null;
     });
+  }
+
+  /**
+   * `withAutomaticReconnect` بيغطي القطع بعد اتصال ناجح بس — لو أول `start()` فشل
+   * (السيرفر لسه بيقوم / الشبكة اتأخرت) الاتصال كان بيموت للأبد والشات يفضل مقفول
+   * لحد ما المستخدم يعمل refresh. بنعيد المحاولة بفواصل متزايدة.
+   */
+  private _startHub(): void {
+    const hub = this.hubConnection;
+    if (!hub) return;
+
+    hub
+      .start()
+      .then(() => {
+        this.startAttempts = 0;
+        this.isConnected.set(true);
+        this.connectionState.set('connected');
+        this._flushPendingRoomJoin();
+        this._flushOutbox();
+      })
+      .catch(err => {
+        console.error('[ChatService] SignalR connection error:', err);
+        this.isConnected.set(false);
+        this.connectionState.set('error');
+        this._scheduleStartRetry();
+      });
+  }
+
+  private _scheduleStartRetry(): void {
+    if (this.startRetryTimer !== null) return;
+    this.startAttempts++;
+    const delay = Math.min(2000 * this.startAttempts, 15000);
+    this.startRetryTimer = setTimeout(() => {
+      this.startRetryTimer = null;
+      if (!this.hubConnection) return;
+      if (this.hubConnection.state !== signalR.HubConnectionState.Disconnected) return;
+      this.connectionState.set('connecting');
+      this._startHub();
+    }, delay);
   }
 
   private _flushPendingRoomJoin(): void {
     if (!this.pendingRoomId) return;
     const id = String(this.pendingRoomId);
     this.pendingRoomId = null;
-    void this._joinSignalRGroupForCheckup(id).catch(err =>
-      this._logHubError('JoinGroup (after connect)', err)
-    );
+    void this._joinSignalRGroupForCheckup(id)
+      .then(() => this._flushOutbox())
+      .catch(err => this._logHubError('JoinGroup (after connect)', err));
   }
 
   private _signalRGroupName(checkupId: string): string {
@@ -389,8 +465,18 @@ export class ChatService implements OnDestroy {
   }
 
   stopConnection(): void {
+    if (this.startRetryTimer !== null) {
+      clearTimeout(this.startRetryTimer);
+      this.startRetryTimer = null;
+    }
+    this.startAttempts = 0;
+    this.outbox = [];
+
     const hc = this.hubConnection;
-    if (!hc) return;
+    if (!hc) {
+      this.connectionState.set('idle');
+      return;
+    }
 
     const finish = () => {
       hc.stop().catch(err => console.error('[ChatService] Error stopping SignalR:', err));
@@ -399,6 +485,7 @@ export class ChatService implements OnDestroy {
       this.currentRoomId = null;
       this.pendingRoomId = null;
       this.isConnected.set(false);
+      this.connectionState.set('idle');
     };
 
     if (
@@ -550,29 +637,6 @@ export class ChatService implements OnDestroy {
 
     this.messages.update(list => [...list, localMessage]);
 
-    const markFailed = () =>
-      this.messages.update(list =>
-        list.map((m: any) =>
-          m.id === tempId ? { ...m, failed: true, pending: false } : m
-        )
-      );
-
-    const markSent = () =>
-      this.messages.update(list =>
-        list.map((m: any) =>
-          m.id === tempId ? { ...m, pending: false } : m
-        )
-      );
-
-    if (
-      !this.hubConnection ||
-      this.hubConnection.state !== signalR.HubConnectionState.Connected
-    ) {
-      console.warn('[ChatService] Cannot send — SignalR not connected');
-      markFailed();
-      return;
-    }
-
     const dto = {
       checkUpId: String(checkupId),
       message,
@@ -580,13 +644,49 @@ export class ChatService implements OnDestroy {
       isFromDoctor: options.isDoctor ?? false
     };
 
-    this.hubConnection
-      .invoke('SendMessage', dto)
-      .then(() => markSent())
-      .catch(err => {
-        this._logHubError('SendMessage', err);
-        markFailed();
-      });
+    // الاتصال ممكن يكون لسه بيتفتح (الشات بيتحمل مع الصفحة). الرسالة بتستنى في
+    // الطابور وتتبعت أول ما يجهز بدل ما تتعلّم "فشل" فورًا وتضيع.
+    this.outbox.push({ tempId, dto });
+
+    if (!this.hubConnection) {
+      this.startConnection(this.lastUserId);
+      return;
+    }
+    if (this.hubConnection.state === signalR.HubConnectionState.Disconnected) {
+      this._scheduleStartRetry();
+      return;
+    }
+    this._flushOutbox();
+  }
+
+  private _markMessage(tempId: string, patch: Record<string, unknown>): void {
+    this.messages.update(list =>
+      list.map((m: any) => (m.id === tempId ? { ...m, ...patch } : m))
+    );
+  }
+
+  /** بيبعت اللي في الطابور بالترتيب. أي فشل بيرجّع الرسالة "failed" ويكمّل الباقي. */
+  private _flushOutbox(): void {
+    const hub = this.hubConnection;
+    if (!hub || hub.state !== signalR.HubConnectionState.Connected) return;
+    if (!this.outbox.length) return;
+
+    const pending = this.outbox;
+    this.outbox = [];
+
+    pending.reduce(
+      (chain, item) =>
+        chain.then(() =>
+          hub
+            .invoke('SendMessage', item.dto)
+            .then(() => this._markMessage(item.tempId, { pending: false }))
+            .catch(err => {
+              this._logHubError('SendMessage', err);
+              this._markMessage(item.tempId, { pending: false, failed: true });
+            })
+        ),
+      Promise.resolve()
+    );
   }
 
   uploadFileAndSend(checkupId: string, file: File, options: { isDoctor?: boolean } = {}): void {

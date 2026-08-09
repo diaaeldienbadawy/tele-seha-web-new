@@ -12,10 +12,10 @@
 
     <div class="hidden md:block w-full md:w-[40%] h-[calc(100vh-100px)] px-[20px]">
       <div class="h-[70vh] ">
-        <app-patient-chat-video-call></app-patient-chat-video-call>
+        <app-patient-chat-video-call [checkUpIdInput]="meetingReport?.checkUpId ?? sessionId"></app-patient-chat-video-call>
       </div>
       <div>
-        <app-patient-send-picture-video-call></app-patient-send-picture-video-call>
+        <app-patient-send-picture-video-call [checkUpIdInput]="meetingReport?.checkUpId ?? sessionId"></app-patient-send-picture-video-call>
       </div>
     </div>
   </div>
@@ -34,10 +34,10 @@
 
   <!-- WhatsApp Content -->
   <div class="w-full h-[80vh] ">
-    <app-patient-chat-video-call></app-patient-chat-video-call>
+    <app-patient-chat-video-call [checkUpIdInput]="meetingReport?.checkUpId ?? sessionId"></app-patient-chat-video-call>
   </div>
   <div>
-    <app-patient-send-picture-video-call></app-patient-send-picture-video-call>
+    <app-patient-send-picture-video-call [checkUpIdInput]="meetingReport?.checkUpId ?? sessionId"></app-patient-send-picture-video-call>
   </div>
 
 </div>
@@ -231,24 +231,32 @@
       
       <!-- Doctor Info & QR Code Panel -->
       <div class="flex flex-col sm:flex-row gap-5 p-4 bg-slate-50 border border-slate-100 rounded-2xl mb-6 items-center text-left">
-        <!-- QR Code -->
-        <div class="w-24 h-24 p-1.5 bg-white border border-slate-200 rounded-xl flex-shrink-0">
-          <img class="w-full h-full object-contain" src="../../../../../assets/images/2048px-QR_Code_Model_1_Example 1.png" loading="lazy" alt="QR Code">
+        <!-- QR Code (حقيقي — بيفتح لينك المستند) -->
+        <div class="w-24 h-24 p-1.5 bg-white border border-slate-200 rounded-xl flex-shrink-0 flex items-center justify-center">
+          @if (qrDataUrl) {
+            <img class="w-full h-full object-contain" [src]="qrDataUrl" alt="QR Code">
+          } @else {
+            <i class="fa-solid fa-qrcode text-slate-300 text-3xl"></i>
+          }
         </div>
-        
-        <!-- Doctor Details -->
+
+        <!-- Doctor & patient details -->
         <div class="flex-1 text-center sm:text-left">
           <div class="flex items-center justify-center sm:justify-start gap-2 mb-1">
-            <h4 class="text-slate-800 font-bold text-sm">{{ agoraDetailsPatient?.doctor?.name || 'غير متاح' }}</h4>
-            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-600 gap-0.5">
-              {{ agoraDetailsPatient?.doctor?.rating || 0 }} <i class="fa-solid fa-star text-[8px]"></i>
-            </span>
+            <h4 class="text-slate-800 font-bold text-sm">
+              {{ meetingReport?.doctorName || agoraDetailsPatient?.doctor?.name || 'غير متاح' }}
+            </h4>
           </div>
-          <p class="text-slate-500 text-xs font-semibold mb-1.5">{{ agoraDetailsPatient?.doctor?.speciality || 'غير متاح' }}</p>
-          <p class="text-slate-400 text-[10px] font-medium mb-2">(Number of Consultations: {{ agoraDetailsPatient?.doctor?.consultations || 0 }})</p>
-          <p class="text-slate-600 text-xs font-semibold">
-            Medical Practice License Number: <span class="text-[#007BBD] font-bold">{{ agoraDetailsPatient?.doctor?.licenseNumber || 'غير متاح' }}</span>
+          <p class="text-slate-500 text-xs font-semibold mb-1.5">
+            {{ meetingReport?.doctorSpecialty || agoraDetailsPatient?.doctor?.subspecialty || 'غير متاح' }}
           </p>
+          <p class="text-slate-600 text-xs font-semibold">
+            اسم المريض:
+            <span class="text-[#007BBD] font-bold">
+              {{ meetingReport?.patientName || agoraDetailsPatient?.patient?.name || 'غير متاح' }}
+            </span>
+          </p>
+          <p class="text-slate-400 text-[11px] font-medium mt-1">امسح الكود لفتح المستند من أي جهاز</p>
         </div>
       </div>
 
@@ -320,12 +328,15 @@
 
       <!-- Buttons Panel -->
       <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-slate-100">
-        <button (click)="downloadPrescription()" class="w-full ts-btn-primary flex items-center justify-center gap-2">
-          <i class="fa-solid fa-download"></i>
-          Download
-          @if(currentSection === 0){ Lab Analyses }
-          @if(currentSection === 1){ Radiology }
-          @if(currentSection === 2){ Prescription }
+        <button (click)="downloadPrescription()" [disabled]="isDownloading"
+          class="w-full ts-btn-primary flex items-center justify-center gap-2">
+          <i [class]="isDownloading ? 'fa-solid fa-circle-notch fa-spin' : 'fa-solid fa-file-pdf'"></i>
+          {{ isDownloading ? 'جاري تجهيز الملف…' : 'تحميل PDF' }}
+          @if(!isDownloading){
+            @if(currentSection === 0){ — التحاليل }
+            @if(currentSection === 1){ — الأشعة }
+            @if(currentSection === 2){ — الروشتة }
+          }
         </button>
         
         <button (click)="exitMeeting()" class="w-full bg-slate-700 hover:bg-slate-800 text-white flex items-center justify-center gap-2 py-3 rounded-full text-sm font-bold transition-all duration-200 shadow-2xs cursor-pointer">
