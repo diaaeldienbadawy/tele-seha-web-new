@@ -8,6 +8,7 @@ import { PopupUploadComponent } from '../popup-upload/popup-upload.component';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { TranslateModule } from '@ngx-translate/core';
+import { exportReportToPdf } from '../../../../shared/utils/pdf-exporter';
 
 @Component({
   selector: 'app-patient-report-lab-tests-section',
@@ -157,28 +158,9 @@ export class PatientReportLabTestsSectionComponent implements OnInit {
     // this.service.uploadFiles(formData).subscribe(...)
   }
 
-  downloadPDF() {
-    const DATA = document.getElementById('labTestContent');
-
-    if (!DATA) return;
-
-    html2canvas(DATA, {
-      scale: 2,
-      useCORS: true,
-    }).then((canvas) => {
-      const imgWidth = 210;
-      const pageHeight = 295;
-
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-      const contentDataURL = canvas.toDataURL('image/png');
-
-      const pdf = new jsPDF('p', 'mm', 'a4');
-
-      pdf.addImage(contentDataURL, 'PNG', 0, 0, imgWidth, imgHeight);
-
-      pdf.save('LabTest.pdf');
-    });
+  async downloadPDF() {
+    const filename = `LabTest_LAB-${this.labTest?.id || 'Request'}.pdf`;
+    await exportReportToPdf('labTestContent', filename);
   }
 
   showPopupUpload(id: number) {

@@ -41,4 +41,12 @@ export class RecentAppointmentsService {
       {},
     );
   }
+
+  cancelAppointment(appointmentId: number): Observable<any> {
+    return this.http.post<any>(
+      `${Environment.apiUrl}/api/appointment/cancel/${appointmentId}`,
+      {},
+    );
+  }
 }
+

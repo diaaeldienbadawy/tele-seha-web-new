@@ -13,10 +13,11 @@ import { SessionStateService } from '../../../../shared/services/session-state.s
 import { ToastrService } from 'ngx-toastr';
 import { TranslateModule } from '@ngx-translate/core';
 import { NotificationService } from '../../../patient/service/notification.service';
+import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-patient-all-resent-section',
-  imports: [CommonModule, RouterLink, FormsModule, TranslateModule],
+  imports: [CommonModule, RouterLink, FormsModule, TranslateModule, ConfirmDialogComponent],
   templateUrl: './patient-all-resent-section.component.html',
   styleUrl: './patient-all-resent-section.component.css',
 })
@@ -31,6 +32,11 @@ export class PatientAllResentSectionComponent implements OnInit {
 
   showPopupRating: boolean = false;
   showPopupChatAI: boolean = false;
+
+  // إلغاء الحجز
+  showCancelModal: boolean = false;
+  appointmentToCancelId: number | null = null;
+  cancelingAppointment: boolean = false;
 
   // الحجز اللي مستني المريض يجاوب على نسبة التحسن قبل ما يدخل مكالمته.
   pendingSession: any = null;
@@ -138,6 +144,50 @@ export class PatientAllResentSectionComponent implements OnInit {
       status === PatientAppointmentStatus.Completed ||
       status === PatientAppointmentStatus.Canceled
     );
+  }
+
+  canCancel(status: PatientAppointmentStatus | string): boolean {
+    return (
+      status !== PatientAppointmentStatus.Started &&
+      status !== PatientAppointmentStatus.Completed &&
+      status !== PatientAppointmentStatus.Canceled &&
+      status !== 'Started' &&
+      status !== 'Completed' &&
+      status !== 'Canceled'
+    );
+  }
+
+  openCancelModal(appointmentId: number) {
+    this.appointmentToCancelId = appointmentId;
+    this.showCancelModal = true;
+  }
+
+  closeCancelModal() {
+    this.showCancelModal = false;
+    this.appointmentToCancelId = null;
+    this.cancelingAppointment = false;
+  }
+
+  confirmCancel() {
+    if (!this.appointmentToCancelId || this.cancelingAppointment) return;
+    this.cancelingAppointment = true;
+
+    this.recentAppointmentService.cancelAppointment(this.appointmentToCancelId).subscribe({
+      next: () => {
+        this.cancelingAppointment = false;
+        this.toaster.success('تم إلغاء الحجز بنجاح.');
+        this.closeCancelModal();
+        this.loadAppointmentComming();
+      },
+      error: (err) => {
+        this.cancelingAppointment = false;
+        const apiError = err?.error;
+        this.toaster.error(
+          apiError?.message ||
+            (typeof apiError === 'string' && apiError ? apiError : 'تعذر إلغاء الحجز.'),
+        );
+      },
+    });
   }
 
   handleButtonClick(item: any) {

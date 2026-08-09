@@ -8,6 +8,7 @@ import { NotificationService } from '../../service/notification.service';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { TranslateModule } from '@ngx-translate/core';
+import { exportReportToPdf } from '../../../../shared/utils/pdf-exporter';
 
 @Component({
   selector: 'app-patient-report-radiology-section',
@@ -149,28 +150,9 @@ export class PatientReportRadiologySectionComponent implements OnInit {
     });
   }
 
-  downloadPDF() {
-    const DATA = document.getElementById('radiologyContent');
-
-    if (!DATA) return;
-
-    html2canvas(DATA, {
-      scale: 2,
-      useCORS: true,
-    }).then((canvas) => {
-      const imgWidth = 210;
-      const pageHeight = 295;
-
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-      const contentDataURL = canvas.toDataURL('image/png');
-
-      const pdf = new jsPDF('p', 'mm', 'a4');
-
-      pdf.addImage(contentDataURL, 'PNG', 0, 0, imgWidth, imgHeight);
-
-      pdf.save('Radiology.pdf');
-    });
+  async downloadPDF() {
+    const filename = `Radiology_RAD-${this.radiology?.id || 'Request'}.pdf`;
+    await exportReportToPdf('radiologyContent', filename);
   }
 
   showPopupUpload(id: number) {

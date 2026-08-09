@@ -250,51 +250,54 @@
               @if(currentSection === 1){ RAD-{{ meetingReport?.radiologicalExaminationRequest?.id || '—' }} }
               @if(currentSection === 2){ RX-{{ meetingReport?.prescription?.id || '—' }} }
             </p>
+            @if (meetingReport?.createdAt || agoraDetailsPatient?.checkUpDate) {
+            <span class="rpt-pdf-date">{{ (meetingReport?.createdAt || agoraDetailsPatient?.checkUpDate) | date: 'dd/MM/yyyy - hh:mm a' }}</span>
+            }
           </div>
         </div>
 
         <div class="rpt-pdf-divider"></div>
 
         <!-- Doctor & Patient Info Panel -->
-        <div class="rpt-parties mb-4">
+        <div class="rpt-parties">
           <div>
             <span class="rpt-label">الطبيب المعالج / Doctor</span>
             <div class="rpt-doc-name">
-              <span>{{ agoraDetailsPatient?.doctor?.name || 'غير متاح' }}</span>
+              <span>{{ agoraDetailsPatient?.doctor?.name || meetingReport?.doctorName || 'غير متاح' }}</span>
               @if (agoraDetailsPatient?.doctor?.rating) {
               <span class="rpt-star"><i class="fa-solid fa-star"></i> {{ agoraDetailsPatient.doctor.rating }}</span>
               }
             </div>
-            <p class="rpt-muted">{{ agoraDetailsPatient?.doctor?.speciality || 'تخصص عام' }}</p>
+            <p class="rpt-muted">{{ agoraDetailsPatient?.doctor?.speciality || meetingReport?.doctorSpecialty || 'تخصص عام' }}</p>
             @if (agoraDetailsPatient?.doctor?.licenseNumber) {
             <p class="text-[11px] text-slate-500 font-semibold mt-1">ترخيص: <span class="text-[#007BBD] font-bold">{{ agoraDetailsPatient.doctor.licenseNumber }}</span></p>
             }
           </div>
           <div class="rpt-patient">
             <span class="rpt-label">المريض / Patient</span>
-            <p class="rpt-strong">{{ agoraDetailsPatient?.patientName || 'اسم المريض غير متاح' }}</p>
+            <p class="rpt-strong">{{ agoraDetailsPatient?.patientName || meetingReport?.patientName || 'اسم المريض غير متاح' }}</p>
+            @if (meetingReport?.createdAt || agoraDetailsPatient?.checkUpDate) {
+            <p class="rpt-muted">تاريخ الكشف: {{ (meetingReport?.createdAt || agoraDetailsPatient?.checkUpDate) | date: 'dd/MM/yyyy' }}</p>
+            }
           </div>
         </div>
 
         <!-- Section Content Requests Card -->
-        <div class="mb-4 text-left">
+        <div class="rpt-section">
           @if(currentSection === 0){
           <!-- Lab Analyses -->
           <div>
-            <h4 class="text-[#0068A1] text-sm font-bold mb-3 flex items-center gap-2">
-              <i class="fa-solid fa-flask-vial"></i> Lab Analysis Requests
+            <h4 class="rpt-h">
+              <span class="rpt-bar"></span> طلب تحاليل طبية / Lab Analysis Requests
             </h4>
-            <div *ngIf="meetingReport?.labAnalysisRequest?.labAnalyses?.length; else labNotFound" class="space-y-2">
-              <div *ngFor="let lab of meetingReport.labAnalysisRequest.labAnalyses" class="p-3 bg-slate-50 border border-slate-100 rounded-xl">
-                <p class="text-slate-800 font-bold text-sm mb-1">{{ lab.name }}</p>
-                <p class="text-slate-400 text-xs font-medium"><i class="fa-regular fa-comment-dots text-slate-300 mr-1"></i>{{ lab.notes || 'No Notes' }}</p>
+            <div *ngIf="meetingReport?.labAnalysisRequest?.labAnalyses?.length; else labNotFound" class="rpt-grid">
+              <div *ngFor="let lab of meetingReport.labAnalysisRequest.labAnalyses" class="rpt-item">
+                <h5><i class="fa-solid fa-flask-vial text-[#007bbd] mr-1.5"></i>{{ lab.name }}</h5>
+                <p><i class="fa-regular fa-comment-dots mr-1"></i>الملاحظات: {{ lab.notes || 'لا يوجد ملاحظات' }}</p>
               </div>
             </div>
             <ng-template #labNotFound>
-              <div class="ts-empty-state">
-                <i class="fa-solid fa-flask-vial"></i>
-                <p>الدكتور لم يكتب شيئاً هنا</p>
-              </div>
+              <p class="rpt-empty">الدكتور لم يكتب شيئاً هنا</p>
             </ng-template>
           </div>
           }
@@ -302,20 +305,17 @@
           @if(currentSection === 1){
           <!-- Radiological Examinations -->
           <div>
-            <h4 class="text-[#0068A1] text-sm font-bold mb-3 flex items-center gap-2">
-              <i class="fa-solid fa-x-ray"></i> Radiological Examinations
+            <h4 class="rpt-h">
+              <span class="rpt-bar"></span> طلب أشعة تشخيصية / Radiological Examinations
             </h4>
-            <div *ngIf="meetingReport?.radiologicalExaminationRequest?.radiologicalExaminations?.length; else radiologyNotFound" class="space-y-2">
-              <div *ngFor="let rad of meetingReport.radiologicalExaminationRequest.radiologicalExaminations" class="p-3 bg-slate-50 border border-slate-100 rounded-xl">
-                <p class="text-slate-800 font-bold text-sm mb-1">{{ rad.name }}</p>
-                <p class="text-slate-400 text-xs font-medium"><i class="fa-regular fa-comment-dots text-slate-300 mr-1"></i>{{ rad.notes || 'No Notes' }}</p>
+            <div *ngIf="meetingReport?.radiologicalExaminationRequest?.radiologicalExaminations?.length; else radiologyNotFound" class="rpt-grid">
+              <div *ngFor="let rad of meetingReport.radiologicalExaminationRequest.radiologicalExaminations" class="rpt-item">
+                <h5><i class="fa-solid fa-x-ray text-[#007bbd] mr-1.5"></i>{{ rad.name }}</h5>
+                <p><i class="fa-regular fa-comment-dots mr-1"></i>الملاحظات: {{ rad.notes || rad.position || 'لا يوجد ملاحظات' }}</p>
               </div>
             </div>
             <ng-template #radiologyNotFound>
-              <div class="ts-empty-state">
-                <i class="fa-solid fa-x-ray"></i>
-                <p>الدكتور لم يكتب شيئاً هنا</p>
-              </div>
+              <p class="rpt-empty">الدكتور لم يكتب شيئاً هنا</p>
             </ng-template>
           </div>
           }
@@ -323,20 +323,17 @@
           @if(currentSection === 2){
           <!-- Prescription Medicines -->
           <div>
-            <h4 class="text-[#0068A1] text-sm font-bold mb-3 flex items-center gap-2">
-              <i class="fa-solid fa-pills"></i> Prescription
+            <h4 class="rpt-h">
+              <span class="rpt-bar"></span> Rx / روشتة طبية - Medical Prescription
             </h4>
-            <div *ngIf="meetingReport?.prescription?.medicines?.length; else prescriptionNotFound" class="space-y-2">
-              <div *ngFor="let med of meetingReport.prescription.medicines" class="p-3 bg-slate-50 border border-slate-100 rounded-xl">
-                <p class="text-slate-800 font-bold text-sm mb-1">{{ med.name }}</p>
-                <p class="text-slate-400 text-xs font-medium"><i class="fa-solid fa-hand-holding-medical text-slate-300 mr-1"></i>Instructions: {{ med.instructions }}</p>
+            <div *ngIf="meetingReport?.prescription?.medicines?.length; else prescriptionNotFound" class="rpt-grid">
+              <div *ngFor="let med of meetingReport.prescription.medicines" class="rpt-item">
+                <h5><i class="fa-solid fa-pills text-[#007bbd] mr-1.5"></i>{{ med.name }}</h5>
+                <p><i class="fa-solid fa-clock-rotate-left mr-1"></i>التعليمات: {{ med.instructions }}</p>
               </div>
             </div>
             <ng-template #prescriptionNotFound>
-              <div class="ts-empty-state">
-                <i class="fa-solid fa-pills"></i>
-                <p>الدكتور لم يكتب شيئاً هنا</p>
-              </div>
+              <p class="rpt-empty">الدكتور لم يكتب شيئاً هنا</p>
             </ng-template>
           </div>
           }
@@ -349,7 +346,7 @@
               <img src="assets/images/2048px-QR_Code_Model_1_Example 1.png" class="rpt-pdf-qr-img" alt="QR Verification" />
               <div>
                 <p class="text-xs font-bold text-slate-700 m-0">رمز التوثيق الإلكتروني</p>
-                <p class="text-[10px] text-slate-400 m-0">امسح الكود للتحقق من التقرير</p>
+                <p class="text-[10px] text-slate-400 m-0">امسح الكود للتحقق من صحة الوثيقة</p>
               </div>
             </div>
             <div class="rpt-pdf-stamp">

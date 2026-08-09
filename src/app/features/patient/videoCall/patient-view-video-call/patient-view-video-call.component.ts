@@ -14,6 +14,7 @@ import { LocalstorageService } from '../../../../core/services/localstorage.serv
 import { ToastrService } from 'ngx-toastr';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import { exportReportToPdf } from '../../../../shared/utils/pdf-exporter';
 
 @Component({
   selector: 'app-patient-view-video-call',
@@ -170,31 +171,17 @@ export class PatientViewVideoCallComponent implements OnInit {
     this.router.navigate(['/patient/home']);
   }
 
-  downloadPrescription() {
-    const DATA = document.getElementById('videoCallReportContent');
-    if (!DATA) return;
+  async downloadPrescription() {
+    let filename = 'teleSEHA_Report.pdf';
+    if (this.currentSection === 0) {
+      filename = `LabTest_LAB-${this.meetingReport?.labAnalysisRequest?.id || 'Request'}.pdf`;
+    } else if (this.currentSection === 1) {
+      filename = `Radiology_RAD-${this.meetingReport?.radiologicalExaminationRequest?.id || 'Request'}.pdf`;
+    } else if (this.currentSection === 2) {
+      filename = `Prescription_RX-${this.meetingReport?.prescription?.id || 'Rx'}.pdf`;
+    }
 
-    html2canvas(DATA, {
-      scale: 2,
-      useCORS: true,
-    }).then((canvas) => {
-      const imgWidth = 210;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      const contentDataURL = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      pdf.addImage(contentDataURL, 'PNG', 0, 0, imgWidth, imgHeight);
-
-      let filename = 'teleSEHA_Report.pdf';
-      if (this.currentSection === 0) {
-        filename = `LabTest_LAB-${this.meetingReport?.labAnalysisRequest?.id || 'Request'}.pdf`;
-      } else if (this.currentSection === 1) {
-        filename = `Radiology_RAD-${this.meetingReport?.radiologicalExaminationRequest?.id || 'Request'}.pdf`;
-      } else if (this.currentSection === 2) {
-        filename = `Prescription_RX-${this.meetingReport?.prescription?.id || 'Rx'}.pdf`;
-      }
-
-      pdf.save(filename);
-    });
+    await exportReportToPdf('videoCallReportContent', filename);
   }
 
   generatePrescriptionText(): string {

@@ -247,7 +247,11 @@
     "answerInputPlaceholder": "Write your answer...",
     "yes": "Yes",
     "no": "No",
-    "conditionTitle": "Your Medical Condition"
+    "conditionTitle": "Your Medical Condition",
+    "cancelBooking": "Cancel Booking",
+    "confirmCancelTitle": "Confirm Cancellation",
+    "confirmCancelMessage": "Are you sure you want to cancel this booking?",
+    "cancelSuccess": "Booking canceled successfully."
   },
   "waitingSession": {
     "title": "Waiting Room",

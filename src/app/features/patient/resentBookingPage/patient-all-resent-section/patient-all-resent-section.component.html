@@ -108,6 +108,17 @@
             >
               {{ getButtonText(item.status) | translate }}
             </button>
+
+            @if(canCancel(item.status)){
+            <button
+              type="button"
+              (click)="openCancelModal(item.id)"
+              class="w-full md:w-auto md:min-w-[12rem] px-6 py-2 rounded-full text-xs sm:text-sm font-semibold text-rose-600 border border-rose-200 hover:bg-rose-50 transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-1.5"
+            >
+              <i class="fa-regular fa-calendar-xmark text-xs"></i>
+              {{ 'patientBooking.cancelBooking' | translate }}
+            </button>
+            }
           </div>
         </div>
 
@@ -389,3 +400,16 @@
   </div>
 </div>
 }
+
+<!-- Cancel Appointment Confirmation Modal -->
+<app-confirm-dialog
+  [visible]="showCancelModal"
+  [title]="'patientBooking.confirmCancelTitle' | translate"
+  [message]="'patientBooking.confirmCancelMessage' | translate"
+  [confirmText]="'patientBooking.cancelBooking' | translate"
+  [cancelText]="'cancel' | translate"
+  [isDanger]="true"
+  (onConfirm)="confirmCancel()"
+  (onCancel)="closeCancelModal()"
+></app-confirm-dialog>
+

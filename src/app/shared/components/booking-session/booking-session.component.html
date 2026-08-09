@@ -175,6 +175,17 @@
           {{ getPostBookingButtonText() | translate }}
         </button>
 
+        @if(canCancelPostBooking()){
+        <button 
+          type="button"
+          (click)="openCancelModal()"
+          class="text-rose-500 hover:text-rose-700 text-sm font-semibold transition-colors cursor-pointer flex items-center gap-1.5"
+        >
+          <i class="fa-regular fa-calendar-xmark text-xs"></i>
+          {{ 'patientBooking.cancelBooking' | translate }}
+        </button>
+        }
+
         <!-- Continue Later link -->
         <button 
           (click)="closeModal()"
@@ -368,3 +379,16 @@
   </div>
 </div>
 }
+
+<!-- Cancel Appointment Confirmation Modal -->
+<app-confirm-dialog
+  [visible]="showCancelModal"
+  [title]="'patientBooking.confirmCancelTitle' | translate"
+  [message]="'patientBooking.confirmCancelMessage' | translate"
+  [confirmText]="'patientBooking.cancelBooking' | translate"
+  [cancelText]="'cancel' | translate"
+  [isDanger]="true"
+  (onConfirm)="confirmCancelBooking()"
+  (onCancel)="closeCancelModal()"
+></app-confirm-dialog>
+

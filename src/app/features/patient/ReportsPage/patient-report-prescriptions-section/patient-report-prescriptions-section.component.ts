@@ -7,6 +7,7 @@ import { NotificationService } from '../../service/notification.service';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { TranslateModule } from '@ngx-translate/core';
+import { exportReportToPdf } from '../../../../shared/utils/pdf-exporter';
 
 @Component({
   selector: 'app-patient-report-prescriptions-section',
@@ -78,28 +79,9 @@ export class PatientReportPrescriptionsSectionComponent implements OnInit {
     this.showPopupPrescription = true;
   }
 
-  downloadPDF() {
-    const DATA = document.getElementById('prescriptionContent');
-
-    if (!DATA) return;
-
-    html2canvas(DATA, {
-      scale: 2,
-      useCORS: true,
-    }).then((canvas) => {
-      const imgWidth = 210;
-      const pageHeight = 295;
-
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-      const contentDataURL = canvas.toDataURL('image/png');
-
-      const pdf = new jsPDF('p', 'mm', 'a4');
-
-      pdf.addImage(contentDataURL, 'PNG', 0, 0, imgWidth, imgHeight);
-
-      pdf.save('Prescription.pdf');
-    });
+  async downloadPDF() {
+    const filename = `Prescription_RX-${this.medicines?.id || 'Rx'}.pdf`;
+    await exportReportToPdf('prescriptionContent', filename);
   }
 
   closePopupPrescription() {

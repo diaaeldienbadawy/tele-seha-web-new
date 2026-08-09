@@ -247,7 +247,11 @@
     "answerInputPlaceholder": "اكتب إجابتك...",
     "yes": "نعم",
     "no": "لا",
-    "conditionTitle": "حالتك المرضية"
+    "conditionTitle": "حالتك المرضية",
+    "cancelBooking": "إلغاء الحجز",
+    "confirmCancelTitle": "تأكيد إلغاء الحجز",
+    "confirmCancelMessage": "هل أنت تأكد من رغبتك في إلغاء هذا الحجز؟",
+    "cancelSuccess": "تم إلغاء الحجز بنجاح."
   },
   "waitingSession": {
     "title": "غرفة الانتظار",

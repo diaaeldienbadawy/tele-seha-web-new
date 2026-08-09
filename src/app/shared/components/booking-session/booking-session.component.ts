@@ -21,10 +21,11 @@ import { PatientAppointmentStatus } from '../../../core/enum/patientAppointmentS
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { FormsModule } from '@angular/forms';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-booking-session',
-  imports: [CommonModule, TranslateModule, FormsModule],
+  imports: [CommonModule, TranslateModule, FormsModule, ConfirmDialogComponent],
   templateUrl: './booking-session.component.html',
   styleUrl: './booking-session.component.css',
 })
@@ -358,12 +359,61 @@ export class BookingSessionComponent implements OnChanges {
     }
   }
 
+  showCancelModal: boolean = false;
+  cancelingBooking: boolean = false;
+
+  canCancelPostBooking(): boolean {
+    if (!this.activeBooking) return false;
+    const status = this.activeBooking.status;
+    return (
+      status !== PatientAppointmentStatus.Started &&
+      status !== PatientAppointmentStatus.Completed &&
+      status !== PatientAppointmentStatus.Canceled &&
+      status !== 'Started' &&
+      status !== 'Completed' &&
+      status !== 'Canceled'
+    );
+  }
+
+  openCancelModal() {
+    this.showCancelModal = true;
+  }
+
+  closeCancelModal() {
+    this.showCancelModal = false;
+    this.cancelingBooking = false;
+  }
+
+  confirmCancelBooking() {
+    if (!this.activeBooking?.id || this.cancelingBooking) return;
+    this.cancelingBooking = true;
+
+    this.recentAppointmentService.cancelAppointment(this.activeBooking.id).subscribe({
+      next: () => {
+        this.cancelingBooking = false;
+        this.toastr.success('تم إلغاء الحجز بنجاح.');
+        this.closeCancelModal();
+        this.closeModal();
+      },
+      error: (err) => {
+        this.cancelingBooking = false;
+        const apiError = err?.error;
+        this.toastr.error(
+          apiError?.message ||
+            (typeof apiError === 'string' && apiError ? apiError : 'تعذر إلغاء الحجز.'),
+        );
+      },
+    });
+  }
+
   closeModal() {
     this.close.emit();
     this.selectedSessionId = null;
     this.selectedDate = null;
     this.bookingCompleted = false;
     this.activeBooking = null;
+    this.showCancelModal = false;
+    this.cancelingBooking = false;
     this.resetChatAI();
   }
 
